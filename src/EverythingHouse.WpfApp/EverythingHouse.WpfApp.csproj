@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="WPF-UI" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Servcies\" />
+    <Folder Include="Assets\" />
+    <Folder Include="Styles\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <Import Project="..\EverythingHouse.Shared\EverythingHouse.Shared.projitems" Label="Shared" />
+
+</Project>

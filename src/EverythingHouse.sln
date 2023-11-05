@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EverythingHouse.WpfApp", "EverythingHouse.WpfApp\EverythingHouse.WpfApp.csproj", "{9144CBC3-BA5E-4F0D-B40D-5A1F7C04A30F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EverythingHouse.Api", "EverythingHouse.Api\EverythingHouse.Api.csproj", "{B7D7619B-AD9F-408C-B27D-208A871E1AD6}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EverythingHouse.Shared", "EverythingHouse.Shared\EverythingHouse.Shared.shproj", "{65C5F769-72FF-4E8F-A9D0-3A42CF2905F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9144CBC3-BA5E-4F0D-B40D-5A1F7C04A30F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9144CBC3-BA5E-4F0D-B40D-5A1F7C04A30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9144CBC3-BA5E-4F0D-B40D-5A1F7C04A30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9144CBC3-BA5E-4F0D-B40D-5A1F7C04A30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7D7619B-AD9F-408C-B27D-208A871E1AD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7D7619B-AD9F-408C-B27D-208A871E1AD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7D7619B-AD9F-408C-B27D-208A871E1AD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7D7619B-AD9F-408C-B27D-208A871E1AD6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0D7F431D-84F5-45C8-9633-2C597F0CA423}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		EverythingHouse.Shared\EverythingHouse.Shared.projitems*{65c5f769-72ff-4e8f-a9d0-3a42cf2905f9}*SharedItemsImports = 13
+		EverythingHouse.Shared\EverythingHouse.Shared.projitems*{9144cbc3-ba5e-4f0d-b40d-5a1f7c04a30f}*SharedItemsImports = 5
+		EverythingHouse.Shared\EverythingHouse.Shared.projitems*{b7d7619b-ad9f-408c-b27d-208a871e1ad6}*SharedItemsImports = 5
+	EndGlobalSection
+EndGlobal
