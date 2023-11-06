@@ -17,23 +17,16 @@
     WindowBackdropType="Acrylic"
     mc:Ignorable="d">
     <ui:UiWindow.Resources>
-        <!--<Style
-            x:Key="NavigationUiButtonStyle"
-            BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
-            TargetType="ui:Button">
-            <Setter Property="FontSize" Value="{StaticResource LargeFontSize}" />
-            <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}" />
-            <Setter Property="Width" Value="Auto" />
-        </Style>-->
         <Style
             x:Key="MenuUiButtonStyle"
             BasedOn="{StaticResource {x:Type ui:Button}}"
             TargetType="ui:Button">
-            <Setter Property="Height" Value="47" />
+            <Setter Property="Height" Value="45" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Margin" Value="0,10,0,0" />
         </Style>
     </ui:UiWindow.Resources>
     <Grid>
@@ -50,9 +43,9 @@
             <Border
                 x:Name="MenuPanel"
                 Width="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MinWidth, Mode=OneTime}"
-                MinWidth="57"
+                MinWidth="66"
                 MaxWidth="250"
-                Padding="5,5,4,5">
+                Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -61,16 +54,15 @@
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="1" Orientation="Vertical">
                         <ui:Button
-                            HorizontalAlignment="Left"
+                            Margin="0"
+                            HorizontalAlignment="Right"
+                            HorizontalContentAlignment="Center"
                             Click="OnExpandButtonClicked"
-                            Style="{StaticResource MenuUiButtonStyle}">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon FontSize="{StaticResource LargeFontSize}" Symbol="LineHorizontal320" />
-                            </StackPanel>
-                        </ui:Button>
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="LineHorizontal320"
+                            Style="{StaticResource MenuUiButtonStyle}" />
                         <ui:Button
                             x:Name="HomeButton"
-                            Margin="0,5,0,0"
                             Click="OnNavigateButtonClicked"
                             Style="{StaticResource MenuUiButtonStyle}">
                             <StackPanel Orientation="Horizontal">
@@ -79,14 +71,13 @@
                                     FontSize="{StaticResource LargeFontSize}"
                                     Symbol="Home24" />
                                 <TextBlock
-                                    Margin="5,0,0,0"
+                                    Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
                                     Text="首页" />
                             </StackPanel>
                         </ui:Button>
                         <ui:Button
                             x:Name="PersonButton"
-                            Margin="0,5,0,0"
                             Click="OnNavigateButtonClicked"
                             Style="{StaticResource MenuUiButtonStyle}">
                             <StackPanel Orientation="Horizontal">
@@ -95,7 +86,7 @@
                                     FontSize="{StaticResource LargeFontSize}"
                                     Symbol="Person24" />
                                 <TextBlock
-                                    Margin="5,0,0,0"
+                                    Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
                                     Text="个人中心" />
                             </StackPanel>
@@ -110,14 +101,13 @@
                                     FontSize="{StaticResource LargeFontSize}"
                                     Symbol="WeatherMoon24" />
                                 <TextBlock
-                                    Margin="5,0,0,0"
+                                    Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
                                     Text="切换主题" />
                             </StackPanel>
                         </ui:Button>
                         <ui:Button
                             x:Name="SettingsButton"
-                            Margin="0,5,0,0"
                             Click="OnNavigateButtonClicked"
                             Style="{StaticResource MenuUiButtonStyle}">
                             <StackPanel Orientation="Horizontal">
@@ -126,7 +116,7 @@
                                     FontSize="{StaticResource LargeFontSize}"
                                     Symbol="Settings24" />
                                 <TextBlock
-                                    Margin="5,0,0,0"
+                                    Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
                                     Text="设置" />
                             </StackPanel>

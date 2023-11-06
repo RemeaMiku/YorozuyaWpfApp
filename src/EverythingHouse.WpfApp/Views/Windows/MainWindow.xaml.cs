@@ -77,7 +77,7 @@ public partial class MainWindow : UiWindow
         if (oldPage == newPage)
             return;
         var duration = TimeSpan.FromSeconds(0.2);
-        var easingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut };
+        var easingFunction = new QuarticEase { EasingMode = EasingMode.EaseInOut };
         var slideDistance = 500;
         var sign = Math.Sign(newIndex - oldIndex);
         if (oldPage is not null)
@@ -89,8 +89,8 @@ public partial class MainWindow : UiWindow
 
     void OnExpandButtonClicked(object sender, RoutedEventArgs e)
     {
-        var duration = TimeSpan.FromSeconds(0.2);
-        var easingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut };
+        var duration = TimeSpan.FromSeconds(0.4);
+        var easingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut };
         if (MenuPanel.Width == MenuPanel.MinWidth)
             MenuPanel.BeginAnimation(WidthProperty, new DoubleAnimation(MenuPanel.MaxWidth, duration) { EasingFunction = easingFunction });
         else
