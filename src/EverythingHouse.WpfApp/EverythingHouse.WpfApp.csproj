@@ -14,10 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common\Converters\" />
     <Folder Include="Servcies\" />
     <Folder Include="Assets\" />
-    <Folder Include="Styles\" />
-    <Folder Include="Extensions\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\Pages\PersonPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <Import Project="..\EverythingHouse.Shared\EverythingHouse.Shared.projitems" Label="Shared" />

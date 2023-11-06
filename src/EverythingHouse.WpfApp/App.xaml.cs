@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using EverythingHouse.WpfApp.Views.Pages;
+using EverythingHouse.WpfApp.Views.Windows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EverythingHouse.WpfApp;
@@ -14,6 +16,9 @@ public partial class App : Application
 
     // IoC容器
     public IServiceProvider ServiceProvider { get; private set; } = new ServiceCollection()
+        .AddSingleton<HomePage>()
+        .AddSingleton<PersonPage>()
+        .AddSingleton<SettingsPage>()
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
 
