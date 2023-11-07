@@ -12,17 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using EverythingHouse.WpfApp.ViewModels.Pages;
 
-namespace EverythingHouse.WpfApp.Views.Pages
+namespace EverythingHouse.WpfApp.Views.Pages;
+
+/// <summary>
+/// SettingsPage.xaml 的交互逻辑
+/// </summary>
+public partial class SettingsPage : Page, IHasViewModel<SettingsPageViewModel>
 {
-    /// <summary>
-    /// SettingsPage.xaml 的交互逻辑
-    /// </summary>
-    public partial class SettingsPage : Page
+    public SettingsPage(SettingsPageViewModel viewModel)
     {
-        public SettingsPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        ViewModel = viewModel;
     }
+
+    public SettingsPageViewModel ViewModel { get; }
 }

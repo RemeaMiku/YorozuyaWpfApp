@@ -7,11 +7,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Mode=OneTime}"
     mc:Ignorable="d">
     <Grid d:Background="White">
         <TextBlock
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
+            Style="{StaticResource DynamicForegroundTextBlock}"
             Text="SettingsPage" />
     </Grid>
 </Page>

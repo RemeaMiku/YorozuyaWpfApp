@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using EverythingHouse.WpfApp.ViewModels.Pages;
+using EverythingHouse.WpfApp.ViewModels.Windows;
 using EverythingHouse.WpfApp.Views.Pages;
 using EverythingHouse.WpfApp.Views.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +18,15 @@ public partial class App : Application
 
     // IoC容器
     public IServiceProvider ServiceProvider { get; private set; } = new ServiceCollection()
+        .AddSingleton<HomePageViewModel>()
+        .AddSingleton<PersonPageViewModel>()
+        .AddSingleton<SettingsPageViewModel>()
+        .AddSingleton<QuestionWindowViewModel>()
+        .AddSingleton<MainWindowViewModel>()
         .AddSingleton<HomePage>()
         .AddSingleton<PersonPage>()
         .AddSingleton<SettingsPage>()
+        .AddSingleton<QuestionWindow>()
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
 
@@ -27,6 +35,7 @@ public partial class App : Application
     {
         // 从容器中获取MainWindow并显示
         ServiceProvider.GetRequiredService<MainWindow>().Show();
+        ServiceProvider.GetRequiredService<QuestionWindow>().Show();
     }
 
 }

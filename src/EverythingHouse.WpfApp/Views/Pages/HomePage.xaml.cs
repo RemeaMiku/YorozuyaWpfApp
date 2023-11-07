@@ -12,16 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using EverythingHouse.WpfApp.ViewModels.Pages;
 
 namespace EverythingHouse.WpfApp.Views.Pages;
 
 /// <summary>
 /// HomePage.xaml 的交互逻辑
 /// </summary>
-public partial class HomePage : Page
+public partial class HomePage : Page, IHasViewModel<HomePageViewModel>
 {
-    public HomePage()
+    public HomePage(HomePageViewModel viewModel)
     {
         InitializeComponent();
+        ViewModel = viewModel;
     }
+
+    public HomePageViewModel ViewModel { get; }
 }

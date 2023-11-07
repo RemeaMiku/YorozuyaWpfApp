@@ -1,0 +1,206 @@
+﻿<ui:UiWindow
+    x:Class="EverythingHouse.WpfApp.Views.Windows.QuestionWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:appearance="clr-namespace:Wpf.Ui.Appearance;assembly=Wpf.Ui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:EverythingHouse.WpfApp.Views.Windows"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="QuestionWindow"
+    Width="1000"
+    Height="560"
+    MinWidth="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Width, Mode=OneTime}"
+    MinHeight="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Height, Mode=OneTime}"
+    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Mode=OneTime}"
+    ExtendsContentIntoTitleBar="True"
+    WindowBackdropType="Acrylic"
+    mc:Ignorable="d">
+    <ui:UiWindow.Resources>
+        <Style
+            x:Key="TitleBarUiButtonStyle"
+            BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
+            TargetType="ui:Button">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="MouseOverBackground" Value="{Binding Path=ButtonsBackground, RelativeSource={RelativeSource AncestorType={x:Type ui:TitleBar}}}" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
+        </Style>
+    </ui:UiWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ui:TitleBar>
+            <ui:TitleBar.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button
+                        Width="Auto"
+                        Click="OnMainWindowButtonClicked"
+                        Content="回到主界面"
+                        Icon="Home24"
+                        MouseOverBackground="{StaticResource MikuGreenBrush}"
+                        Style="{StaticResource TitleBarUiButtonStyle}" />
+                    <ui:Button Icon="ArrowLeft24" Style="{StaticResource TitleBarUiButtonStyle}" />
+                    <ui:Button Icon="ArrowRight24" Style="{StaticResource TitleBarUiButtonStyle}" />
+                </StackPanel>
+            </ui:TitleBar.Header>
+        </ui:TitleBar>
+        <Border Grid.Row="1" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="200" />
+                    <ColumnDefinition Width="3*" MinWidth="300" />
+                </Grid.ColumnDefinitions>
+                <Border
+                    Padding="10"
+                    Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                    CornerRadius="5">
+                    <ListView>
+                        <ListView.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource {x:Type ListViewItem}}" TargetType="ListViewItem">
+                                <Setter Property="Height" Value="30" />
+                                <Setter Property="Padding" Value="10,0,0,0" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </Border>
+                <Grid Grid.Column="1" Margin="10,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ui:CardExpander
+                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                        Content="初音未来是第一个虚拟歌姬吗？"
+                        FontSize="{StaticResource MediumFontSize}">
+                        <ui:CardExpander.Header>
+                            <StackPanel Margin="5" Orientation="Vertical">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontSize="{StaticResource LargeFontSize}"
+                                    Text="初音未来是第一个虚拟歌姬吗？" />
+                                <WrapPanel Margin="0,5,0,0">
+                                    <Border
+                                        Padding="5"
+                                        BorderBrush="{StaticResource MeaBlueBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="3">
+                                        <TextBlock
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Foreground="{StaticResource MeaBlueBrush}"
+                                            Text="VOCALOID" />
+                                    </Border>
+                                </WrapPanel>
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                    </ui:CardExpander>
+                    <Border
+                        Grid.Row="1"
+                        Margin="0,10,0,0"
+                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                        CornerRadius="3">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border
+                                Padding="15,5,5,5"
+                                Background="{StaticResource MikuGreenBrush}"
+                                CornerRadius="3,3,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            FontSize="{StaticResource MediumFontSize}"
+                                            Foreground="White"
+                                            Text="发布于 2023.08.31 11:45:14" />
+                                        <TextBlock
+                                            Margin="10,0,0,0"
+                                            VerticalAlignment="Center"
+                                            FontWeight="Bold"
+                                            Foreground="White"
+                                            Text="- 此回答已被采纳" />
+                                        <ui:SymbolIcon
+                                            Margin="5,0,0,0"
+                                            FontSize="{StaticResource LargeFontSize}"
+                                            Foreground="White"
+                                            Symbol="CheckmarkStarburst24" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <ui:Button
+                                            Content="831"
+                                            FontSize="{StaticResource LargeFontSize}"
+                                            Foreground="White"
+                                            Icon="ThumbLike24">
+                                            <ui:Button.Style>
+                                                <Style BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}" TargetType="ui:Button">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Appearance" Value="Success" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:Button.Style>
+                                        </ui:Button>
+                                        <ui:Button
+                                            Margin="5,0,0,0"
+                                            Content="39"
+                                            FontSize="{StaticResource LargeFontSize}"
+                                            Foreground="White"
+                                            Icon="ThumbDislike24">
+                                            <ui:Button.Style>
+                                                <Style BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}" TargetType="ui:Button">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Appearance" Value="Danger" />
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:Button.Style>
+                                        </ui:Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Row="1" Padding="15">
+                                <TextBlock
+                                    VerticalAlignment="Top"
+                                    FontSize="{StaticResource MediumFontSize}"
+                                    Text="      不是。初音未来并不是第一个虚拟歌姬。实际上，第一个虚拟歌姬是名为Leon的角色，他是在2004年发售的VOCALOID的第一代产品1。然而，初音未来无疑是最具影响力的虚拟歌姬1。她的声源库实际上对应的已经是VOCALOID二代产品，就算是在初音的生父CRYPTON公司，早于初音未来诞生的也还有KAITO和MEIKO1。尽管如此，初音未来的影响力和知名度使她在许多人心中被视为虚拟歌姬的代表。"
+                                    TextWrapping="Wrap" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <StackPanel
+                        Grid.Row="2"
+                        Margin="0,10,0,0"
+                        Orientation="Horizontal">
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="ArrowUp24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="ArrowDown24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="Copy24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}" />
+                    </StackPanel>
+                </Grid>
+                <GridSplitter
+                    HorizontalAlignment="Right"
+                    BorderBrush="Transparent"
+                    BorderThickness="3" />
+            </Grid>
+        </Border>
+    </Grid>
+</ui:UiWindow>
