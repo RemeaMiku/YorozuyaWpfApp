@@ -6,9 +6,9 @@
     xmlns:local="clr-namespace:EverythingHouse.WpfApp.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance local:HomePage}"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}, Mode=OneTime}"
     mc:Ignorable="d">
     <Grid d:Background="White">
         <TextBlock

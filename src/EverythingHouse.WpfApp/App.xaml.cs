@@ -21,12 +21,12 @@ public partial class App : Application
         .AddSingleton<HomePageViewModel>()
         .AddSingleton<PersonPageViewModel>()
         .AddSingleton<SettingsPageViewModel>()
-        .AddSingleton<QuestionWindowViewModel>()
+        .AddSingleton<PostWindowViewModel>()
         .AddSingleton<MainWindowViewModel>()
         .AddSingleton<HomePage>()
         .AddSingleton<PersonPage>()
         .AddSingleton<SettingsPage>()
-        .AddSingleton<QuestionWindow>()
+        .AddSingleton<PostWindow>()
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
 
@@ -35,7 +35,7 @@ public partial class App : Application
     {
         // 从容器中获取MainWindow并显示
         ServiceProvider.GetRequiredService<MainWindow>().Show();
-        ServiceProvider.GetRequiredService<QuestionWindow>().Show();
+        ServiceProvider.GetRequiredService<PostWindow>().Show();
     }
 
 }

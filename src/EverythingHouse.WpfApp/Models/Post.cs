@@ -23,6 +23,9 @@ public class Post
     [JsonPropertyName("delTag")]
     public long DelTag { get; set; }
 
+    [JsonPropertyName("field")]
+    public string Field { get; set; } = null!;
+
     [JsonPropertyName("id")]
     public long Id { get; set; }
 

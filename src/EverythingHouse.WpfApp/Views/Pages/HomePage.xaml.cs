@@ -24,6 +24,7 @@ public partial class HomePage : Page
     public HomePage(HomePageViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = this;
         ViewModel = viewModel;
     }
 

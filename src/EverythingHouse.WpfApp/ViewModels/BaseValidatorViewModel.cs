@@ -14,7 +14,7 @@ public partial class BaseValidatorViewModel : ObservableValidator
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotBusy))]
-    bool _isBusy;
+    bool _isBusy = false;
 
-    bool IsNotBusy => !IsBusy;
+    public bool IsNotBusy => !IsBusy;
 }

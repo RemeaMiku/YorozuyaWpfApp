@@ -24,6 +24,7 @@ public partial class PersonPage : Page
     public PersonPage(PersonPageViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = this;
         ViewModel = viewModel;
     }
 

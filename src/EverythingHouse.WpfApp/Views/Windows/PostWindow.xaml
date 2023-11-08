@@ -1,0 +1,313 @@
+﻿<ui:UiWindow
+    x:Class="EverythingHouse.WpfApp.Views.Windows.PostWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:appearance="clr-namespace:Wpf.Ui.Appearance;assembly=Wpf.Ui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:EverythingHouse.WpfApp.Views.Windows"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="QuestionWindow"
+    Width="1000"
+    Height="560"
+    MinWidth="{Binding Width, Mode=OneTime}"
+    MinHeight="{Binding Height, Mode=OneTime}"
+    d:DataContext="{d:DesignInstance local:PostWindow}"
+    ExtendsContentIntoTitleBar="True"
+    WindowBackdropType="Acrylic"
+    mc:Ignorable="d">
+    <ui:UiWindow.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style
+            x:Key="TitleBarUiButtonStyle"
+            BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
+            TargetType="ui:Button">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="MouseOverBackground" Value="{Binding Path=ButtonsBackground, RelativeSource={RelativeSource AncestorType={x:Type ui:TitleBar}}}" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
+        </Style>
+    </ui:UiWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ui:TitleBar>
+            <ui:TitleBar.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button
+                        Width="Auto"
+                        Click="OnMainWindowButtonClicked"
+                        Content="回到主界面"
+                        Icon="Home24"
+                        MouseOverBackground="{StaticResource MikuGreenBrush}"
+                        Style="{StaticResource TitleBarUiButtonStyle}"
+                        ToolTip="回到主界面" />
+                    <ui:Button
+                        Icon="ChevronLeft24"
+                        Style="{StaticResource TitleBarUiButtonStyle}"
+                        ToolTip="返回到上一个问题" />
+                    <ui:Button
+                        Icon="ChevronRight24"
+                        Style="{StaticResource TitleBarUiButtonStyle}"
+                        ToolTip="前进到下一个问题" />
+                </StackPanel>
+            </ui:TitleBar.Header>
+        </ui:TitleBar>
+        <Border
+            Grid.Row="1"
+            Padding="10"
+            IsEnabled="{Binding ViewModel.IsNotBusy}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*"
+                        MinWidth="100"
+                        MaxWidth="400" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+                <ui:ProgressRing
+                    Grid.ColumnSpan="2"
+                    Panel.ZIndex="100"
+                    d:Visibility="Hidden"
+                    Foreground="{StaticResource MeaBlueBrush}"
+                    IsIndeterminate="True"
+                    Visibility="{Binding ViewModel.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Border
+                    Padding="10"
+                    Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                    CornerRadius="5">
+                    <ListView>
+                        <ListView.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource {x:Type ListViewItem}}" TargetType="ListViewItem">
+                                <Setter Property="Height" Value="30" />
+                                <Setter Property="Padding" Value="10,0,0,0" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </Border>
+                <Grid Grid.Column="1" Margin="10,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ui:CardExpander
+                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        FontSize="{StaticResource MediumFontSize}">
+                        <ui:CardExpander.Header>
+                            <StackPanel Margin="5,0" Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Foreground="{StaticResource MikuGreenBrush}" Symbol="ChatHelp24" />
+                                    <TextBlock
+                                        Margin="5,0,0,0"
+                                        d:Text="问题 114514"
+                                        FontSize="{StaticResource SmallFontSize}"
+                                        Foreground="{StaticResource MikuGreenBrush}"
+                                        Text="{Binding ViewModel.Post.Id, StringFormat='问题 {0}'}"
+                                        ToolTip="{Binding ViewModel.Post.Id, StringFormat='问题 ID: {0}'}" />
+                                </StackPanel>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    d:Text="初音未来是第一个虚拟歌姬吗？"
+                                    FontSize="{StaticResource LargeFontSize}"
+                                    FontWeight="Bold"
+                                    Text="{Binding ViewModel.Post.Title}" />
+                                <Grid Margin="0,5,0,0">
+                                    <Border
+                                        Padding="5"
+                                        HorizontalAlignment="Left"
+                                        BorderBrush="{StaticResource MikuRedBrushAlpha}"
+                                        BorderThickness="1"
+                                        CornerRadius="3"
+                                        ToolTip="{Binding ViewModel.Post.Field, StringFormat='问题所属领域：{0}'}">
+                                        <TextBlock
+                                            d:Text="VOCALOID"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Foreground="{StaticResource MikuRedBrush}"
+                                            Text="{Binding ViewModel.Post.Field}" />
+                                    </Border>
+                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="ArrowUpload24" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            d:Text="2023.08.31 11:14:51"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Text="{Binding ViewModel.Post.CreateTime}"
+                                            ToolTip="{Binding ViewModel.Post.CreateTime, StringFormat='问题发布于：{0}'}" />
+                                        <ui:SymbolIcon Margin="15,0,0,0" Symbol="History24" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            d:Text="2023.08.31 11:14:51"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Text="{Binding ViewModel.Post.UpdateTime}"
+                                            ToolTip="{Binding ViewModel.Post.UpdateTime, StringFormat='问题最后一个回复发布于：{0}'}" />
+                                        <ui:SymbolIcon Margin="15,0,0,0" Symbol="Eye24" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            d:Text="831"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Text="{Binding ViewModel.Post.Views}"
+                                            ToolTip="{Binding ViewModel.Post.Views, StringFormat='问题浏览量：{0}'}" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </ui:CardExpander.Header>
+                        <ui:CardExpander.Content>
+                            <ScrollViewer MaxHeight="150" Margin="5,0">
+                                <TextBlock
+                                    d:Text="初音未来是第一个虚拟歌姬吗？"
+                                    FontSize="{StaticResource SmallFontSize}"
+                                    TextWrapping="Wrap" />
+                            </ScrollViewer>
+                        </ui:CardExpander.Content>
+                    </ui:CardExpander>
+                    <Border
+                        Grid.Row="1"
+                        Margin="0,10,0,0"
+                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                        CornerRadius="3">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border
+                                Padding="15,5"
+                                Background="{StaticResource MikuGreenBrush}"
+                                CornerRadius="3,3,0,0">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Foreground="White" Symbol="ChatArrowBack20" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            d:Text="回答 114514"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Foreground="White"
+                                            Text="{Binding ViewModel.CurrentReply.Id, StringFormat='回答 {0}'}" />
+                                        <ui:SymbolIcon
+                                            Margin="15,0,0,0"
+                                            Foreground="White"
+                                            Symbol="ArrowUpload24" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            d:Text="2023.08.31 11:14:51"
+                                            FontSize="{StaticResource SmallFontSize}"
+                                            Foreground="White"
+                                            Text="{Binding ViewModel.CurrentReply.CreateTime}"
+                                            ToolTip="{Binding ViewModel.CurrentReply.CreateTime, StringFormat='回答发布于：{0}'}" />
+                                    </StackPanel>
+                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                        <ui:SymbolIcon
+                                            Foreground="White"
+                                            Symbol="CheckmarkStarburst24"
+                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="{StaticResource MediumFontSize}"
+                                            FontWeight="Bold"
+                                            Foreground="White"
+                                            Text="此回答已被采纳"
+                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <ui:SymbolIcon
+                                            Margin="15,0,0,0"
+                                            Foreground="White"
+                                            Symbol="RibbonStar24"
+                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <TextBlock
+                                            Margin="5,0,0,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="{StaticResource MediumFontSize}"
+                                            FontWeight="Bold"
+                                            Foreground="White"
+                                            Text="最高赞回答"
+                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <ui:Button
+                                            Margin="10,0,0,0"
+                                            d:Content="831"
+                                            Content="{Binding ViewModel.CurrentReply.Likes}"
+                                            FontSize="{StaticResource LargeFontSize}"
+                                            Foreground="White"
+                                            Icon="ThumbLike24"
+                                            IconFilled="{Binding ViewModel.IsCurrentReplyLiked}"
+                                            PressedForeground="White"
+                                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                            ToolTip="{Binding ViewModel.CurrentReply.Likes, StringFormat='回答点赞数：{0}，点击此按钮为回答点赞'}" />
+                                        <ui:Button
+                                            FontSize="{StaticResource LargeFontSize}"
+                                            Foreground="{StaticResource MikuRedBrush}"
+                                            Icon="Delete24"
+                                            PressedForeground="{StaticResource MikuRedBrush}"
+                                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                            ToolTip="删除回答"
+                                            Visibility="{Binding ViewModel.IsCurrentReplyDeletable, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Row="1" Padding="15">
+                                <TextBlock
+                                    VerticalAlignment="Top"
+                                    d:Text="      不是。初音未来并不是第一个虚拟歌姬。实际上，第一个虚拟歌姬是名为Leon的角色，他是在2004年发售的VOCALOID的第一代产品1。然而，初音未来无疑是最具影响力的虚拟歌姬1。她的声源库实际上对应的已经是VOCALOID二代产品，就算是在初音的生父CRYPTON公司，早于初音未来诞生的也还有KAITO和MEIKO1。尽管如此，初音未来的影响力和知名度使她在许多人心中被视为虚拟歌姬的代表。"
+                                    FontSize="{StaticResource MediumFontSize}"
+                                    LineHeight="25"
+                                    Text="{Binding ViewModel.CurrentReply.Content}"
+                                    TextWrapping="Wrap" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <StackPanel
+                        Grid.Row="2"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="ChevronUp24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                            ToolTip="上一个回答" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="ChevronDown24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                            ToolTip="下一个回答" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="Copy24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                            ToolTip="复制此回答" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="ChatAdd24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                            ToolTip="回答问题"
+                            Visibility="{Binding ViewModel.IsPostNotReplied, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="PersonChat24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                            ToolTip="查看你的回答"
+                            Visibility="{Binding ViewModel.IsPostReplied, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <ui:Button
+                            FontSize="{StaticResource LargeFontSize}"
+                            Icon="ChatDismiss24"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                            ToolTip="删除问题"
+                            Visibility="{Binding ViewModel.IsPostDeletable, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </StackPanel>
+                </Grid>
+                <GridSplitter
+                    HorizontalAlignment="Right"
+                    BorderBrush="Transparent"
+                    BorderThickness="3" />
+            </Grid>
+        </Border>
+    </Grid>
+</ui:UiWindow>

@@ -24,6 +24,7 @@ public partial class SettingsPage : Page
     public SettingsPage(SettingsPageViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = this;
         ViewModel = viewModel;
     }
 

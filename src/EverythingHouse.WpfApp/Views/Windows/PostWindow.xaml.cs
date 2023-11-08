@@ -20,15 +20,16 @@ namespace EverythingHouse.WpfApp.Views.Windows;
 /// <summary>
 /// QuestionWindow.xaml 的交互逻辑
 /// </summary>
-public partial class QuestionWindow : UiWindow
+public partial class PostWindow : UiWindow
 {
-    public QuestionWindow(QuestionWindowViewModel viewModel)
+    public PostWindow(PostWindowViewModel viewModel)
     {
         InitializeComponent();
+        DataContext = this;
         ViewModel = viewModel;
     }
 
-    public QuestionWindowViewModel ViewModel { get; }
+    public PostWindowViewModel ViewModel { get; }
 
     void OnMainWindowButtonClicked(object sender, RoutedEventArgs e)
     {
