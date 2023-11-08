@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using EverythingHouse.WpfApp.ViewModels.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Controls;
 
@@ -21,10 +22,13 @@ namespace EverythingHouse.WpfApp.Views.Windows;
 /// </summary>
 public partial class QuestionWindow : UiWindow
 {
-    public QuestionWindow()
+    public QuestionWindow(QuestionWindowViewModel viewModel)
     {
         InitializeComponent();
+        ViewModel = viewModel;
     }
+
+    public QuestionWindowViewModel ViewModel { get; }
 
     void OnMainWindowButtonClicked(object sender, RoutedEventArgs e)
     {

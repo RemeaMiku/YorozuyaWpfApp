@@ -5,6 +5,15 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <AssemblyName>EverythingHouse</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Converters\" />
     <Folder Include="Servcies\" />
     <Folder Include="Assets\" />
   </ItemGroup>
@@ -25,6 +33,12 @@
     </Compile>
   </ItemGroup>
 
-  <Import Project="..\EverythingHouse.Shared\EverythingHouse.Shared.projitems" Label="Shared" />
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\RemeaMiku study\course in progress\.NET 架构程序设计\EverythingHouse\src\EverythingHouse.WpfApp\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\RemeaMiku study\course in progress\.NET 架构程序设计\EverythingHouse\src\EverythingHouse.WpfApp\.editorconfig" />
+  </ItemGroup>
 
 </Project>

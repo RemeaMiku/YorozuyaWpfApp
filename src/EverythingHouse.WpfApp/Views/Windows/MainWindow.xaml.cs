@@ -20,9 +20,9 @@ using Wpf.Ui.Mvvm.Interfaces;
 namespace EverythingHouse.WpfApp.Views.Windows;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// MainWindow.xaml 的交互逻辑
 /// </summary>
-public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
+public partial class MainWindow : UiWindow
 {
     public MainWindow(MainWindowViewModel viewModel)
     {
@@ -36,11 +36,23 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
 
     public MainWindowViewModel ViewModel { get; }
 
+    /// <summary>
+    /// 主题切换时手动更新导航按钮的颜色
+    /// </summary>
+    /// <param name="currentTheme"></param>
+    /// <param name="systemAccent"></param>
+
     void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
     {
         ResetAllNavigateButtons();
         SetNavigateButton(_currentNavigateButton);
     }
+
+    /// <summary>
+    /// 判断系统主题，如果是深色主题则自动切换为深色主题；否则使用浅色主题。设置导航按钮的颜色
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
 
     void OnMainWindowLoaded(object sender, RoutedEventArgs e)
     {
@@ -51,7 +63,16 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         OnNavigateButtonClicked(HomeButton, e);
     }
 
+    /// <summary>
+    /// 导航按钮与索引和页面类型的对应关系。
+    /// 索引用于判断导航按钮的上下顺序用于确定切换动画方向，页面类型用于从容器中获取页面实例
+    /// </summary>
+
     readonly Dictionary<Wpf.Ui.Controls.Button, (int Index, Type PageType)> _navigateDictionary = new();
+
+    /// <summary>
+    /// 当前导航按钮
+    /// </summary>
 
     Wpf.Ui.Controls.Button _currentNavigateButton;
 
@@ -61,6 +82,12 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         _navigateDictionary.Add(PersonButton, (1, typeof(PersonPage)));
         _navigateDictionary.Add(SettingsButton, (2, typeof(SettingsPage)));
     }
+
+    /// <summary>
+    /// 点击主题按钮时切换主题并更新按钮图标
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
 
     void OnThemeButtonClicked(object sender, RoutedEventArgs e)
     {
@@ -76,9 +103,21 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         }
     }
 
+    /// <summary>
+    /// 页面切换动画的持续时间
+    /// </summary>
+
     static readonly TimeSpan _navigateDuration = TimeSpan.FromSeconds(0.2);
 
+    /// <summary>
+    /// 上一次导航按钮点击的时间，用于防止快速点击导航按钮导致的动画异常
+    /// </summary>
+
     DateTime _lastNavigateTime = DateTime.MinValue;
+
+    /// <summary>
+    /// 重新设置所有导航按钮的颜色
+    /// </summary>
 
     void ResetAllNavigateButtons()
     {
@@ -93,6 +132,10 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         }
     }
 
+    /// <summary>
+    /// 设置当前导航按钮的颜色
+    /// </summary>
+    /// <param name="button"></param>
     static void SetNavigateButton(Wpf.Ui.Controls.Button button)
     {
         button.IconFilled = true;
@@ -106,6 +149,11 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         storyboard.Begin(button);
     }
 
+    /// <summary>
+    /// 播放页面切换动画
+    /// </summary>
+    /// <param name="button"></param>
+    /// <returns></returns>
     async Task DisplayPageSwitchAnimationAsync(Wpf.Ui.Controls.Button button)
     {
         var oldPage = (Page)Frame.Content;
@@ -124,6 +172,11 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         await newPage.SlideAndFadeInAsync(_navigateDuration, new(0, 0, 0, -sign * slideDistance), easingFunction);
     }
 
+    /// <summary>
+    /// 点击导航按钮时切换页面并播放动画
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     async void OnNavigateButtonClicked(object sender, RoutedEventArgs e)
     {
         var newButton = (Wpf.Ui.Controls.Button)sender;
@@ -135,6 +188,12 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
         await DisplayPageSwitchAnimationAsync(newButton);
     }
 
+    /// <summary>
+    /// 点击导航面板的展开按钮时切换导航面板的宽度
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+
     void OnExpandButtonClicked(object sender, RoutedEventArgs e)
     {
         var duration = TimeSpan.FromSeconds(0.4);
@@ -145,8 +204,10 @@ public partial class MainWindow : UiWindow, IHasViewModel<MainWindowViewModel>
             MenuPanel.BeginAnimation(WidthProperty, new DoubleAnimation(MenuPanel.MinWidth, duration) { EasingFunction = easingFunction });
     }
 
-    protected override void OnClosed(EventArgs e)
-    {
-        App.Current.Shutdown();
-    }
+    /// <summary>
+    /// 关闭主窗口时退出应用程序
+    /// </summary>
+    /// <param name="e"></param>
+    protected override void OnClosed(EventArgs e) => App.Current.Shutdown();
+
 }

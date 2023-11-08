@@ -7,9 +7,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!--  WPF-UI Themes and Controls  -->
+                <!--  WPF-UI 的主题字典和控件字典  -->
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
+                <!--  本地资源字典  -->
                 <ResourceDictionary Source="Resources/Fonts.xaml" />
                 <ResourceDictionary Source="Resources/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Controls.xaml" />

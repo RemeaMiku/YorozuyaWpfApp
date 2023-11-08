@@ -8,8 +8,19 @@ using System.Windows.Media.Animation;
 
 namespace EverythingHouse.WpfApp.Extensions;
 
-public static class FrameworkElementExtensions
+/// <summary>
+/// 给 FrameworkElement 添加滑动和淡入淡出动画的扩展方法集
+/// </summary>
+public static class SlideAndFadeExtensions
 {
+    /// <summary>
+    /// 滑入并淡入
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="duration"></param>
+    /// <param name="fromMargin"></param>
+    /// <param name="easingFunction"></param>
+    /// <returns></returns>
     public static async Task SlideAndFadeInAsync(this FrameworkElement element, TimeSpan duration, Thickness fromMargin, EasingFunctionBase easingFunction)
     {
         var storyboard = new Storyboard();
@@ -25,6 +36,14 @@ public static class FrameworkElementExtensions
         await Task.Delay(duration);
     }
 
+    /// <summary>
+    /// 滑出并淡出
+    /// </summary>
+    /// <param name="element"></param>
+    /// <param name="duration"></param>
+    /// <param name="toMargin"></param>
+    /// <param name="easingFunction"></param>
+    /// <returns></returns>
     public static async Task SlideAndFadeOutAsync(this FrameworkElement element, TimeSpan duration, Thickness toMargin, EasingFunctionBase easingFunction)
     {
         var storyboard = new Storyboard();
