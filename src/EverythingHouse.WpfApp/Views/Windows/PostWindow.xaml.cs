@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using EverythingHouse.WpfApp.ViewModels.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 
 namespace EverythingHouse.WpfApp.Views.Windows;
@@ -39,4 +40,17 @@ public partial class PostWindow : UiWindow
             mainWindow.WindowState = WindowState.Normal;
         mainWindow.Focus();
     }
+
+    async void OnCopyButtonClickedAsync(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.CurrentReply is null)
+            return;
+        System.Windows.Clipboard.SetDataObject(ViewModel.CurrentReply.Content);
+        CopyButton.Icon = SymbolRegular.Checkmark24;
+        CopyButton.Appearance = ControlAppearance.Success;
+        await Task.Delay(3000);
+        CopyButton.Icon = SymbolRegular.Copy24;
+        CopyButton.Appearance = ControlAppearance.Transparent;
+    }
+
 }

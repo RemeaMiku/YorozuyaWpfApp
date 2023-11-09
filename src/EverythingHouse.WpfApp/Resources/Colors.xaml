@@ -14,4 +14,10 @@
     <SolidColorBrush x:Key="MikuRedBrushAlpha" Color="{StaticResource MikuRedAlpha}" />
     <SolidColorBrush x:Key="MeaBlueBrushAlpha" Color="{StaticResource MeaBlueAlpha}" />
 
+    <LinearGradientBrush x:Key="MikuMeaRedBlueGreenHorizontalBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Offset="0" Color="{StaticResource MikuRed}" />
+        <GradientStop Offset="0.5" Color="{StaticResource MeaBlue}" />
+        <GradientStop Offset="1" Color="{StaticResource MikuGreen}" />
+    </LinearGradientBrush>
+
 </ResourceDictionary>

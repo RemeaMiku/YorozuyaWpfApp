@@ -16,6 +16,7 @@ using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Markup;
+using Wpf.Ui.Mvvm.Contracts;
 using Wpf.Ui.Mvvm.Interfaces;
 
 namespace EverythingHouse.WpfApp.Views.Windows;

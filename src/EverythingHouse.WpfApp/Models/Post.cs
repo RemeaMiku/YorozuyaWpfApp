@@ -11,8 +11,8 @@ namespace EverythingHouse.WpfApp.Models;
 /// </summary>
 public class Post
 {
-    [JsonPropertyName("asker")]
-    public string Asker { get; set; } = null!;
+    [JsonPropertyName("askerId")]
+    public long AskerId { get; set; }
 
     [JsonPropertyName("content")]
     public string Content { get; set; } = null!;

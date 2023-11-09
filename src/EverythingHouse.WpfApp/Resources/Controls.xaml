@@ -8,15 +8,7 @@
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type ui:TitleBar}}" TargetType="ui:TitleBar">
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Offset="0" Color="{StaticResource MikuRed}" />
-                    <GradientStop Offset="0.5" Color="{StaticResource MeaBlue}" />
-                    <GradientStop Offset="1" Color="{StaticResource MikuGreen}" />
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Background" Value="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}" />
     </Style>
 
     <Style
