@@ -2,7 +2,7 @@
 using System.Windows;
 using EverythingHouse.WpfApp.Servcies;
 using EverythingHouse.WpfApp.Servcies.Contracts;
-using EverythingHouse.WpfApp.Servcies.DesignTime;
+using EverythingHouse.WpfApp.Servcies.Local;
 using EverythingHouse.WpfApp.ViewModels.Pages;
 using EverythingHouse.WpfApp.ViewModels.Windows;
 using EverythingHouse.WpfApp.Views.Pages;

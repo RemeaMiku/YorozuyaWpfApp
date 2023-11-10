@@ -32,7 +32,6 @@ public partial class PostWindowViewModel : BaseViewModel
     [ObservableProperty]
     bool _isPostDeleted = false;
 
-
     public ICancelConfirmDialogService GetCancelConfirmDialogService() => _dialogService;
 
     void Test()
@@ -57,6 +56,8 @@ public partial class PostWindowViewModel : BaseViewModel
             OnPropertyChanging(nameof(IsOrderByLikes));
             _isOrderByLikes = value;
             OnPropertyChanged(nameof(IsOrderByLikes));
+            if (RepliesViewSource.View is null)
+                return;
             RepliesViewSource.View.SortDescriptions.Clear();
             if (_isOrderByLikes)
             {
@@ -72,11 +73,48 @@ public partial class PostWindowViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    async Task DeleteReplyAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Post);
+        ArgumentNullException.ThrowIfNull(CurrentReply);
+        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
+        if (CurrentReply.DelTag == 1)
+        {
+            await _dialogService.ShowDialogAsync("请勿重复操作", "错误");
+            return;
+        }
+        if (!IsUserReply)
+        {
+            await _dialogService.ShowDialogAsync("你不是此回答的作者，无法删除该回答", "无权限");
+            return;
+        }
+        try
+        {
+            await _dialogService.ShowDialogAsync("确定要删除该回答吗？删除后不可恢复！", "删除回答");
+            if (!_dialogService.GetIsConfirmed())
+                return;
+            IsBusy = true;
+            await _postService.DeleteReplyAsync(CurrentReply);
+            await LoadPostRepliesAsync(Post);
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+        finally
+        {
+
+        }
+    }
+
+    [RelayCommand]
     async Task DeletePostAsync()
     {
-        if (Post is null)
+        ArgumentNullException.ThrowIfNull(Post);
+        if (Post.DelTag == 1)
         {
-            await _dialogService.ShowDialogAsync("当前问题不存在", "错误");
+            await _dialogService.ShowDialogAsync("请勿重复操作", "错误");
             return;
         }
         if (!IsUserPost)
@@ -86,7 +124,7 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         try
         {
-            await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "删除问题");
+            await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "警告");
             if (!_dialogService.GetIsConfirmed())
                 return;
             IsBusy = true;
@@ -127,6 +165,7 @@ public partial class PostWindowViewModel : BaseViewModel
                 RepliesViewSource.Source = replies;
                 RepliesCount = replies.Count();
                 IsOrderByLikes = true;
+                RepliesViewSource.View.Refresh();
                 CurrentReply = _mostLikedReply;
             }
             else
@@ -156,8 +195,6 @@ public partial class PostWindowViewModel : BaseViewModel
 
     Reply? _currentReply;
 
-    //public bool IsCurrentReplyNull => CurrentReply is null;
-
     public Reply? CurrentReply
     {
         get => _currentReply;
@@ -170,6 +207,8 @@ public partial class PostWindowViewModel : BaseViewModel
             OnPropertyChanged(nameof(CurrentReply));
             OnPropertyChanged(nameof(IsCurrentReplyMostLiked));
             OnPropertyChanged(nameof(CurrentReplyState));
+            if (_currentReply is null)
+                return;
             UpdateIsLikedAndIsUserReplyCommand.Execute(default);
         }
     }
@@ -221,8 +260,8 @@ public partial class PostWindowViewModel : BaseViewModel
                 return;
             }
             IsBusy = true;
-            var isLiked = await _postService.GetIsLikedAsync(CurrentReply!);
-            var isUserReply = _postService.GetIsUserReply(CurrentReply!);
+            var isUserReply = _postService.GetIsUserReply(CurrentReply);
+            var isLiked = await _postService.GetIsLikedAsync(CurrentReply);
             IsCurrentReplyLiked = isLiked;
             IsUserReply = isUserReply;
         }

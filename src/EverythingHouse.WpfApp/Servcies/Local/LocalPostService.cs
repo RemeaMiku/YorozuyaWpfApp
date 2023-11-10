@@ -8,7 +8,7 @@ using EverythingHouse.WpfApp.Common.ResponseData;
 using EverythingHouse.WpfApp.Models;
 using EverythingHouse.WpfApp.Servcies.Contracts;
 
-namespace EverythingHouse.WpfApp.Servcies.DesignTime;
+namespace EverythingHouse.WpfApp.Servcies.Local;
 
 public class LocalPostService : IPostService
 {
@@ -32,16 +32,18 @@ public class LocalPostService : IPostService
         return response.Data!.IsLiked;
     }
 
+    readonly List<Reply> _localReplies = new()
+    {
+        new Reply() { Id = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答0",Likes=831 },
+        //new Reply() { Id = 1, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答1",Likes= 123,IsAccepted=true },
+        //new Reply() { Id = 2, UserId = 2, CreateTime = "2021.08.31 11:45:14", Content = "回答2",Likes=233 },
+    };
+
     public async Task<IEnumerable<Reply>?> GetPostRepliesAsync(Post post)
     {
-        var response = await _httpClient.GetFromJsonAsync<Response<PostRepliesData>>($"api/post/allReplies?postId={post.Id}");
-        return response == null ? null : response.Data!.ReplyList;
-        //return new List<Reply>()
-        //{
-        //    new Reply() { Id = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答1",Likes=831 },
-        //    new Reply() { Id = 1, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答2",Likes= 123,IsAccepted=true },
-        //    new Reply() { Id = 2, UserId = 2, CreateTime = "2021.08.31 11:45:14", Content = "回答3",Likes=233 },
-        //};
+        //var response = await _httpClient.GetFromJsonAsync<Response<PostRepliesData>>($"api/post/allReplies?postId={post.Id}");
+        //return response == null ? null : response.Data!.ReplyList;
+        return _localReplies;
     }
 
     public bool GetIsUserPost(Post post)
@@ -82,9 +84,11 @@ public class LocalPostService : IPostService
         post.DelTag = 1;
     }
 
-    public Task DeleteReplyAsync(Reply reply)
+    public async Task DeleteReplyAsync(Reply reply)
     {
-        throw new NotImplementedException();
+        await Task.Delay(500);
+        reply.DelTag = 1;
+        _localReplies.Remove(reply);
     }
 
 
