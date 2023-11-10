@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using EverythingHouse.WpfApp.Models;
 
-namespace EverythingHouse.WpfApp.Servcies;
+namespace EverythingHouse.WpfApp.Servcies.Contracts;
 
 public interface IPostService
 {
     public Task<IEnumerable<Reply>?> GetPostRepliesAsync(Post post);
 
-    public Task<bool?> GetIsLikedAsync(Reply reply);
+    public Task<bool> GetIsLikedAsync(Reply reply);
 
     public bool GetIsUserPost(Post post);
 
@@ -21,7 +18,7 @@ public interface IPostService
 
     public Task ReplyPostAsync(Post post, Reply reply);
 
-    public Task LikeReplyAsync(Reply reply);
+    public Task LikeAsync(Reply reply);
 
     public Task CancelLikeAsync(Reply reply);
 

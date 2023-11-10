@@ -21,6 +21,9 @@
     <ui:UiWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <cv:ReplyStateToBrushConverter x:Key="ReplyStateToBrushConverter" />
+        <cv:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
+        <cv:ReversedBooleanToVisibilityConverter x:Key="ReversedBooleanToVisibilityConverter" />
+        <cv:ReversedNullableToVisibilityConveter x:Key="ReversedNullableToVisibilityConveter" />
         <Style
             x:Key="TitleBarUiButtonStyle"
             BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
@@ -62,12 +65,13 @@
         <Border
             Grid.Row="1"
             Padding="10"
-            IsEnabled="{Binding ViewModel.IsNotBusy, Mode=OneWay}">
+            IsEnabled="{Binding ViewModel.IsBusy, Converter={StaticResource ReversedBooleanToVisibilityConverter}, Mode=OneWay}"
+            Visibility="{Binding ViewModel.IsPostDeleted, Converter={StaticResource ReversedBooleanToVisibilityConverter}, Mode=OneWay}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
                         Width="*"
-                        MinWidth="100"
+                        MinWidth="200"
                         MaxWidth="400" />
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
@@ -87,16 +91,17 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <StackPanel Orientation="Horizontal">
+                        <WrapPanel Orientation="Horizontal">
                             <RadioButton
                                 d:IsChecked="True"
                                 Content="按点赞数排序"
                                 FontSize="{StaticResource SmallFontSize}"
                                 IsChecked="{Binding ViewModel.IsOrderByLikes}" />
                             <RadioButton Content="按时间排序" FontSize="{StaticResource SmallFontSize}" />
-                        </StackPanel>
+                        </WrapPanel>
                         <ListView
                             Grid.Row="1"
+                            Margin="0,10,0,0"
                             IsSynchronizedWithCurrentItem="True"
                             ItemsSource="{Binding ViewModel.RepliesViewSource.View, Mode=OneWay}"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -193,11 +198,21 @@
                             </ScrollViewer>
                         </ui:CardExpander.Content>
                     </ui:CardExpander>
+                    <TextBlock
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="100"
+                        d:Visibility="Collapsed"
+                        FontSize="{StaticResource LargeFontSize}"
+                        Text="暂无回答"
+                        Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource ReversedNullableToVisibilityConveter}, Mode=OneWay}" />
                     <Border
                         Grid.Row="1"
                         Margin="0,10,0,0"
                         Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
-                        CornerRadius="3">
+                        CornerRadius="3"
+                        Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -219,13 +234,13 @@
                                             d:Text="回答 114514"
                                             FontSize="{StaticResource MediumFontSize}"
                                             Foreground="White"
-                                            Text="{Binding ViewModel.CurrentReply.Id, StringFormat='回答 {0}'}" />
+                                            Text="{Binding ViewModel.CurrentReply.Id, StringFormat='回答 {0}', Mode=OneWay}" />
                                     </StackPanel>
-                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <WrapPanel HorizontalAlignment="Right" Orientation="Horizontal">
                                         <ui:SymbolIcon
                                             Foreground="White"
                                             Symbol="CheckmarkStarburst24"
-                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                         <TextBlock
                                             Margin="5,0,0,0"
                                             VerticalAlignment="Center"
@@ -233,12 +248,12 @@
                                             FontWeight="Bold"
                                             Foreground="White"
                                             Text="已被采纳"
-                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                         <ui:SymbolIcon
                                             Margin="15,0,0,0"
                                             Foreground="White"
                                             Symbol="RibbonStar24"
-                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                         <TextBlock
                                             Margin="5,0,0,0"
                                             VerticalAlignment="Center"
@@ -246,7 +261,7 @@
                                             FontWeight="Bold"
                                             Foreground="White"
                                             Text="最高赞"
-                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                         <ui:SymbolIcon
                                             Margin="15,0,0,0"
                                             Foreground="White"
@@ -257,18 +272,18 @@
                                             d:Text="2023.08.31 11:14:51"
                                             FontSize="{StaticResource SmallFontSize}"
                                             Foreground="White"
-                                            Text="{Binding ViewModel.CurrentReply.CreateTime}" />
+                                            Text="{Binding ViewModel.CurrentReply.CreateTime, Mode=OneWay}" />
                                         <ui:Button
                                             Margin="10,0,0,0"
                                             d:Content="831"
-                                            Content="{Binding ViewModel.CurrentReply.Likes}"
+                                            Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}"
                                             FontSize="{StaticResource LargeFontSize}"
                                             Foreground="White"
                                             Icon="ThumbLike24"
-                                            IconFilled="{Binding ViewModel.IsCurrentReplyLiked}"
+                                            IconFilled="{Binding ViewModel.IsCurrentReplyLiked, Mode=OneWay}"
                                             Style="{StaticResource BorderlessTransparentUiButtonStyle}">
                                             <ui:Button.ToolTip>
-                                                <ToolTip Content="{Binding ViewModel.CurrentReply.Likes}" ContentStringFormat="回答点赞数：{0}" />
+                                                <ToolTip Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}" ContentStringFormat="回答点赞数：{0}" />
                                             </ui:Button.ToolTip>
                                         </ui:Button>
                                         <ui:Button
@@ -276,8 +291,8 @@
                                             Foreground="White"
                                             Icon="Delete24"
                                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                                            Visibility="{Binding ViewModel.IsUserReply, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                    </StackPanel>
+                                            Visibility="{Binding ViewModel.IsUserReply, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                    </WrapPanel>
                                 </Grid>
                             </Border>
                             <Border Grid.Row="1" Padding="15">
@@ -286,7 +301,7 @@
                                     d:Text="      不是。初音未来并不是第一个虚拟歌姬。实际上，第一个虚拟歌姬是名为Leon的角色，他是在2004年发售的VOCALOID的第一代产品1。然而，初音未来无疑是最具影响力的虚拟歌姬1。她的声源库实际上对应的已经是VOCALOID二代产品，就算是在初音的生父CRYPTON公司，早于初音未来诞生的也还有KAITO和MEIKO1。尽管如此，初音未来的影响力和知名度使她在许多人心中被视为虚拟歌姬的代表。"
                                     FontSize="{StaticResource MediumFontSize}"
                                     LineHeight="25"
-                                    Text="{Binding ViewModel.CurrentReply.Content}"
+                                    Text="{Binding ViewModel.CurrentReply.Content, Mode=OneWay}"
                                     TextWrapping="Wrap" />
                             </Border>
                         </Grid>
@@ -303,23 +318,23 @@
                         </TextBlock>
                         <ui:Button
                             Margin="10,0,0,0"
-                            Command="{Binding ViewModel.MoveToPreviousReplyCommand}"
+                            Command="{Binding ViewModel.MoveToPreviousReplyCommand, Mode=OneTime}"
                             FontSize="{StaticResource LargeFontSize}"
                             Icon="ChevronUp24"
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                             ToolTip="上一个回答" />
                         <ui:Button
-                            Command="{Binding ViewModel.MoveToNextReplyCommand}"
+                            Command="{Binding ViewModel.MoveToNextReplyCommand, Mode=OneTime}"
                             FontSize="{StaticResource LargeFontSize}"
                             Icon="ChevronDown24"
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                             ToolTip="下一个回答" />
                         <ui:Button
                             FontSize="{StaticResource LargeFontSize}"
-                            Icon="Checkmark24"
+                            Icon="CheckmarkStarburst24"
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                             ToolTip="采纳此回答"
-                            Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                         <ui:Button
                             x:Name="CopyButton"
                             Click="OnCopyButtonClickedAsync"
@@ -332,19 +347,21 @@
                             Icon="ChatAdd24"
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                             ToolTip="回答问题"
-                            Visibility="{Binding ViewModel.IsPostNotReplied, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding ViewModel.UserReply, Converter={StaticResource ReversedNullableToVisibilityConveter}, Mode=OneWay}" />
                         <ui:Button
+                            Command="{Binding ViewModel.MoveToUserReplyCommand, Mode=OneTime}"
                             FontSize="{StaticResource LargeFontSize}"
                             Icon="PersonChat24"
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                             ToolTip="查看你的回答"
-                            Visibility="{Binding ViewModel.IsPostReplied, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding ViewModel.UserReply, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}" />
                         <ui:Button
+                            Command="{Binding ViewModel.DeletePostCommand}"
                             FontSize="{StaticResource LargeFontSize}"
                             Icon="ChatDismiss24"
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                             ToolTip="删除问题"
-                            Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                     </StackPanel>
                 </Grid>
                 <GridSplitter
@@ -353,5 +370,33 @@
                     BorderThickness="3" />
             </Grid>
         </Border>
+        <Border
+            Grid.Row="1"
+            d:Visibility="Hidden"
+            Background="{StaticResource MeaBlueBrushAlpha}"
+            Visibility="{Binding ViewModel.IsPostDeleted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <ui:SymbolIcon FontSize="{StaticResource LargeFontSize}" Symbol="ChatDismiss24" />
+                <TextBlock
+                    Margin="10,0,0,0"
+                    FontSize="{StaticResource LargeFontSize}"
+                    Text="问题已被删除" />
+            </StackPanel>
+        </Border>
+        <ui:Dialog
+            x:Name="Dialog"
+            Grid.Row="1"
+            Panel.ZIndex="1000"
+            d:Visibility="Hidden"
+            ButtonLeftAppearance="Secondary"
+            ButtonLeftName="取消"
+            ButtonLeftVisibility="Visible"
+            ButtonRightAppearance="Primary"
+            ButtonRightName="确定"
+            ButtonRightVisibility="Visible"
+            DialogHeight="200" />
     </Grid>
 </ui:UiWindow>

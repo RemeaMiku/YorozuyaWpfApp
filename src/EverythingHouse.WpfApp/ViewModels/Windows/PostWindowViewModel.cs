@@ -1,32 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EverythingHouse.WpfApp.Common;
 using EverythingHouse.WpfApp.Models;
-using EverythingHouse.WpfApp.Servcies;
-using EverythingHouse.WpfApp.Servcies.DesignTime;
+using EverythingHouse.WpfApp.Servcies.Contracts;
 
 namespace EverythingHouse.WpfApp.ViewModels.Windows;
 
 public partial class PostWindowViewModel : BaseViewModel
 {
-
+    readonly ICancelConfirmDialogService _dialogService;
+    readonly IUserService _userService;
     readonly IPostService _postService;
 
     //TODO ：测试
-    readonly Post _localPost = new() { AskerId = new Random().Next(100), Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
+    readonly Post _localPost = new() { AskerId = 0, Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
 
-    public PostWindowViewModel(IPostService postService)
+    public PostWindowViewModel(ICancelConfirmDialogService dialogService, IUserService userService, IPostService postService)
     {
+        _dialogService = dialogService;
+        _userService = userService;
         _postService = postService;
+        //TODO ：测试
         Test();
     }
+
+    [ObservableProperty]
+    bool _isPostDeleted = false;
+
+
+    public ICancelConfirmDialogService GetCancelConfirmDialogService() => _dialogService;
 
     void Test()
     {
@@ -37,8 +44,8 @@ public partial class PostWindowViewModel : BaseViewModel
 
     bool _isOrderByLikes = true;
 
-    readonly SortDescription _likesSortDescription = new(nameof(Reply.Likes), ListSortDirection.Descending);
-    readonly SortDescription _creatTimeSortDescription = new(nameof(Reply.CreateTime), ListSortDirection.Descending);
+    readonly static SortDescription _likesSortDescription = new(nameof(Reply.Likes), ListSortDirection.Descending);
+    readonly static SortDescription _creatTimeSortDescription = new(nameof(Reply.CreateTime), ListSortDirection.Descending);
 
     public bool IsOrderByLikes
     {
@@ -65,18 +72,72 @@ public partial class PostWindowViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    async Task LoadPostRepliesAsync(Post post)
+    async Task DeletePostAsync()
     {
+        if (Post is null)
+        {
+            await _dialogService.ShowDialogAsync("当前问题不存在", "错误");
+            return;
+        }
+        if (!IsUserPost)
+        {
+            await _dialogService.ShowDialogAsync("你不是提问者，无法删除该问题", "无权限");
+            return;
+        }
         try
         {
+            await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "删除问题");
+            if (!_dialogService.GetIsConfirmed())
+                return;
+            IsBusy = true;
+            await _postService.DeletePostAsync(Post);
+            await LoadPostRepliesAsync(Post);
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    async Task LoadPostRepliesAsync(Post post)
+    {
+        if (post.DelTag == 1)
+        {
+            IsPostDeleted = true;
+            return;
+        }
+        IsPostDeleted = false;
+        try
+        {
+            ArgumentNullException.ThrowIfNull(_userService.UserInfo);
             IsBusy = true;
             IsUserPost = _postService.GetIsUserPost(post);
             var replies = await _postService.GetPostRepliesAsync(post);
             ArgumentNullException.ThrowIfNull(replies);
-            _mostLikedReply = replies.MaxBy(r => r.Likes);
-            RepliesViewSource.Source = replies;
-            RepliesViewSource.View.SortDescriptions.Add(new(nameof(Reply.Likes), ListSortDirection.Descending));
-            RepliesCount = replies.Count();
+            if (replies.Any())
+            {
+                UserReply = replies.SingleOrDefault(r => r.UserId == _userService.UserInfo.Id);
+                _mostLikedReply = replies.MaxBy(r => r.Likes);
+                RepliesViewSource.Source = replies;
+                RepliesCount = replies.Count();
+                IsOrderByLikes = true;
+                CurrentReply = _mostLikedReply;
+            }
+            else
+            {
+                UserReply = default;
+                RepliesViewSource.Source = default;
+                _mostLikedReply = default;
+                RepliesCount = 0;
+                CurrentReply = default;
+                SelectedIndex = -1;
+            }
         }
         catch (Exception)
         {
@@ -95,6 +156,8 @@ public partial class PostWindowViewModel : BaseViewModel
 
     Reply? _currentReply;
 
+    //public bool IsCurrentReplyNull => CurrentReply is null;
+
     public Reply? CurrentReply
     {
         get => _currentReply;
@@ -109,6 +172,13 @@ public partial class PostWindowViewModel : BaseViewModel
             OnPropertyChanged(nameof(CurrentReplyState));
             UpdateIsLikedAndIsUserReplyCommand.Execute(default);
         }
+    }
+
+    [RelayCommand]
+    void MoveToUserReply()
+    {
+        ArgumentNullException.ThrowIfNull(UserReply);
+        CurrentReply = UserReply;
     }
 
     [ObservableProperty]
@@ -130,13 +200,13 @@ public partial class PostWindowViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(IsNotLastReply))]
     void MoveToNextReply()
     {
-        RepliesViewSource.View.MoveCurrentToNext();
+        SelectedIndex++;
     }
 
     [RelayCommand(CanExecute = nameof(IsNotFirstReply))]
     void MoveToPreviousReply()
     {
-        RepliesViewSource.View.MoveCurrentToPrevious();
+        SelectedIndex--;
     }
 
     [RelayCommand]
@@ -150,10 +220,10 @@ public partial class PostWindowViewModel : BaseViewModel
                 IsUserReply = false;
                 return;
             }
+            IsBusy = true;
             var isLiked = await _postService.GetIsLikedAsync(CurrentReply!);
-            ArgumentNullException.ThrowIfNull(isLiked);
             var isUserReply = _postService.GetIsUserReply(CurrentReply!);
-            IsCurrentReplyLiked = isLiked.Value;
+            IsCurrentReplyLiked = isLiked;
             IsUserReply = isUserReply;
         }
         catch (Exception)
@@ -170,11 +240,10 @@ public partial class PostWindowViewModel : BaseViewModel
     [ObservableProperty]
     bool _isCurrentReplyLiked = false;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsPostNotReplied))]
-    bool _isPostReplied = false;
-
     public bool IsCurrentReplyMostLiked => CurrentReply == _mostLikedReply;
+
+    [ObservableProperty]
+    Reply? _userReply;
 
     Reply? _mostLikedReply;
 
@@ -183,8 +252,6 @@ public partial class PostWindowViewModel : BaseViewModel
 
     [ObservableProperty]
     bool _isUserReply = false;
-
-    public bool IsPostNotReplied => !IsPostReplied;
 
     public ReplyState CurrentReplyState
     {

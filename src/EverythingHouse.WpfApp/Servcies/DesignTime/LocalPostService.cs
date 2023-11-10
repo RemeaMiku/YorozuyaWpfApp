@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using EverythingHouse.WpfApp.Common;
 using EverythingHouse.WpfApp.Common.ResponseData;
 using EverythingHouse.WpfApp.Models;
+using EverythingHouse.WpfApp.Servcies.Contracts;
 
 namespace EverythingHouse.WpfApp.Servcies.DesignTime;
 
@@ -26,17 +24,24 @@ public class LocalPostService : IPostService
         BaseAddress = new("http://127.0.0.1:4523/m1/3553693-0-default/")
     };
 
-    public async Task<bool?> GetIsLikedAsync(Reply reply)
+    public async Task<bool> GetIsLikedAsync(Reply reply)
     {
         var userId = _userService.UserInfo?.Id;
         var response = await _httpClient.GetFromJsonAsync<Response<IsLikedData>>($"api/post/isLiked?userId={userId}&replyId={reply.Id}");
-        return response == null ? null : response.Data!.IsLiked;
+        ArgumentNullException.ThrowIfNull(response);
+        return response.Data!.IsLiked;
     }
 
     public async Task<IEnumerable<Reply>?> GetPostRepliesAsync(Post post)
     {
         var response = await _httpClient.GetFromJsonAsync<Response<PostRepliesData>>($"api/post/allReplies?postId={post.Id}");
         return response == null ? null : response.Data!.ReplyList;
+        //return new List<Reply>()
+        //{
+        //    new Reply() { Id = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答1",Likes=831 },
+        //    new Reply() { Id = 1, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答2",Likes= 123,IsAccepted=true },
+        //    new Reply() { Id = 2, UserId = 2, CreateTime = "2021.08.31 11:45:14", Content = "回答3",Likes=233 },
+        //};
     }
 
     public bool GetIsUserPost(Post post)
@@ -61,7 +66,7 @@ public class LocalPostService : IPostService
         throw new NotImplementedException();
     }
 
-    public Task LikeReplyAsync(Reply reply)
+    public Task LikeAsync(Reply reply)
     {
         throw new NotImplementedException();
     }
@@ -71,13 +76,16 @@ public class LocalPostService : IPostService
         throw new NotImplementedException();
     }
 
-    public Task DeletePostAsync(Post post)
+    public async Task DeletePostAsync(Post post)
     {
-        throw new NotImplementedException();
+        await Task.Delay(500);
+        post.DelTag = 1;
     }
 
     public Task DeleteReplyAsync(Reply reply)
     {
         throw new NotImplementedException();
     }
+
+
 }

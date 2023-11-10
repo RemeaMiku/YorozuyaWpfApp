@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using EverythingHouse.WpfApp.Extensions;
@@ -15,9 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using Wpf.Ui.Markup;
-using Wpf.Ui.Mvvm.Contracts;
-using Wpf.Ui.Mvvm.Interfaces;
 
 namespace EverythingHouse.WpfApp.Views.Windows;
 

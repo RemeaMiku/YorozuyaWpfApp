@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EverythingHouse.WpfApp.Models;
+using EverythingHouse.WpfApp.Servcies.Contracts;
 
 namespace EverythingHouse.WpfApp.Servcies.DesignTime;
 
