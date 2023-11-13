@@ -1,5 +1,7 @@
-﻿using System;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -11,44 +13,28 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
-public partial class PostWindowViewModel : BaseViewModel
+public partial class PostWindowViewModel : BaseValidatorViewModel
 {
-    readonly ICancelConfirmDialogService _dialogService;
-    readonly IUserService _userService;
-    readonly IPostService _postService;
-
-    //TODO ：测试
-    readonly Post _localPost = new() { AskerId = 0, Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
 
     public PostWindowViewModel(ICancelConfirmDialogService dialogService, IUserService userService, IPostService postService)
     {
         _dialogService = dialogService;
         _userService = userService;
         _postService = postService;
+
         //TODO ：测试
         Test();
     }
 
     [ObservableProperty]
-    bool _isPostDeleted = false;
+    bool _isReplying = false;
 
-    public ICancelConfirmDialogService GetCancelConfirmDialogService() => _dialogService;
 
-    void Test()
-    {
-        // TODO：测试
-        Post = _localPost;
-        LoadPostRepliesCommand.Execute(Post);
-    }
-
-    bool _isOrderByLikes = true;
-
-    readonly static SortDescription _likesSortDescription = new(nameof(Reply.Likes), ListSortDirection.Descending);
-    readonly static SortDescription _creatTimeSortDescription = new(nameof(Reply.CreateTime), ListSortDirection.Descending);
 
     public bool IsOrderByLikes
     {
         get => _isOrderByLikes;
+
         set
         {
             if (value == _isOrderByLikes)
@@ -72,8 +58,164 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
+    [ObservableProperty]
+    string _newReply = string.Empty;
+
+    public int ReplyMaxLength { get; } = 10000;
+
     [RelayCommand]
-    async Task DeleteReplyAsync()
+    void OpenReplyPanel()
+    {
+        IsReplying = true;
+    }
+
+    [RelayCommand]
+    void CancelReply()
+    {
+        NewReply = string.Empty;
+        IsReplying = false;
+    }
+
+    public CollectionViewSource RepliesViewSource { get; } = new();
+
+    public Reply? CurrentReply
+    {
+        get => _currentReply;
+
+        set
+        {
+            if (value == _currentReply)
+                return;
+            OnPropertyChanging(nameof(CurrentReply));
+            _currentReply = value;
+            OnPropertyChanged(nameof(CurrentReply));
+            OnPropertyChanged(nameof(IsCurrentReplyMostLiked));
+            OnPropertyChanged(nameof(CurrentReplyState));
+            AcceptReplyCommand.NotifyCanExecuteChanged();
+            if (_currentReply is null)
+                return;
+            UpdateIsLikedAndIsUserReplyCommand.Execute(default);
+        }
+    }
+
+    public int CurrentReplyIndex => SelectedIndex + 1;
+
+    public bool IsNotFirstReply => CurrentReplyIndex > 1;
+
+    public bool IsNotLastReply => CurrentReplyIndex < RepliesCount;
+
+    public bool IsCurrentReplyMostLiked => CurrentReply == _mostLikedReply;
+
+    public ReplyState CurrentReplyState
+    {
+        get
+        {
+            if (CurrentReply is null)
+                return ReplyState.Default;
+            if (CurrentReply.IsAccepted && IsCurrentReplyMostLiked)
+                return ReplyState.IsAcceptedAndMostLiked;
+            if (CurrentReply.IsAccepted)
+                return ReplyState.IsAccepted;
+            if (IsCurrentReplyMostLiked)
+                return ReplyState.IsMostLiked;
+            return ReplyState.Default;
+        }
+    }
+
+    public ICancelConfirmDialogService GetCancelConfirmDialogService() => _dialogService;
+
+    private static readonly SortDescription _likesSortDescription = new(nameof(Reply.Likes), ListSortDirection.Descending);
+
+    private static readonly SortDescription _creatTimeSortDescription = new(nameof(Reply.CreateTime), ListSortDirection.Descending);
+
+    private readonly ICancelConfirmDialogService _dialogService;
+
+    private readonly IUserService _userService;
+
+    private readonly IPostService _postService;
+
+    //TODO ：测试
+    private readonly Post _localPost = new() { AskerId = 0, Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
+
+    private bool _isOrderByLikes = true;
+
+    [ObservableProperty]
+    private Post? _post;
+
+    private Reply? _currentReply;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentReplyIndex))]
+    [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand), nameof(MoveToPreviousReplyCommand))]
+    private int _selectedIndex = 0;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand))]
+    private int _repliesCount;
+
+    [ObservableProperty]
+    private bool _isCurrentReplyLiked = false;
+
+    [ObservableProperty]
+    private Reply? _userReply;
+
+    private Reply? _mostLikedReply;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AcceptReplyCommand))]
+    private bool _isUserPost = false;
+
+    [ObservableProperty]
+    private bool _isUserReply = false;
+
+    private void Test()
+    {
+        // TODO：测试
+        Post = _localPost;
+        LoadPostRepliesCommand.Execute(Post);
+    }
+
+    public bool CanAcceptReply => CurrentReply is not null && IsUserPost && !CurrentReply.IsAccepted;
+
+    [RelayCommand(CanExecute = nameof(CanAcceptReply))]
+    private async Task AcceptReplyAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Post);
+        ArgumentNullException.ThrowIfNull(CurrentReply);
+        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
+        if (CurrentReply.IsAccepted)
+        {
+            await _dialogService.ShowDialogAsync("请勿重复操作", "错误");
+            return;
+        }
+        if (!IsUserPost)
+        {
+            await _dialogService.ShowDialogAsync("你不是提问者，无法接受该回答", "无权限");
+            return;
+        }
+        try
+        {
+            await _dialogService.ShowDialogAsync("确定要采纳该回答吗？采纳后不可更改！", "接受回答");
+            if (!_dialogService.GetIsConfirmed())
+                return;
+            IsBusy = true;
+            await _postService.AcceptReplyAsync(Post, CurrentReply);
+            await LoadPostRepliesAsync();
+            OnPropertyChanged(nameof(CurrentReply));
+            OnPropertyChanged(nameof(CurrentReplyState));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteReplyAsync()
     {
         ArgumentNullException.ThrowIfNull(Post);
         ArgumentNullException.ThrowIfNull(CurrentReply);
@@ -95,21 +237,20 @@ public partial class PostWindowViewModel : BaseViewModel
                 return;
             IsBusy = true;
             await _postService.DeleteReplyAsync(CurrentReply);
-            await LoadPostRepliesAsync(Post);
+            await LoadPostRepliesAsync();
         }
         catch (Exception)
         {
-
             throw;
         }
         finally
         {
-
+            IsBusy = false;
         }
     }
 
     [RelayCommand]
-    async Task DeletePostAsync()
+    private async Task DeletePostAsync()
     {
         ArgumentNullException.ThrowIfNull(Post);
         if (Post.DelTag == 1)
@@ -129,11 +270,11 @@ public partial class PostWindowViewModel : BaseViewModel
                 return;
             IsBusy = true;
             await _postService.DeletePostAsync(Post);
-            await LoadPostRepliesAsync(Post);
+            Post = default;
+            await LoadPostRepliesAsync();
         }
         catch (Exception)
         {
-
             throw;
         }
         finally
@@ -143,20 +284,16 @@ public partial class PostWindowViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    async Task LoadPostRepliesAsync(Post post)
+    private async Task LoadPostRepliesAsync()
     {
-        if (post.DelTag == 1)
-        {
-            IsPostDeleted = true;
+        if (Post is null || Post.DelTag == 1)
             return;
-        }
-        IsPostDeleted = false;
         try
         {
             ArgumentNullException.ThrowIfNull(_userService.UserInfo);
             IsBusy = true;
-            IsUserPost = _postService.GetIsUserPost(post);
-            var replies = await _postService.GetPostRepliesAsync(post);
+            IsUserPost = _postService.GetIsUserPost(Post);
+            var replies = await _postService.GetPostRepliesAsync(Post);
             ArgumentNullException.ThrowIfNull(replies);
             if (replies.Any())
             {
@@ -188,68 +325,27 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    [ObservableProperty]
-    Post? _post;
-
-    public CollectionViewSource RepliesViewSource { get; } = new();
-
-    Reply? _currentReply;
-
-    public Reply? CurrentReply
-    {
-        get => _currentReply;
-        set
-        {
-            if (value == _currentReply)
-                return;
-            OnPropertyChanging(nameof(CurrentReply));
-            _currentReply = value;
-            OnPropertyChanged(nameof(CurrentReply));
-            OnPropertyChanged(nameof(IsCurrentReplyMostLiked));
-            OnPropertyChanged(nameof(CurrentReplyState));
-            if (_currentReply is null)
-                return;
-            UpdateIsLikedAndIsUserReplyCommand.Execute(default);
-        }
-    }
-
     [RelayCommand]
-    void MoveToUserReply()
+    private void MoveToUserReply()
     {
         ArgumentNullException.ThrowIfNull(UserReply);
         CurrentReply = UserReply;
     }
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CurrentReplyIndex))]
-    [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand), nameof(MoveToPreviousReplyCommand))]
-    int _selectedIndex = 0;
-
-    public int CurrentReplyIndex => SelectedIndex + 1;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand))]
-    int _repliesCount;
-
-    public bool IsNotFirstReply => CurrentReplyIndex > 1;
-
-    public bool IsNotLastReply => CurrentReplyIndex < RepliesCount;
-
-
     [RelayCommand(CanExecute = nameof(IsNotLastReply))]
-    void MoveToNextReply()
+    private void MoveToNextReply()
     {
         SelectedIndex++;
     }
 
     [RelayCommand(CanExecute = nameof(IsNotFirstReply))]
-    void MoveToPreviousReply()
+    private void MoveToPreviousReply()
     {
         SelectedIndex--;
     }
 
     [RelayCommand]
-    async Task UpdateIsLikedAndIsUserReplyAsync()
+    private async Task UpdateIsLikedAndIsUserReplyAsync()
     {
         try
         {
@@ -267,6 +363,37 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         catch (Exception)
         {
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    async Task ReplyPostAsync()
+    {
+        ArgumentNullException.ThrowIfNull(Post);
+        ArgumentNullException.ThrowIfNull(CurrentReply);
+        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
+        if (string.IsNullOrEmpty(NewReply))
+        {
+            await _dialogService.ShowDialogAsync("回答不能为空", "错误");
+            return;
+        }
+        try
+        {
+            IsBusy = true;
+            var newReply = new Reply() { Content = NewReply, UserId = _userService.UserInfo.Id, PostId = Post.Id };
+            await _postService.ReplyPostAsync(Post, newReply);
+            NewReply = string.Empty;
+            IsReplying = false;
+            await LoadPostRepliesAsync();
+            CurrentReply = newReply;
+        }
+        catch (Exception)
+        {
 
             throw;
         }
@@ -276,35 +403,35 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    [ObservableProperty]
-    bool _isCurrentReplyLiked = false;
-
-    public bool IsCurrentReplyMostLiked => CurrentReply == _mostLikedReply;
-
-    [ObservableProperty]
-    Reply? _userReply;
-
-    Reply? _mostLikedReply;
-
-    [ObservableProperty]
-    bool _isUserPost = false;
-
-    [ObservableProperty]
-    bool _isUserReply = false;
-
-    public ReplyState CurrentReplyState
+    [RelayCommand]
+    async Task LikeOrCancelLikeAsync()
     {
-        get
+        ArgumentNullException.ThrowIfNull(Post);
+        ArgumentNullException.ThrowIfNull(CurrentReply);
+        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
+        try
         {
-            if (CurrentReply is null)
-                return ReplyState.Default;
-            if (CurrentReply.IsAccepted && IsCurrentReplyMostLiked)
-                return ReplyState.IsAcceptedAndMostLiked;
-            if (CurrentReply.IsAccepted)
-                return ReplyState.IsAccepted;
-            if (IsCurrentReplyMostLiked)
-                return ReplyState.IsMostLiked;
-            return ReplyState.Default;
+            IsBusy = true;
+            if (IsCurrentReplyLiked)
+            {
+                await _postService.CancelLikeAsync(CurrentReply);
+            }
+            else
+            {
+                await _postService.LikeAsync(CurrentReply);
+            }
+            IsCurrentReplyLiked = !IsCurrentReplyLiked;
+            OnPropertyChanged(nameof(CurrentReply));
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
+
 }

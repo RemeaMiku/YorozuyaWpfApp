@@ -9,7 +9,7 @@ namespace Yorozuya.WpfApp.Common.Converters;
 /// 反转的可空值转可见性转换器
 /// 如果值为null，则返回 Visible，否则返回Collapsed
 /// </summary>
-public class ReversedNullableToVisibilityConveter : IValueConverter
+public class ReversedNullableToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

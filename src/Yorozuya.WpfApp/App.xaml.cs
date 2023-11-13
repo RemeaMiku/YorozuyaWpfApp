@@ -20,7 +20,7 @@ public partial class App : Application
     public static new App Current => (App)Application.Current;
 
     // IoC容器
-    public IServiceProvider ServiceProvider { get; private set; } = new ServiceCollection()
+    public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
         .AddTransient<ICancelConfirmDialogService, CancelConfirmDialogService>()
         .AddSingleton<IUserService, LocalUserService>()
         .AddSingleton<IPostService, LocalPostService>()

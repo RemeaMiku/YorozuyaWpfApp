@@ -23,7 +23,7 @@
         <cv:ReplyStateToBrushConverter x:Key="ReplyStateToBrushConverter" />
         <cv:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
         <cv:ReversedBooleanToVisibilityConverter x:Key="ReversedBooleanToVisibilityConverter" />
-        <cv:ReversedNullableToVisibilityConveter x:Key="ReversedNullableToVisibilityConveter" />
+        <cv:ReversedNullableToVisibilityConverter x:Key="ReversedNullableToVisibilityConverter" />
         <Style
             x:Key="TitleBarUiButtonStyle"
             BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
@@ -65,8 +65,8 @@
         <Border
             Grid.Row="1"
             Padding="10"
-            IsEnabled="{Binding ViewModel.IsBusy, Converter={StaticResource ReversedBooleanToVisibilityConverter}, Mode=OneWay}"
-            Visibility="{Binding ViewModel.IsPostDeleted, Converter={StaticResource ReversedBooleanToVisibilityConverter}, Mode=OneWay}">
+            IsEnabled="{Binding ViewModel.IsNotBusy, Mode=OneWay}"
+            Visibility="{Binding ViewModel.Post, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
@@ -79,7 +79,6 @@
                     Grid.ColumnSpan="2"
                     Panel.ZIndex="100"
                     d:Visibility="Hidden"
-                    Foreground="{StaticResource MeaBlueBrush}"
                     IsIndeterminate="True"
                     Visibility="{Binding ViewModel.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                 <Border
@@ -126,8 +125,16 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    <TextBlock
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Panel.ZIndex="100"
+                        d:Visibility="Collapsed"
+                        FontSize="{StaticResource LargeFontSize}"
+                        Text="暂无回答"
+                        Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource ReversedNullableToVisibilityConverter}, Mode=OneWay}" />
                     <ui:CardExpander
                         Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
                         BorderThickness="0"
@@ -198,172 +205,210 @@
                             </ScrollViewer>
                         </ui:CardExpander.Content>
                     </ui:CardExpander>
-                    <TextBlock
+                    <Grid
                         Grid.Row="1"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Panel.ZIndex="100"
-                        d:Visibility="Collapsed"
-                        FontSize="{StaticResource LargeFontSize}"
-                        Text="暂无回答"
-                        Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource ReversedNullableToVisibilityConveter}, Mode=OneWay}" />
-                    <Border
-                        Grid.Row="1"
-                        Margin="0,10,0,0"
-                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
-                        CornerRadius="3"
-                        Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Border
-                                Padding="15,5"
-                                d:Background="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}"
-                                Background="{Binding ViewModel.CurrentReplyState, Converter={StaticResource ReplyStateToBrushConverter}, Mode=OneWay}"
-                                CornerRadius="3,3,0,0">
-                                <Grid>
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon
-                                            FontSize="{StaticResource MediumFontSize}"
-                                            Foreground="White"
-                                            Symbol="ChatArrowBack20" />
-                                        <TextBlock
-                                            Margin="5,0,0,0"
-                                            d:Text="回答 114514"
-                                            FontSize="{StaticResource MediumFontSize}"
-                                            Foreground="White"
-                                            Text="{Binding ViewModel.CurrentReply.Id, StringFormat='回答 {0}', Mode=OneWay}" />
-                                    </StackPanel>
-                                    <WrapPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                        <ui:SymbolIcon
-                                            Foreground="White"
-                                            Symbol="CheckmarkStarburst24"
-                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                                        <TextBlock
-                                            Margin="5,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontSize="{StaticResource MediumFontSize}"
-                                            FontWeight="Bold"
-                                            Foreground="White"
-                                            Text="已被采纳"
-                                            Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                                        <ui:SymbolIcon
-                                            Margin="15,0,0,0"
-                                            Foreground="White"
-                                            Symbol="RibbonStar24"
-                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                                        <TextBlock
-                                            Margin="5,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontSize="{StaticResource MediumFontSize}"
-                                            FontWeight="Bold"
-                                            Foreground="White"
-                                            Text="最高赞"
-                                            Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                                        <ui:SymbolIcon
-                                            Margin="15,0,0,0"
-                                            Foreground="White"
-                                            Symbol="ArrowUpload24" />
-                                        <TextBlock
-                                            Margin="5,0,0,0"
-                                            HorizontalAlignment="Right"
-                                            d:Text="2023.08.31 11:14:51"
-                                            FontSize="{StaticResource SmallFontSize}"
-                                            Foreground="White"
-                                            Text="{Binding ViewModel.CurrentReply.CreateTime, Mode=OneWay}" />
-                                        <ui:Button
-                                            Margin="10,0,0,0"
-                                            d:Content="831"
-                                            Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}"
-                                            FontSize="{StaticResource LargeFontSize}"
-                                            Foreground="White"
-                                            Icon="ThumbLike24"
-                                            IconFilled="{Binding ViewModel.IsCurrentReplyLiked, Mode=OneWay}"
-                                            Style="{StaticResource BorderlessTransparentUiButtonStyle}">
-                                            <ui:Button.ToolTip>
-                                                <ToolTip Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}" ContentStringFormat="回答点赞数：{0}" />
-                                            </ui:Button.ToolTip>
-                                        </ui:Button>
-                                        <ui:Button
-                                            Command="{Binding ViewModel.DeleteReplyCommand, Mode=OneTime}"
-                                            FontSize="{StaticResource LargeFontSize}"
-                                            Foreground="White"
-                                            Icon="Delete24"
-                                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                                            Visibility="{Binding ViewModel.IsUserReply, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                                    </WrapPanel>
-                                </Grid>
-                            </Border>
-                            <Border Grid.Row="1" Padding="15">
-                                <TextBlock
-                                    VerticalAlignment="Top"
-                                    d:Text="      不是。初音未来并不是第一个虚拟歌姬。实际上，第一个虚拟歌姬是名为Leon的角色，他是在2004年发售的VOCALOID的第一代产品1。然而，初音未来无疑是最具影响力的虚拟歌姬1。她的声源库实际上对应的已经是VOCALOID二代产品，就算是在初音的生父CRYPTON公司，早于初音未来诞生的也还有KAITO和MEIKO1。尽管如此，初音未来的影响力和知名度使她在许多人心中被视为虚拟歌姬的代表。"
-                                    FontSize="{StaticResource MediumFontSize}"
-                                    LineHeight="25"
-                                    Text="{Binding ViewModel.CurrentReply.Content, Mode=OneWay}"
-                                    TextWrapping="Wrap" />
-                            </Border>
-                        </Grid>
-                    </Border>
-                    <StackPanel
-                        Grid.Row="2"
-                        Margin="0,10,0,0"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal">
-                        <TextBlock FontSize="{StaticResource MediumFontSize}">
-                            <Run d:Text="1" Text="{Binding ViewModel.CurrentReplyIndex, Mode=OneWay}" />
-                            <Run Text="/" />
-                            <Run d:Text="39" Text="{Binding ViewModel.RepliesCount, Mode=OneWay}" />
-                        </TextBlock>
-                        <ui:Button
-                            Margin="10,0,0,0"
-                            Command="{Binding ViewModel.MoveToPreviousReplyCommand, Mode=OneTime}"
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="ChevronUp24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="上一个回答" />
-                        <ui:Button
-                            Command="{Binding ViewModel.MoveToNextReplyCommand, Mode=OneTime}"
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="ChevronDown24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="下一个回答" />
-                        <ui:Button
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="CheckmarkStarburst24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="采纳此回答"
-                            Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                        <ui:Button
-                            x:Name="CopyButton"
-                            Click="OnCopyButtonClickedAsync"
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="Copy24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="复制此回答" />
-                        <ui:Button
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="ChatAdd24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="回答问题"
-                            Visibility="{Binding ViewModel.UserReply, Converter={StaticResource ReversedNullableToVisibilityConveter}, Mode=OneWay}" />
-                        <ui:Button
-                            Command="{Binding ViewModel.MoveToUserReplyCommand, Mode=OneTime}"
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="PersonChat24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="查看你的回答"
-                            Visibility="{Binding ViewModel.UserReply, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}" />
-                        <ui:Button
-                            Command="{Binding ViewModel.DeletePostCommand}"
-                            FontSize="{StaticResource LargeFontSize}"
-                            Icon="ChatDismiss24"
-                            Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                            ToolTip="删除问题"
-                            Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
-                    </StackPanel>
+                        d:Visibility="Hidden"
+                        Visibility="{Binding ViewModel.IsReplying, Converter={StaticResource ReversedBooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Border
+                            Margin="0,10,0,0"
+                            Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                            CornerRadius="3"
+                            Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Border
+                                    Padding="15,5"
+                                    d:Background="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}"
+                                    Background="{Binding ViewModel.CurrentReplyState, Converter={StaticResource ReplyStateToBrushConverter}, Mode=OneWay}"
+                                    CornerRadius="3,3,0,0">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon
+                                                FontSize="{StaticResource MediumFontSize}"
+                                                Foreground="White"
+                                                Symbol="ChatArrowBack20" />
+                                            <TextBlock
+                                                Margin="5,0,0,0"
+                                                d:Text="回答 114514"
+                                                FontSize="{StaticResource MediumFontSize}"
+                                                Foreground="White"
+                                                Text="{Binding ViewModel.CurrentReply.Id, StringFormat='回答 {0}', Mode=OneWay}" />
+                                        </StackPanel>
+                                        <WrapPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                            <ui:SymbolIcon
+                                                Foreground="White"
+                                                Symbol="CheckmarkStarburst24"
+                                                Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                            <TextBlock
+                                                Margin="5,0,0,0"
+                                                VerticalAlignment="Center"
+                                                FontSize="{StaticResource MediumFontSize}"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Text="已被采纳"
+                                                Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                            <ui:SymbolIcon
+                                                Margin="15,0,0,0"
+                                                Foreground="White"
+                                                Symbol="RibbonStar24"
+                                                Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                            <TextBlock
+                                                Margin="5,0,0,0"
+                                                VerticalAlignment="Center"
+                                                FontSize="{StaticResource MediumFontSize}"
+                                                FontWeight="Bold"
+                                                Foreground="White"
+                                                Text="最高赞"
+                                                Visibility="{Binding ViewModel.IsCurrentReplyMostLiked, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                            <ui:SymbolIcon
+                                                Margin="15,0,0,0"
+                                                Foreground="White"
+                                                Symbol="ArrowUpload24" />
+                                            <TextBlock
+                                                Margin="5,0,0,0"
+                                                HorizontalAlignment="Right"
+                                                d:Text="2023.08.31 11:14:51"
+                                                FontSize="{StaticResource SmallFontSize}"
+                                                Foreground="White"
+                                                Text="{Binding ViewModel.CurrentReply.CreateTime, Mode=OneWay}" />
+                                            <ui:Button
+                                                Margin="10,0,0,0"
+                                                d:Content="831"
+                                                Command="{Binding ViewModel.LikeOrCancelLikeCommand, Mode=OneTime}"
+                                                Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}"
+                                                FontSize="{StaticResource LargeFontSize}"
+                                                Foreground="White"
+                                                Icon="ThumbLike24"
+                                                IconFilled="{Binding ViewModel.IsCurrentReplyLiked, Mode=OneWay}"
+                                                Style="{StaticResource BorderlessTransparentUiButtonStyle}">
+                                                <ui:Button.ToolTip>
+                                                    <ToolTip Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}" ContentStringFormat="回答点赞数：{0}" />
+                                                </ui:Button.ToolTip>
+                                            </ui:Button>
+                                            <ui:Button
+                                                Command="{Binding ViewModel.DeleteReplyCommand, Mode=OneTime}"
+                                                FontSize="{StaticResource LargeFontSize}"
+                                                Foreground="White"
+                                                Icon="Delete24"
+                                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                                Visibility="{Binding ViewModel.IsUserReply, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                        </WrapPanel>
+                                    </Grid>
+                                </Border>
+                                <Border Grid.Row="1" Padding="15">
+                                    <TextBlock
+                                        VerticalAlignment="Top"
+                                        d:Text="      不是。初音未来并不是第一个虚拟歌姬。实际上，第一个虚拟歌姬是名为Leon的角色，他是在2004年发售的VOCALOID的第一代产品1。然而，初音未来无疑是最具影响力的虚拟歌姬1。她的声源库实际上对应的已经是VOCALOID二代产品，就算是在初音的生父CRYPTON公司，早于初音未来诞生的也还有KAITO和MEIKO1。尽管如此，初音未来的影响力和知名度使她在许多人心中被视为虚拟歌姬的代表。"
+                                        FontSize="{StaticResource MediumFontSize}"
+                                        LineHeight="25"
+                                        Text="{Binding ViewModel.CurrentReply.Content, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                            <TextBlock FontSize="{StaticResource MediumFontSize}">
+                                <Run d:Text="1" Text="{Binding ViewModel.CurrentReplyIndex, Mode=OneWay}" />
+                                <Run Text="/" />
+                                <Run d:Text="39" Text="{Binding ViewModel.RepliesCount, Mode=OneWay}" />
+                            </TextBlock>
+                            <ui:Button
+                                Margin="10,0,0,0"
+                                Command="{Binding ViewModel.MoveToPreviousReplyCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="ChevronUp24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="上一个回答" />
+                            <ui:Button
+                                Command="{Binding ViewModel.MoveToNextReplyCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="ChevronDown24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="下一个回答" />
+                            <ui:Button
+                                Command="{Binding ViewModel.AcceptReplyCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="CheckmarkStarburst24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="采纳此回答"
+                                Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                            <ui:Button
+                                x:Name="CopyButton"
+                                Click="OnCopyButtonClickedAsync"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="Copy24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="复制此回答" />
+                            <ui:Button
+                                Command="{Binding ViewModel.OpenReplyPanelCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="ChatAdd24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="回答问题"
+                                Visibility="{Binding ViewModel.UserReply, Converter={StaticResource ReversedNullableToVisibilityConverter}, Mode=OneWay}" />
+                            <ui:Button
+                                Command="{Binding ViewModel.MoveToUserReplyCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="PersonChat24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="查看你的回答"
+                                Visibility="{Binding ViewModel.UserReply, Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}" />
+                            <ui:Button
+                                Command="{Binding ViewModel.DeletePostCommand}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="ChatDismiss24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="删除问题"
+                                Visibility="{Binding ViewModel.IsUserPost, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                        </StackPanel>
+                    </Grid>
+                    <Grid Grid.Row="1" Visibility="{Binding ViewModel.IsReplying, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ui:TextBox
+                            x:Name="NewReplyBox"
+                            Margin="0,10,0,0"
+                            MaxLength="{Binding ViewModel.ReplyMaxLength, Mode=OneTime}"
+                            PlaceholderText="输入你的回答..."
+                            Text="{Binding ViewModel.NewReply}"
+                            TextWrapping="Wrap" />
+                        <StackPanel
+                            Grid.Row="1"
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal">
+                            <TextBlock
+                                d:Text="已输入 39/10000 字"
+                                FontSize="{StaticResource MediumFontSize}"
+                                Text="{Binding ElementName=NewReplyBox, Path=Text.Length, StringFormat='已输入 {0}/10000 字'}" />
+                            <ui:Button
+                                Margin="10,0,0,0"
+                                Command="{Binding ViewModel.CancelReplyCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="Dismiss24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="取消" />
+                            <ui:Button
+                                Command="{Binding ViewModel.ReplyPostCommand, Mode=OneTime}"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Icon="ArrowUpload24"
+                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                ToolTip="提交" />
+                        </StackPanel>
+                    </Grid>
                 </Grid>
                 <GridSplitter
                     HorizontalAlignment="Right"
@@ -374,8 +419,8 @@
         <Border
             Grid.Row="1"
             d:Visibility="Hidden"
-            Background="{StaticResource MeaBlueBrushAlpha}"
-            Visibility="{Binding ViewModel.IsPostDeleted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}">
+            Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+            Visibility="{Binding ViewModel.Post, Converter={StaticResource ReversedNullableToVisibilityConverter}, Mode=OneWay}">
             <StackPanel
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
@@ -384,7 +429,7 @@
                 <TextBlock
                     Margin="10,0,0,0"
                     FontSize="{StaticResource LargeFontSize}"
-                    Text="问题已被删除" />
+                    Text="问题不存在或已被删除" />
             </StackPanel>
         </Border>
         <ui:Dialog
