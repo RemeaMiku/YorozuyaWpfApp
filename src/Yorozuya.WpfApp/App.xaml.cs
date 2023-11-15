@@ -8,6 +8,7 @@ using Yorozuya.WpfApp.ViewModels.Windows;
 using Yorozuya.WpfApp.Views.Pages;
 using Yorozuya.WpfApp.Views.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Yorozuya.WpfApp;
 
@@ -21,6 +22,7 @@ public partial class App : Application
 
     // IoC容器
     public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
+        .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
         .AddTransient<ICancelConfirmDialogService, CancelConfirmDialogService>()
         .AddSingleton<IUserService, LocalUserService>()
         .AddSingleton<IPostService, LocalPostService>()
@@ -41,7 +43,7 @@ public partial class App : Application
     {
         // 从容器中获取MainWindow并显示
         ServiceProvider.GetRequiredService<MainWindow>().Show();
-        ServiceProvider.GetRequiredService<PostWindow>().Show();
+        ServiceProvider.GetRequiredService<PostWindow>().Hide();
     }
 
 }

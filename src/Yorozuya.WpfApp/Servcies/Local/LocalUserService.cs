@@ -6,7 +6,7 @@ namespace Yorozuya.WpfApp.Servcies.Local;
 
 public class LocalUserService : IUserService
 {
-    readonly UserInfo _localUserInfo = new() { Id = 0 };
+    readonly UserInfo _localUserInfo = new() { Id = 0, Username = "Developer" };
 
     public UserInfo? UserInfo
     {

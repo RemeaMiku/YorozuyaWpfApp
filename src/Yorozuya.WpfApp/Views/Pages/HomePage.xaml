@@ -11,10 +11,9 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid d:Background="White">
-        <TextBlock
+        <ui:Button
             HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Style="{StaticResource DynamicForegroundTextBlock}"
-            Text="HomePage" />
+            Command="{Binding ViewModel.TestCommand}"
+            Content="Test" />
     </Grid>
 </Page>

@@ -4,20 +4,24 @@ using Yorozuya.WpfApp.ViewModels.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
+using CommunityToolkit.Mvvm.Messaging;
+using Yorozuya.WpfApp.Models;
+using System.ComponentModel;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
 /// <summary>
 /// QuestionWindow.xaml 的交互逻辑
 /// </summary>
-public partial class PostWindow : UiWindow
+public partial class PostWindow : UiWindow, IRecipient<Post>
 {
-    public PostWindow(PostWindowViewModel viewModel)
+    public PostWindow(PostWindowViewModel viewModel, IMessenger messenger)
     {
         InitializeComponent();
         DataContext = this;
         ViewModel = viewModel;
         ViewModel.GetCancelConfirmDialogService().Initialize(Dialog);
+        messenger.Register(this);
     }
 
     public PostWindowViewModel ViewModel { get; }
@@ -33,9 +37,9 @@ public partial class PostWindow : UiWindow
 
     async void OnCopyButtonClickedAsync(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.CurrentReply is null)
+        if (string.IsNullOrEmpty(ViewModel.CurrentReply!.Content))
             return;
-        System.Windows.Clipboard.SetDataObject(ViewModel.CurrentReply.Content);
+        Wpf.Ui.Common.Clipboard.SetText(ViewModel.CurrentReply.Content);
         CopyButton.Icon = SymbolRegular.Checkmark24;
         CopyButton.Appearance = ControlAppearance.Success;
         await Task.Delay(3000);
@@ -43,4 +47,19 @@ public partial class PostWindow : UiWindow
         CopyButton.Appearance = ControlAppearance.Transparent;
     }
 
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        Hide();
+        e.Cancel = true;
+    }
+
+    public void Receive(Post message)
+    {
+        if (!IsVisible)
+            Show();
+        Focus();
+        ViewModel.PushBackward();
+        ViewModel.Post = message;
+        ViewModel.CheckForward();
+    }
 }

@@ -33,6 +33,12 @@
             <Setter Property="MouseOverBackground" Value="{Binding Path=ButtonsBackground, RelativeSource={RelativeSource AncestorType={x:Type ui:TitleBar}}}" />
             <Setter Property="CornerRadius" Value="0" />
             <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="#AAAAAA" />
+                    <Setter Property="Cursor" Value="No" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </ui:UiWindow.Resources>
     <Grid>
@@ -40,28 +46,33 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ui:TitleBar Background="{ui:ThemeResource}">
-            <ui:TitleBar.Header>
-                <StackPanel Orientation="Horizontal">
-                    <ui:Button
-                        Width="Auto"
-                        Click="OnMainWindowButtonClicked"
-                        Content="回到主界面"
-                        Icon="Home24"
-                        MouseOverBackground="{StaticResource MikuGreenBrush}"
-                        Style="{StaticResource TitleBarUiButtonStyle}"
-                        ToolTip="回到主界面" />
-                    <ui:Button
-                        Icon="ChevronLeft24"
-                        Style="{StaticResource TitleBarUiButtonStyle}"
-                        ToolTip="返回到上一个问题" />
-                    <ui:Button
-                        Icon="ChevronRight24"
-                        Style="{StaticResource TitleBarUiButtonStyle}"
-                        ToolTip="前进到下一个问题" />
-                </StackPanel>
-            </ui:TitleBar.Header>
-        </ui:TitleBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Background="{ui:ThemeResource}" Orientation="Horizontal">
+                <ui:Button
+                    Width="Auto"
+                    Click="OnMainWindowButtonClicked"
+                    Content="回到主界面"
+                    Icon="Home24"
+                    MouseOverBackground="{StaticResource MikuGreenBrush}"
+                    Style="{StaticResource TitleBarUiButtonStyle}"
+                    ToolTip="回到主界面" />
+                <ui:Button
+                    Command="{Binding ViewModel.BackCommand, Mode=OneTime}"
+                    Icon="ChevronLeft24"
+                    Style="{StaticResource TitleBarUiButtonStyle}"
+                    ToolTip="返回到上一个问题" />
+                <ui:Button
+                    Command="{Binding ViewModel.ForwardCommand, Mode=OneTime}"
+                    Icon="ChevronRight24"
+                    Style="{StaticResource TitleBarUiButtonStyle}"
+                    ToolTip="前进到下一个问题" />
+            </StackPanel>
+            <ui:TitleBar Grid.Column="1" Background="{ui:ThemeResource}" />
+        </Grid>
         <Border
             Grid.Row="1"
             Padding="10"
@@ -130,7 +141,6 @@
                         Grid.Row="1"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Panel.ZIndex="100"
                         d:Visibility="Collapsed"
                         FontSize="{StaticResource LargeFontSize}"
                         Text="暂无回答"
@@ -349,7 +359,8 @@
                                 FontSize="{StaticResource LargeFontSize}"
                                 Icon="Copy24"
                                 Style="{StaticResource BorderlessTransparentUiButtonStyle}"
-                                ToolTip="复制此回答" />
+                                ToolTip="复制此回答"
+                                Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource NullableToVisibilityConverter}}" />
                             <ui:Button
                                 Command="{Binding ViewModel.OpenReplyPanelCommand, Mode=OneTime}"
                                 FontSize="{StaticResource LargeFontSize}"
@@ -378,13 +389,17 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <ui:TextBox
-                            x:Name="NewReplyBox"
+                        <Border
                             Margin="0,10,0,0"
-                            MaxLength="{Binding ViewModel.ReplyMaxLength, Mode=OneTime}"
-                            PlaceholderText="输入你的回答..."
-                            Text="{Binding ViewModel.NewReply}"
-                            TextWrapping="Wrap" />
+                            Background="{ui:ThemeResource}"
+                            CornerRadius="5">
+                            <ui:TextBox
+                                x:Name="NewReplyBox"
+                                MaxLength="{Binding ViewModel.ReplyMaxLength, Mode=OneTime}"
+                                PlaceholderText="输入你的回答..."
+                                Text="{Binding ViewModel.NewReply}"
+                                TextWrapping="Wrap" />
+                        </Border>
                         <StackPanel
                             Grid.Row="1"
                             Margin="0,10,0,0"

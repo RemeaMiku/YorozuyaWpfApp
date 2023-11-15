@@ -6,6 +6,8 @@ namespace Yorozuya.WpfApp.Servcies.Contracts;
 
 public interface IPostService
 {
+    public Task<IEnumerable<Post>?> GetPostsByFieldAsync(string field);
+
     public Task<IEnumerable<Reply>?> GetPostRepliesAsync(Post post);
 
     public Task<bool> GetIsLikedAsync(Reply reply);

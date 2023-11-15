@@ -20,6 +20,7 @@ namespace Yorozuya.WpfApp.Views.Windows;
 /// </summary>
 public partial class MainWindow : UiWindow
 {
+
     public MainWindow(MainWindowViewModel viewModel)
     {
         InitializeComponent();

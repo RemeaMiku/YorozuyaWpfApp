@@ -1,5 +1,5 @@
-﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Yorozuya.WpfApp.Common;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
@@ -15,21 +16,18 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class PostWindowViewModel : BaseValidatorViewModel
 {
+    readonly Stack<Post> _backStack = new();
+    readonly Stack<Post> _forwardStack = new();
 
     public PostWindowViewModel(ICancelConfirmDialogService dialogService, IUserService userService, IPostService postService)
     {
         _dialogService = dialogService;
         _userService = userService;
         _postService = postService;
-
-        //TODO ：测试
-        Test();
     }
 
     [ObservableProperty]
     bool _isReplying = false;
-
-
 
     public bool IsOrderByLikes
     {
@@ -134,13 +132,66 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
 
     private readonly IPostService _postService;
 
-    //TODO ：测试
-    private readonly Post _localPost = new() { AskerId = 0, Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
+    //private readonly Post _localPost = new() { AskerId = 0, Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
 
     private bool _isOrderByLikes = true;
 
-    [ObservableProperty]
     private Post? _post;
+
+    public Post? Post
+    {
+        get => _post;
+        set
+        {
+            if (value == _post)
+                return;
+            OnPropertyChanging(nameof(Post));
+            _post = value;
+            OnPropertyChanged(nameof(Post));
+            BackCommand.NotifyCanExecuteChanged();
+            ForwardCommand.NotifyCanExecuteChanged();
+            LoadPostRepliesCommand.Execute(default);
+        }
+    }
+
+    bool CanBack => _backStack.Any();
+
+    [RelayCommand(CanExecute = nameof(CanBack))]
+    void Back()
+    {
+        if (Post is not null)
+            _forwardStack.Push(Post);
+        Post = _backStack.Pop();
+    }
+
+    bool CanForward => _forwardStack.Any();
+
+    [RelayCommand(CanExecute = nameof(CanForward))]
+    void Forward()
+    {
+        if (Post is not null)
+            _backStack.Push(Post);
+        Post = _forwardStack.Pop();
+    }
+
+    public void CheckForward()
+    {
+        if (!CanForward)
+            return;
+        if (Post != _forwardStack.Pop())
+        {
+            _forwardStack.Clear();
+            ForwardCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    public void PushBackward()
+    {
+        if (Post is null)
+            return;
+        _backStack.Push(Post);
+        BackCommand.NotifyCanExecuteChanged();
+    }
 
     private Reply? _currentReply;
 
@@ -167,13 +218,6 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
 
     [ObservableProperty]
     private bool _isUserReply = false;
-
-    private void Test()
-    {
-        // TODO：测试
-        Post = _localPost;
-        LoadPostRepliesCommand.Execute(Post);
-    }
 
     public bool CanAcceptReply => CurrentReply is not null && IsUserPost && !CurrentReply.IsAccepted;
 
@@ -283,11 +327,18 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
         }
     }
 
+
+
     [RelayCommand]
     private async Task LoadPostRepliesAsync()
     {
-        if (Post is null || Post.DelTag == 1)
+        if (Post is null)
             return;
+        if (Post.DelTag != 0)
+        {
+            Post = default;
+            return;
+        }
         try
         {
             ArgumentNullException.ThrowIfNull(_userService.UserInfo);
@@ -375,7 +426,6 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     async Task ReplyPostAsync()
     {
         ArgumentNullException.ThrowIfNull(Post);
-        ArgumentNullException.ThrowIfNull(CurrentReply);
         ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         if (string.IsNullOrEmpty(NewReply))
         {
@@ -433,5 +483,4 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
             IsBusy = false;
         }
     }
-
 }
