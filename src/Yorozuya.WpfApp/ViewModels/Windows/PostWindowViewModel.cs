@@ -8,7 +8,9 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Extensions;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
@@ -19,12 +21,17 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     readonly Stack<Post> _backStack = new();
     readonly Stack<Post> _forwardStack = new();
 
-    public PostWindowViewModel(ICancelConfirmDialogService dialogService, IUserService userService, IPostService postService)
+    public PostWindowViewModel(ILeftRightButtonDialogService dialogService, ISnackbarService snackbarService, IUserService userService, IPostService postService)
     {
         _dialogService = dialogService;
+        _snackbarService = snackbarService;
         _userService = userService;
         _postService = postService;
     }
+
+    readonly ISnackbarService _snackbarService;
+
+    public ISnackbarService GetSnackbarService() => _snackbarService;
 
     [ObservableProperty]
     bool _isReplying = false;
@@ -32,7 +39,6 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     public bool IsOrderByLikes
     {
         get => _isOrderByLikes;
-
         set
         {
             if (value == _isOrderByLikes)
@@ -57,7 +63,7 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     }
 
     [ObservableProperty]
-    string _newReply = string.Empty;
+    string _newReplyContent = string.Empty;
 
     public int ReplyMaxLength { get; } = 10000;
 
@@ -70,7 +76,7 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     [RelayCommand]
     void CancelReply()
     {
-        NewReply = string.Empty;
+        NewReplyContent = string.Empty;
         IsReplying = false;
     }
 
@@ -120,19 +126,17 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
         }
     }
 
-    public ICancelConfirmDialogService GetCancelConfirmDialogService() => _dialogService;
+    public ILeftRightButtonDialogService GetCancelConfirmDialogService() => _dialogService;
 
     private static readonly SortDescription _likesSortDescription = new(nameof(Reply.Likes), ListSortDirection.Descending);
 
     private static readonly SortDescription _creatTimeSortDescription = new(nameof(Reply.CreateTime), ListSortDirection.Descending);
 
-    private readonly ICancelConfirmDialogService _dialogService;
+    private readonly ILeftRightButtonDialogService _dialogService;
 
     private readonly IUserService _userService;
 
     private readonly IPostService _postService;
-
-    //private readonly Post _localPost = new() { AskerId = 0, Id = 114514, Title = "初音未来是第一个虚拟歌姬吗？", Content = "初音未来是第一个虚拟歌姬吗？", CreateTime = "2023.08.31 11:14:51", UpdateTime = "2023.08.31 11:14:51", Field = "VOCALOID", Views = 831 };
 
     private bool _isOrderByLikes = true;
 
@@ -221,36 +225,36 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
 
     public bool CanAcceptReply => CurrentReply is not null && IsUserPost && !CurrentReply.IsAccepted;
 
+    const string _postIsNullErrorMessage = "问题不存在或已被删除";
+
+    const string _replyIsNullErrorMessage = "回答不存在或已被删除";
+
+    const string _userNotLoggedInErrorMessage = "登录失效，请重新登录";
+
     [RelayCommand(CanExecute = nameof(CanAcceptReply))]
     private async Task AcceptReplyAsync()
     {
-        ArgumentNullException.ThrowIfNull(Post);
-        ArgumentNullException.ThrowIfNull(CurrentReply);
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
-        if (CurrentReply.IsAccepted)
-        {
-            await _dialogService.ShowDialogAsync("请勿重复操作", "错误");
+        if (_snackbarService.ShowErrorMessageIfAny("采纳回答失败",
+            (() => Post is null, _postIsNullErrorMessage),
+            (() => CurrentReply is null, _replyIsNullErrorMessage),
+            (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+            (() => CurrentReply!.IsAccepted, "该回答已被采纳，请勿重复操作"),
+            (() => !IsUserPost, "你不是提问者，无法接受该回答")))
             return;
-        }
-        if (!IsUserPost)
-        {
-            await _dialogService.ShowDialogAsync("你不是提问者，无法接受该回答", "无权限");
-            return;
-        }
         try
         {
-            await _dialogService.ShowDialogAsync("确定要采纳该回答吗？采纳后不可更改！", "接受回答");
-            if (!_dialogService.GetIsConfirmed())
+            await _dialogService.ShowDialogAsync("确定要采纳该回答吗？采纳后不可更改！", "警告", "取消", "确认");
+            if (!_dialogService.GetIsRightButtonClicked())
                 return;
             IsBusy = true;
-            await _postService.AcceptReplyAsync(Post, CurrentReply);
+            await _postService.AcceptReplyAsync(Post!, CurrentReply!);
             await LoadPostRepliesAsync();
             OnPropertyChanged(nameof(CurrentReply));
             OnPropertyChanged(nameof(CurrentReplyState));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _snackbarService.ShowErrorMessage("采纳回答失败", ex.Message);
         }
         finally
         {
@@ -261,31 +265,25 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     [RelayCommand]
     private async Task DeleteReplyAsync()
     {
-        ArgumentNullException.ThrowIfNull(Post);
-        ArgumentNullException.ThrowIfNull(CurrentReply);
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
-        if (CurrentReply.DelTag == 1)
-        {
-            await _dialogService.ShowDialogAsync("请勿重复操作", "错误");
+        if (_snackbarService.ShowErrorMessageIfAny("删除回答失败",
+             (() => Post is null, _postIsNullErrorMessage),
+             (() => CurrentReply is null, _replyIsNullErrorMessage),
+             (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+             (() => CurrentReply!.DelTag != 0, "该回答已被删除，请勿重复操作"),
+             (() => !IsUserReply, "你不是此回答的作者，无法删除该回答")))
             return;
-        }
-        if (!IsUserReply)
-        {
-            await _dialogService.ShowDialogAsync("你不是此回答的作者，无法删除该回答", "无权限");
-            return;
-        }
         try
         {
-            await _dialogService.ShowDialogAsync("确定要删除该回答吗？删除后不可恢复！", "删除回答");
-            if (!_dialogService.GetIsConfirmed())
+            await _dialogService.ShowDialogAsync("确定要删除该回答吗？删除后不可恢复！", "警告", "取消", "确认");
+            if (!_dialogService.GetIsRightButtonClicked())
                 return;
             IsBusy = true;
-            await _postService.DeleteReplyAsync(CurrentReply);
+            await _postService.DeleteReplyAsync(CurrentReply!);
             await LoadPostRepliesAsync();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _snackbarService.ShowErrorMessage("删除回答失败", ex.Message);
         }
         finally
         {
@@ -296,30 +294,25 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     [RelayCommand]
     private async Task DeletePostAsync()
     {
-        ArgumentNullException.ThrowIfNull(Post);
-        if (Post.DelTag == 1)
-        {
-            await _dialogService.ShowDialogAsync("请勿重复操作", "错误");
+        if (_snackbarService.ShowErrorMessageIfAny("删除问题失败",
+           (() => Post is null, _postIsNullErrorMessage),
+           (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+           (() => !IsUserPost, "你不是提问者，无法删除该问题"),
+           (() => Post!.DelTag != 0, "该问题已被删除，请勿重复操作")))
             return;
-        }
-        if (!IsUserPost)
-        {
-            await _dialogService.ShowDialogAsync("你不是提问者，无法删除该问题", "无权限");
-            return;
-        }
         try
         {
-            await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "警告");
-            if (!_dialogService.GetIsConfirmed())
+            await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "警告", "取消", "确认");
+            if (!_dialogService.GetIsRightButtonClicked())
                 return;
             IsBusy = true;
-            await _postService.DeletePostAsync(Post);
+            await _postService.DeletePostAsync(Post!);
             Post = default;
             await LoadPostRepliesAsync();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _snackbarService.ShowErrorMessage("删除问题失败", ex.Message);
         }
         finally
         {
@@ -341,14 +334,15 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
         }
         try
         {
-            ArgumentNullException.ThrowIfNull(_userService.UserInfo);
+            if (_snackbarService.ShowErrorMessageIf("加载失败", () => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage))
+                return;
             IsBusy = true;
             IsUserPost = _postService.GetIsUserPost(Post);
             var replies = await _postService.GetPostRepliesAsync(Post);
             ArgumentNullException.ThrowIfNull(replies);
             if (replies.Any())
             {
-                UserReply = replies.SingleOrDefault(r => r.UserId == _userService.UserInfo.Id);
+                UserReply = replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id);
                 _mostLikedReply = replies.MaxBy(r => r.Likes);
                 RepliesViewSource.Source = replies;
                 RepliesCount = replies.Count();
@@ -366,9 +360,11 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
                 SelectedIndex = -1;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            await _dialogService.ShowDialogAsync(ex.Message, "加载失败", null, "重试");
+            if (_dialogService.GetIsRightButtonClicked())
+                LoadPostRepliesCommand.Execute(default);
         }
         finally
         {
@@ -412,9 +408,11 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
             IsCurrentReplyLiked = isLiked;
             IsUserReply = isUserReply;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            await _dialogService.ShowDialogAsync(ex.Message, "加载失败", null, "重试");
+            if (_dialogService.GetIsRightButtonClicked())
+                UpdateIsLikedAndIsUserReplyCommand.Execute(default);
         }
         finally
         {
@@ -425,27 +423,24 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     [RelayCommand]
     async Task ReplyPostAsync()
     {
-        ArgumentNullException.ThrowIfNull(Post);
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
-        if (string.IsNullOrEmpty(NewReply))
-        {
-            await _dialogService.ShowDialogAsync("回答不能为空", "错误");
+        if (_snackbarService.ShowErrorMessageIfAny("提交回答失败",
+            (() => Post is null, _postIsNullErrorMessage),
+            (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+            (() => string.IsNullOrEmpty(NewReplyContent), "回答不能为空"),
+            (() => NewReplyContent.Length > ReplyMaxLength, $"回答字数不能超过 {ReplyMaxLength} 个字")))
             return;
-        }
         try
         {
             IsBusy = true;
-            var newReply = new Reply() { Content = NewReply, UserId = _userService.UserInfo.Id, PostId = Post.Id };
-            await _postService.ReplyPostAsync(Post, newReply);
-            NewReply = string.Empty;
+            var newReply = await _postService.ReplyPostAsync(Post!, NewReplyContent);
+            NewReplyContent = string.Empty;
             IsReplying = false;
             await LoadPostRepliesAsync();
             CurrentReply = newReply;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            _snackbarService.ShowErrorMessage("提交回答失败", ex.Message);
         }
         finally
         {
@@ -456,27 +451,24 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
     [RelayCommand]
     async Task LikeOrCancelLikeAsync()
     {
-        ArgumentNullException.ThrowIfNull(Post);
-        ArgumentNullException.ThrowIfNull(CurrentReply);
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
+        if (_snackbarService.ShowErrorMessageIfAny("点赞或取消点赞失败",
+           (() => Post is null, _postIsNullErrorMessage),
+           (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+           (() => CurrentReply is null, _replyIsNullErrorMessage)))
+            return;
         try
         {
             IsBusy = true;
             if (IsCurrentReplyLiked)
-            {
-                await _postService.CancelLikeAsync(CurrentReply);
-            }
+                await _postService.CancelLikeAsync(CurrentReply!);
             else
-            {
-                await _postService.LikeAsync(CurrentReply);
-            }
+                await _postService.LikeAsync(CurrentReply!);
             IsCurrentReplyLiked = !IsCurrentReplyLiked;
             OnPropertyChanged(nameof(CurrentReply));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            _snackbarService.ShowErrorMessage("点赞或取消点赞失败", ex.Message);
         }
         finally
         {

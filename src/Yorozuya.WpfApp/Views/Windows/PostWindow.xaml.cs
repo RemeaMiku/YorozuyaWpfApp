@@ -20,7 +20,8 @@ public partial class PostWindow : UiWindow, IRecipient<Post>
         InitializeComponent();
         DataContext = this;
         ViewModel = viewModel;
-        ViewModel.GetCancelConfirmDialogService().Initialize(Dialog);
+        ViewModel.GetCancelConfirmDialogService().SetDialogControl(Dialog);
+        ViewModel.GetSnackbarService().SetSnackbarControl(Snackbar);
         messenger.Register(this);
     }
 

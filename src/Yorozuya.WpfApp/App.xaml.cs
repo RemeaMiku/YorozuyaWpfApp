@@ -9,6 +9,8 @@ using Yorozuya.WpfApp.Views.Pages;
 using Yorozuya.WpfApp.Views.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
+using Wpf.Ui.Mvvm.Contracts;
+using Wpf.Ui.Mvvm.Services;
 
 namespace Yorozuya.WpfApp;
 
@@ -23,7 +25,8 @@ public partial class App : Application
     // IoC容器
     public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
         .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
-        .AddTransient<ICancelConfirmDialogService, CancelConfirmDialogService>()
+        .AddTransient<ISnackbarService, SnackbarService>()
+        .AddTransient<ILeftRightButtonDialogService, LeftRightButtonDialogService>()
         .AddSingleton<IUserService, LocalUserService>()
         .AddSingleton<IPostService, LocalPostService>()
         .AddSingleton<HomePageViewModel>()
