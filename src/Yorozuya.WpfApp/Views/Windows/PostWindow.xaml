@@ -46,13 +46,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ui:Snackbar
-            x:Name="Snackbar"
-            Grid.Row="1"
-            Width="300"
-            HorizontalAlignment="Right"
-            Panel.ZIndex="1000"
-            Timeout="5000" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -404,7 +397,7 @@
                                 x:Name="NewReplyBox"
                                 MaxLength="{Binding ViewModel.ReplyMaxLength, Mode=OneTime}"
                                 PlaceholderText="输入你的回答..."
-                                Text="{Binding ViewModel.NewReplyContent}"
+                                Text="{Binding ViewModel.NewReply}"
                                 TextWrapping="Wrap" />
                         </Border>
                         <StackPanel

@@ -18,7 +18,7 @@ public interface IPostService
 
     public Task AcceptReplyAsync(Post post, Reply reply);
 
-    public Task<Reply> ReplyPostAsync(Post post, string replyContent);
+    public Task ReplyPostAsync(Post post, Reply reply);
 
     public Task LikeAsync(Reply reply);
 

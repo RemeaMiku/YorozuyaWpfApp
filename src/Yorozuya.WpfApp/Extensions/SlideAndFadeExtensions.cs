@@ -8,7 +8,7 @@ namespace Yorozuya.WpfApp.Extensions;
 /// <summary>
 /// 给 FrameworkElement 添加滑动和淡入淡出动画的扩展方法集
 /// </summary>
-public static class FrameworkElementExtensions
+public static class SlideAndFadeExtensions
 {
     /// <summary>
     /// 滑入并淡入

@@ -61,7 +61,6 @@ public class LocalPostService : IPostService
     {
         //var response = await _httpClient.GetFromJsonAsync<Response<PostRepliesData>>($"api/post/allReplies?postId={post.Id}");
         //return response == null ? null : response.Data!.ReplyList;
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
         return _localReplies.Where(p => p.PostId == post.Id);
     }
@@ -80,50 +79,41 @@ public class LocalPostService : IPostService
 
     public async Task AcceptReplyAsync(Post post, Reply reply)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
         reply.IsAccepted = true;
     }
 
-    public async Task<Reply> ReplyPostAsync(Post post, string replyContent)
+    public async Task ReplyPostAsync(Post post, Reply reply)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
-        var reply = new Reply() { Content = replyContent, CreateTime = DateTime.Now.ToString("yyyy.MM.dd HH:mm:ss"), PostId = post.Id, UserId = _userService.UserInfo.Id };
+        reply.CreateTime = DateTime.Now.ToString();
         _localReplies.Add(reply);
-        return reply;
     }
 
     public async Task LikeAsync(Reply reply)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
+        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         reply.Likes++;
         _localLikes.Add(new() { ReplyId = reply.Id, UserId = _userService.UserInfo.Id });
     }
 
     public async Task CancelLikeAsync(Reply reply)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
+        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         reply.Likes--;
         _localLikes.RemoveAll(l => l.ReplyId == reply.Id && l.UserId == _userService.UserInfo.Id);
     }
 
     public async Task DeletePostAsync(Post post)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
-        if (post.AskerId != _userService.UserInfo.Id)
-            throw new InvalidOperationException("");
         await Task.Delay(1000);
         post.DelTag = 1;
     }
 
     public async Task DeleteReplyAsync(Reply reply)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
-        if (reply.UserId != _userService.UserInfo.Id)
-            throw new InvalidOperationException("");
         await Task.Delay(1000);
         reply.DelTag = 1;
         _localReplies.Remove(reply);
@@ -131,7 +121,6 @@ public class LocalPostService : IPostService
 
     public async Task<IEnumerable<Post>?> GetPostsByFieldAsync(string field)
     {
-        ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(500);
         return _localPosts.Where(p => p.Field == field);
     }
