@@ -3,8 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <FontFamily x:Key="DefaultFontFamily">../Assets/Fonts/#Source Han Sans SC</FontFamily>
+
     <sys:Double x:Key="LargeFontSize">24</sys:Double>
     <sys:Double x:Key="MediumFontSize">16</sys:Double>
-    <sys:Double x:Key="SmallFontSize">12</sys:Double>
+    <sys:Double x:Key="SmallFontSize">16</sys:Double>
 
 </ResourceDictionary>

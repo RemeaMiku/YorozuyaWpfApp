@@ -21,7 +21,7 @@
             <StackPanel Orientation="Vertical">
                 <TextBlock
                     FontSize="{StaticResource LargeFontSize}"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="设置" />
                 <Grid Margin="{StaticResource LargeStackSpacing}">
                     <Grid.ColumnDefinitions>
@@ -40,7 +40,7 @@
                             <TextBlock
                                 FontSize="{StaticResource MediumFontSize}"
                                 FontWeight="Bold"
-                                Style="{StaticResource DynamicForegroundTextBlock}"
+                                Style="{StaticResource DefaultFontFamilyTextBlock}"
                                 Text="RemeaMiku_岚曦" />
                             <Border
                                 Margin="20,0,0,0"
@@ -71,16 +71,16 @@
                     Margin="{StaticResource LargeStackSpacing}"
                     FontSize="{StaticResource MediumFontSize}"
                     FontWeight="Bold"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="常规设置" />
                 <TextBlock
                     Margin="{StaticResource MediumStackSpacing}"
                     FontSize="{StaticResource MediumFontSize}"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="启动时颜色模式：（更改模式后将于下次启动时生效）" />
                 <Border Width="200" HorizontalAlignment="Left">
                     <ComboBox
-                        x:Name="ThemeBox"        
+                        x:Name="ThemeBox"
                         Margin="{StaticResource SmallStackSpacing}"
                         SelectedValuePath="Tag"
                         SelectionChanged="OnThemeBoxSelectionChanged">
@@ -92,8 +92,8 @@
                 <TextBlock
                     Margin="{StaticResource MediumStackSpacing}"
                     FontSize="{StaticResource MediumFontSize}"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
-                    Text="窗体背景类型：（若窗体显示异常，可重新启动程序）" />
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
+                    Text="窗体背景类型：" />
                 <Border Width="200" HorizontalAlignment="Left">
                     <ComboBox
                         x:Name="WindowBackdropTypeBox"
@@ -103,7 +103,7 @@
                         <ComboBoxItem Content="Acrylic" Tag="{x:Static appearance:BackgroundType.Acrylic}" />
                         <ComboBoxItem Content="Mica" Tag="{x:Static appearance:BackgroundType.Mica}" />
                         <ComboBoxItem Content="Tabbed" Tag="{x:Static appearance:BackgroundType.Tabbed}" />
-                        <ComboBoxItem Content="普通窗体" Tag="{x:Static appearance:BackgroundType.None}" />
+                        <ComboBoxItem Content="默认" Tag="{x:Static appearance:BackgroundType.Auto}" />
                     </ComboBox>
                 </Border>
             </StackPanel>

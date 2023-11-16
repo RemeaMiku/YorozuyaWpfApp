@@ -82,6 +82,7 @@
                                 <TextBlock
                                     Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                     Text="首页" />
                             </StackPanel>
                         </ui:Button>
@@ -94,6 +95,7 @@
                                 <TextBlock
                                     Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                     Text="个人中心" />
                             </StackPanel>
                         </ui:Button>
@@ -108,7 +110,8 @@
                                 <TextBlock
                                     x:Name="ThemeText"
                                     Margin="10,0,0,0"
-                                    FontSize="{StaticResource MediumFontSize}" />
+                                    FontSize="{StaticResource MediumFontSize}"
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}" />
                             </StackPanel>
                         </ui:Button>
                         <ui:Button
@@ -120,6 +123,7 @@
                                 <TextBlock
                                     Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                     Text="设置" />
                             </StackPanel>
                         </ui:Button>
