@@ -11,6 +11,13 @@ using Microsoft.Extensions.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Wpf.Ui.Mvvm.Contracts;
 using Wpf.Ui.Mvvm.Services;
+using System.Configuration;
+using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
+using System.Windows.Documents;
+using System.Collections.Generic;
+using System.Collections.Frozen;
+using System.Xml.Linq;
 
 namespace Yorozuya.WpfApp;
 
@@ -45,8 +52,103 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         // 从容器中获取MainWindow并显示
-        ServiceProvider.GetRequiredService<MainWindow>().Show();
-        ServiceProvider.GetRequiredService<PostWindow>().Hide();
+        var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+        ServiceProvider.GetRequiredService<PostWindow>();
+        ApplyAppTheme(AppTheme);
+        ApplyBackdropType(WindowBackdropType);
+        mainWindow.Show();
+    }
+
+    private string? _appTheme;
+    private BackgroundType? _windowBackgroundType;
+
+    public string AppTheme
+    {
+        get
+        {
+            _appTheme ??= ReadAppThemeFromConfiguration();
+            return _appTheme;
+        }
+    }
+
+    public BackgroundType WindowBackdropType
+    {
+        get
+        {
+            _windowBackgroundType ??= ReadWindowBackdropTypeFromConfiguration();
+            return _windowBackgroundType.Value;
+        }
+    }
+
+    public Configuration Configuration { get; } = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+    private BackgroundType ReadWindowBackdropTypeFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["Window Backdrop Type"];
+        if (element is null)
+            return BackgroundType.Acrylic;
+        if (Enum.TryParse<BackgroundType>(element.Value, out var type))
+            return type;
+        return BackgroundType.Acrylic;
+    }
+
+    private string ReadAppThemeFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["Theme"];
+        if (element is null)
+            return "System";
+        if (element.Value == "System" || element.Value == "Light" || element.Value == "Dark")
+            return element.Value;
+        return "System";
+    }
+
+    public void ApplyAppTheme(string theme)
+    {
+        switch (theme)
+        {
+            case "Light":
+                Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
+                break;
+            case "Dark":
+                Theme.Apply(ThemeType.Dark, WindowBackdropType, true, true);
+                break;
+            case "System":
+                foreach (var window in Windows)
+                    if (window is UiWindow uiWindow)
+                        Watcher.Watch(uiWindow, WindowBackdropType, true, true);
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    public void WriteAppThemeToConfiguration(string theme)
+    {
+        _appTheme = theme;
+        var element = Configuration.AppSettings.Settings["Theme"];
+        if (element is null)
+            Configuration.AppSettings.Settings.Add("Theme", theme);
+        else
+            element.Value = theme;
+        Configuration.Save();
+    }
+
+    public void ApplyBackdropType(BackgroundType type)
+    {
+        foreach (var window in Windows)
+            if (window is UiWindow uiWindow)
+                uiWindow.WindowBackdropType = type;
+    }
+
+    public void WriteBackdropTypeToConfiguration(BackgroundType type)
+    {
+        _windowBackgroundType = type;
+        var element = Configuration.AppSettings.Settings["Window Backdrop Type"];
+        if (element is null)
+            Configuration.AppSettings.Settings.Add("Window Backdrop Type", type.ToString());
+        else
+            element.Value = type.ToString();
+        Configuration.Save();
     }
 
 }

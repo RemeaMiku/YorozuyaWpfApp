@@ -1,6 +1,8 @@
-﻿namespace Yorozuya.WpfApp.ViewModels.Pages;
+﻿using Wpf.Ui.Appearance;
 
-public class SettingsPageViewModel : BaseViewModel
+namespace Yorozuya.WpfApp.ViewModels.Pages;
+
+public partial class SettingsPageViewModel : BaseViewModel
 {
 
 }

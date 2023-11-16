@@ -3,9 +3,9 @@
     <Color x:Key="MikuGreen">#39c5bb</Color>
     <Color x:Key="MikuRed">#e74892</Color>
     <Color x:Key="MeaBlue">#7bcddf</Color>
-    <Color x:Key="MikuGreenAlpha">#AA39c5bb</Color>
-    <Color x:Key="MikuRedAlpha">#AAe74892</Color>
-    <Color x:Key="MeaBlueAlpha">#AA7bcddf</Color>
+    <Color x:Key="MikuGreenAlpha">#5539c5bb</Color>
+    <Color x:Key="MikuRedAlpha">#55e74892</Color>
+    <Color x:Key="MeaBlueAlpha">#557bcddf</Color>
 
     <SolidColorBrush x:Key="MikuGreenBrush" Color="{StaticResource MikuGreen}" />
     <SolidColorBrush x:Key="MikuRedBrush" Color="{StaticResource MikuRed}" />
@@ -19,5 +19,4 @@
         <GradientStop Offset="0.5" Color="{StaticResource MeaBlue}" />
         <GradientStop Offset="1" Color="{StaticResource MikuGreen}" />
     </LinearGradientBrush>
-
 </ResourceDictionary>

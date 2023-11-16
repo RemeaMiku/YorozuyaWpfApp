@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
+using System.Configuration;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
@@ -43,6 +44,16 @@ public partial class MainWindow : UiWindow
     {
         ResetAllNavigateButtons();
         SetNavigateButton(_currentNavigateButton);
+        if (currentTheme == ThemeType.Light)
+        {
+            ThemeIcon.Symbol = SymbolRegular.WeatherMoon24;
+            ThemeText.Text = "切换至深色模式";
+        }
+        else
+        {
+            ThemeIcon.Symbol = SymbolRegular.WeatherSunny24;
+            ThemeText.Text = "切换至浅色模式";
+        }
     }
 
     /// <summary>
@@ -53,10 +64,10 @@ public partial class MainWindow : UiWindow
 
     void OnMainWindowLoaded(object sender, RoutedEventArgs e)
     {
-        if (Theme.GetSystemTheme() == SystemThemeType.Dark)
-            OnThemeButtonClicked(sender, e);
-        else
-            Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
+        //if (Theme.GetSystemTheme() == SystemThemeType.Dark)
+        //    OnThemeButtonClicked(sender, e);
+        //else
+        //    Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
         OnNavigateButtonClicked(HomeButton, e);
     }
 
@@ -65,7 +76,7 @@ public partial class MainWindow : UiWindow
     /// 索引用于判断导航按钮的上下顺序用于确定切换动画方向，页面类型用于从容器中获取页面实例
     /// </summary>
 
-    readonly Dictionary<Wpf.Ui.Controls.Button, (int Index, Type PageType)> _navigateDictionary = new();
+    readonly Dictionary<Wpf.Ui.Controls.Button, (int Index, Type PageType)> _navigateDictionary = [];
 
     /// <summary>
     /// 当前导航按钮
@@ -91,12 +102,10 @@ public partial class MainWindow : UiWindow
         if (Theme.GetAppTheme() == ThemeType.Light)
         {
             Theme.Apply(ThemeType.Dark, WindowBackdropType, true, true);
-            ThemeIcon.Symbol = SymbolRegular.WeatherSunny24;
         }
         else
         {
             Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
-            ThemeIcon.Symbol = SymbolRegular.WeatherMoon24;
         }
     }
 
@@ -200,11 +209,4 @@ public partial class MainWindow : UiWindow
         else
             MenuPanel.BeginAnimation(WidthProperty, new DoubleAnimation(MenuPanel.MinWidth, duration) { EasingFunction = easingFunction });
     }
-
-    /// <summary>
-    /// 关闭主窗口时退出应用程序
-    /// </summary>
-    /// <param name="e"></param>
-    protected override void OnClosed(EventArgs e) => App.Current.Shutdown();
-
 }
