@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <AssemblyName>Yorozuya</AssemblyName>
@@ -38,6 +38,12 @@
 
   <ItemGroup>
     <None Include="D:\RemeaMiku study\course in progress\.NET 架构程序设计\EverythingHouse\src\EverythingHouse.WpfApp\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
