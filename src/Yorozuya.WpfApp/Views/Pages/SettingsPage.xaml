@@ -23,12 +23,30 @@
                     FontSize="{StaticResource LargeFontSize}"
                     Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="设置" />
+                <TextBlock
+                    Margin="{StaticResource LargeStackSpacing}"
+                    FontSize="{StaticResource MediumFontSize}"
+                    FontWeight="Bold"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
+                    Text="账号" />
                 <Grid Margin="{StaticResource LargeStackSpacing}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon FontSize="39" Symbol="Person24" />
+                    <Border
+                        Width="64"
+                        Height="64"
+                        Padding="10"
+                        Background="{StaticResource MeaBlueBrushAlpha}"
+                        CornerRadius="30">
+                        <Viewbox>
+                            <ui:SymbolIcon
+                                Filled="True"
+                                Foreground="{StaticResource MeaBlueBrush}"
+                                Symbol="Person24" />
+                        </Viewbox>
+                    </Border>
                     <StackPanel
                         Grid.Column="1"
                         Margin="20,0,0,0"
@@ -43,7 +61,7 @@
                                 Margin="20,0,0,0"
                                 Padding="5"
                                 HorizontalAlignment="Left"
-                                BorderBrush="{StaticResource MikuRedBrushAlpha}"
+                                BorderBrush="{StaticResource MikuRedBrush}"
                                 BorderThickness="1"
                                 CornerRadius="3">
                                 <TextBlock
@@ -62,6 +80,7 @@
                     </StackPanel>
                 </Grid>
                 <Rectangle
+                    Height="0.5"
                     Margin="{StaticResource LargeStackSpacing}"
                     HorizontalAlignment="Stretch"
                     Stroke="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}" />
