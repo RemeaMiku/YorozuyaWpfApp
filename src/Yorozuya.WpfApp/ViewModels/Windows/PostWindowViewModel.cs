@@ -16,20 +16,11 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
-public partial class PostWindowViewModel : BaseValidatorViewModel
+public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogService, ISnackbarService snackbarService, IUserService userService, IPostService postService) : BaseValidatorViewModel
 {
     readonly Stack<Post> _backStack = new();
     readonly Stack<Post> _forwardStack = new();
-
-    public PostWindowViewModel(ILeftRightButtonDialogService dialogService, ISnackbarService snackbarService, IUserService userService, IPostService postService)
-    {
-        _dialogService = dialogService;
-        _snackbarService = snackbarService;
-        _userService = userService;
-        _postService = postService;
-    }
-
-    readonly ISnackbarService _snackbarService;
+    readonly ISnackbarService _snackbarService = snackbarService;
 
     public ISnackbarService GetSnackbarService() => _snackbarService;
 
@@ -132,11 +123,11 @@ public partial class PostWindowViewModel : BaseValidatorViewModel
 
     private static readonly SortDescription _creatTimeSortDescription = new(nameof(Reply.CreateTime), ListSortDirection.Descending);
 
-    private readonly ILeftRightButtonDialogService _dialogService;
+    private readonly ILeftRightButtonDialogService _dialogService = dialogService;
 
-    private readonly IUserService _userService;
+    private readonly IUserService _userService = userService;
 
-    private readonly IPostService _postService;
+    private readonly IPostService _postService = postService;
 
     private bool _isOrderByLikes = true;
 

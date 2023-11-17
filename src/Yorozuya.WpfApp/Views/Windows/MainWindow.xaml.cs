@@ -64,10 +64,6 @@ public partial class MainWindow : UiWindow
 
     void OnMainWindowLoaded(object sender, RoutedEventArgs e)
     {
-        //if (Theme.GetSystemTheme() == SystemThemeType.Dark)
-        //    OnThemeButtonClicked(sender, e);
-        //else
-        //    Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
         OnNavigateButtonClicked(HomeButton, e);
     }
 
@@ -100,13 +96,9 @@ public partial class MainWindow : UiWindow
     void OnThemeButtonClicked(object sender, RoutedEventArgs e)
     {
         if (Theme.GetAppTheme() == ThemeType.Light)
-        {
             Theme.Apply(ThemeType.Dark, WindowBackdropType, true, true);
-        }
         else
-        {
             Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
-        }
     }
 
     /// <summary>

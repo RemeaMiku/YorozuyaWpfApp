@@ -11,14 +11,9 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.Servcies.Local;
 
-public class LocalPostService : IPostService
+public class LocalPostService(IUserService userService) : IPostService
 {
-    public LocalPostService(IUserService userService)
-    {
-        _userService = userService;
-    }
-
-    readonly IUserService _userService;
+    readonly IUserService _userService = userService;
 
     //readonly HttpClient _httpClient = new()
     //{
@@ -51,7 +46,7 @@ public class LocalPostService : IPostService
 
     readonly List<Post> _localPosts = new()
     {
-        new (){ AskerId = 0, Content = "问题0", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 0, Title = "问题0", Views = 123,Field="Test" },
+        new (){ AskerId = 0, Content = "问题0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 0, Title = "问题0", Views = 123,Field="Test" },
         new (){ AskerId = 1, Content = "问题1", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 1, Title = "问题1", Views = 831,Field="Test" },
         new (){ AskerId = 2, Content = "问题2", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 2, Title = "问题2", Views = 250,Field="Test" },
         new (){ AskerId = 3, Content = "问题3", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 3, Title = "问题3", Views = 39,Field="Test" },

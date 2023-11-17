@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Views\Pages\PersonPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -34,6 +30,14 @@
 
   <ItemGroup>
     <EditorConfigFiles Remove="D:\RemeaMiku study\course in progress\.NET 架构程序设计\EverythingHouse\src\EverythingHouse.WpfApp\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\SOURCEHANSANSSC-REGULAR.OTF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Fonts\SOURCEHANSANSSC-REGULAR.OTF" />          
   </ItemGroup>
 
   <ItemGroup>

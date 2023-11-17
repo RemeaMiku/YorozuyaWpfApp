@@ -6,16 +6,10 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.ViewModels.Pages;
 
-public partial class HomePageViewModel : BaseViewModel
+public partial class HomePageViewModel(IPostService postService, IMessenger messenger) : BaseViewModel
 {
-    readonly IMessenger _messenger;
-    readonly IPostService _postService;
-
-    public HomePageViewModel(IPostService postService, IMessenger messenger)
-    {
-        _postService = postService;
-        _messenger = messenger;
-    }
+    readonly IMessenger _messenger = messenger;
+    readonly IPostService _postService = postService;
 
     [RelayCommand]
     public async Task Test()

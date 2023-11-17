@@ -56,11 +56,13 @@ public partial class App : Application
         ServiceProvider.GetRequiredService<PostWindow>();
         ApplyAppTheme(AppTheme);
         ApplyBackdropType(WindowBackdropType);
+        ApplyAppFont(AppFont);
         mainWindow.Show();
     }
 
     private string? _appTheme;
     private BackgroundType? _windowBackgroundType;
+    private string? _appFont;
 
     public string AppTheme
     {
@@ -80,6 +82,15 @@ public partial class App : Application
         }
     }
 
+    public string AppFont
+    {
+        get
+        {
+            _appFont ??= ReadAppFontFromConfiguration();
+            return _appFont;
+        }
+    }
+
     public Configuration Configuration { get; } = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
     private BackgroundType ReadWindowBackdropTypeFromConfiguration()
@@ -94,10 +105,20 @@ public partial class App : Application
 
     private string ReadAppThemeFromConfiguration()
     {
-        var element = Configuration.AppSettings.Settings["Theme"];
+        var element = Configuration.AppSettings.Settings["App Theme"];
         if (element is null)
             return "System";
         if (element.Value == "System" || element.Value == "Light" || element.Value == "Dark")
+            return element.Value;
+        return "System";
+    }
+
+    private string ReadAppFontFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["App Font"];
+        if (element is null)
+            return "System";
+        if (element.Value == "System" || element.Value == "Source Han Sans SC")
             return element.Value;
         return "System";
     }
@@ -125,9 +146,9 @@ public partial class App : Application
     public void WriteAppThemeToConfiguration(string theme)
     {
         _appTheme = theme;
-        var element = Configuration.AppSettings.Settings["Theme"];
+        var element = Configuration.AppSettings.Settings["App Theme"];
         if (element is null)
-            Configuration.AppSettings.Settings.Add("Theme", theme);
+            Configuration.AppSettings.Settings.Add("App Theme", theme);
         else
             element.Value = theme;
         Configuration.Save();
@@ -151,4 +172,24 @@ public partial class App : Application
         Configuration.Save();
     }
 
+    public void ApplyAppFont(string font)
+    {
+        Resources["DefaultFontFamily"] = font switch
+        {
+            "System" => Resources["SystemFontFamily"],
+            "Source Han Sans SC" => Resources["SourceHanSansSCFontFamily"],
+            _ => throw new NotImplementedException(),
+        };
+    }
+
+    public void WriteAppFontToConfiguration(string font)
+    {
+        _appFont = font;
+        var element = Configuration.AppSettings.Settings["App Font"];
+        if (element is null)
+            Configuration.AppSettings.Settings.Add("App Font", font);
+        else
+            element.Value = font;
+        Configuration.Save();
+    }
 }

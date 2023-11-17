@@ -137,7 +137,6 @@
                             </ListView.ItemContainerStyle>
                         </ListView>
                     </Grid>
-
                 </Border>
                 <Grid Grid.Column="1" Margin="10,0,0,0">
                     <Grid.RowDefinitions>
@@ -150,6 +149,7 @@
                         VerticalAlignment="Center"
                         d:Visibility="Collapsed"
                         FontSize="{StaticResource LargeFontSize}"
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
                         Text="暂无回答"
                         Visibility="{Binding ViewModel.CurrentReply, Converter={StaticResource ReversedNullableToVisibilityConverter}, Mode=OneWay}" />
                     <ui:CardExpander
@@ -163,6 +163,7 @@
                                     <TextBlock
                                         Margin="5,0,0,0"
                                         d:Text="问题 114514"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         FontSize="{StaticResource SmallFontSize}"
                                         Foreground="{StaticResource MikuGreenBrush}"
                                         Text="{Binding ViewModel.Post.Id, StringFormat='问题 {0}', Mode=OneWay}" />
@@ -172,6 +173,7 @@
                                     d:Text="初音未来是第一个虚拟歌姬吗？"
                                     FontSize="{StaticResource LargeFontSize}"
                                     FontWeight="Bold"
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                     Text="{Binding ViewModel.Post.Title, Mode=OneWay}" />
                                 <Grid Margin="0,5,0,0">
                                     <Border
@@ -182,6 +184,7 @@
                                         CornerRadius="3">
                                         <TextBlock
                                             d:Text="VOCALOID"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             FontSize="{StaticResource SmallFontSize}"
                                             Foreground="{StaticResource MikuRedBrush}"
                                             Text="{Binding ViewModel.Post.Field, Mode=OneWay}" />
@@ -193,6 +196,7 @@
                                             HorizontalAlignment="Right"
                                             d:Text="2023.08.31 11:14:51"
                                             FontSize="{StaticResource SmallFontSize}"
+                                            Style="{StaticResource DefaultFontFamilyTextBlock}"
                                             Text="{Binding ViewModel.Post.CreateTime, Mode=OneWay}" />
                                         <ui:SymbolIcon Margin="15,0,0,0" Symbol="History24" />
                                         <TextBlock
@@ -200,6 +204,7 @@
                                             HorizontalAlignment="Right"
                                             d:Text="2023.08.31 11:14:51"
                                             FontSize="{StaticResource SmallFontSize}"
+                                            Style="{StaticResource DefaultFontFamilyTextBlock}"
                                             Text="{Binding ViewModel.Post.UpdateTime, Mode=OneWay}" />
                                         <ui:SymbolIcon Margin="15,0,0,0" Symbol="Eye24" />
                                         <TextBlock
@@ -207,6 +212,7 @@
                                             HorizontalAlignment="Right"
                                             d:Text="831"
                                             FontSize="{StaticResource SmallFontSize}"
+                                            Style="{StaticResource DefaultFontFamilyTextBlock}"
                                             Text="{Binding ViewModel.Post.Views, Mode=OneWay}" />
                                     </StackPanel>
                                 </Grid>
@@ -217,6 +223,7 @@
                                 <TextBlock
                                     d:Text="初音未来是第一个虚拟歌姬吗？"
                                     FontSize="{StaticResource SmallFontSize}"
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                     Text="{Binding ViewModel.Post.Content, Mode=OneWay}"
                                     TextWrapping="Wrap" />
                             </ScrollViewer>
@@ -254,6 +261,7 @@
                                             <TextBlock
                                                 Margin="5,0,0,0"
                                                 d:Text="回答 114514"
+                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                 FontSize="{StaticResource MediumFontSize}"
                                                 Foreground="White"
                                                 Text="{Binding ViewModel.CurrentReply.Id, StringFormat='回答 {0}', Mode=OneWay}" />
@@ -266,6 +274,7 @@
                                             <TextBlock
                                                 Margin="5,0,0,0"
                                                 VerticalAlignment="Center"
+                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                 FontSize="{StaticResource MediumFontSize}"
                                                 FontWeight="Bold"
                                                 Foreground="White"
@@ -279,6 +288,7 @@
                                             <TextBlock
                                                 Margin="5,0,0,0"
                                                 VerticalAlignment="Center"
+                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                 FontSize="{StaticResource MediumFontSize}"
                                                 FontWeight="Bold"
                                                 Foreground="White"
@@ -292,6 +302,7 @@
                                                 Margin="5,0,0,0"
                                                 HorizontalAlignment="Right"
                                                 d:Text="2023.08.31 11:14:51"
+                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                 FontSize="{StaticResource SmallFontSize}"
                                                 Foreground="White"
                                                 Text="{Binding ViewModel.CurrentReply.CreateTime, Mode=OneWay}" />
@@ -323,6 +334,7 @@
                                     <TextBlock
                                         VerticalAlignment="Top"
                                         d:Text="      不是。初音未来并不是第一个虚拟歌姬。实际上，第一个虚拟歌姬是名为Leon的角色，他是在2004年发售的VOCALOID的第一代产品1。然而，初音未来无疑是最具影响力的虚拟歌姬1。她的声源库实际上对应的已经是VOCALOID二代产品，就算是在初音的生父CRYPTON公司，早于初音未来诞生的也还有KAITO和MEIKO1。尽管如此，初音未来的影响力和知名度使她在许多人心中被视为虚拟歌姬的代表。"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         FontSize="{StaticResource MediumFontSize}"
                                         LineHeight="25"
                                         Text="{Binding ViewModel.CurrentReply.Content, Mode=OneWay}"
@@ -415,6 +427,7 @@
                             <TextBlock
                                 d:Text="已输入 39/10000 字"
                                 FontSize="{StaticResource MediumFontSize}"
+                                Style="{StaticResource DefaultFontFamilyTextBlock}"
                                 Text="{Binding ElementName=NewReplyBox, Path=Text.Length, StringFormat='已输入 {0}/10000 字'}" />
                             <ui:Button
                                 Margin="10,0,0,0"
@@ -451,6 +464,7 @@
                 <TextBlock
                     Margin="10,0,0,0"
                     FontSize="{StaticResource LargeFontSize}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="问题不存在或已被删除" />
             </StackPanel>
         </Border>
