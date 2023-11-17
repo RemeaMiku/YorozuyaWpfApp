@@ -14,7 +14,6 @@
     MinHeight="{Binding Height, Mode=OneTime}"
     d:DataContext="{d:DesignInstance local:MainWindow}"
     ExtendsContentIntoTitleBar="True"
-    WindowBackdropType="Acrylic"
     mc:Ignorable="d">
     <ui:UiWindow.Resources>
         <Style
@@ -111,7 +110,8 @@
                                     x:Name="ThemeText"
                                     Margin="10,0,0,0"
                                     FontSize="{StaticResource MediumFontSize}"
-                                    Style="{StaticResource DefaultFontFamilyTextBlock}" />
+                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
+                                    Text="切换至深色模式" />
                             </StackPanel>
                         </ui:Button>
                         <ui:Button

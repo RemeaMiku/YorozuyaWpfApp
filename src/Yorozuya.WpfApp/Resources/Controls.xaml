@@ -37,4 +37,23 @@
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>
 
+    <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type RadioButton}}" TargetType="RadioButton">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type ui:Dialog}}" TargetType="ui:Dialog">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type ui:Snackbar}}" TargetType="ui:Snackbar">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
 </ResourceDictionary>

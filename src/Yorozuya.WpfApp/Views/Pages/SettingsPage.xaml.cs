@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
 using Yorozuya.WpfApp.ViewModels.Pages;
@@ -25,6 +26,7 @@ public partial class SettingsPage : Page
     private void OnSettingsPageLoaded(object sender, RoutedEventArgs e)
     {
         ThemeBox.SelectedValue = App.Current.AppTheme;
+        FontFamilyBox.SelectedValue = App.Current.AppFont;
         WindowBackdropTypeBox.SelectedValue = App.Current.WindowBackdropType;
     }
 
@@ -41,5 +43,12 @@ public partial class SettingsPage : Page
     {
         var theme = (string)ThemeBox.SelectedValue;
         App.Current.WriteAppThemeToConfiguration(theme);
+    }
+
+    private void OnFontFamilyBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var font = (string)FontFamilyBox.SelectedValue;
+        App.Current.ApplyAppFont(font);
+        App.Current.WriteAppFontToConfiguration(font);
     }
 }

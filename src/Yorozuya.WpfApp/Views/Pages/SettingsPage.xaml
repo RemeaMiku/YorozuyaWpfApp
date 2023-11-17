@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{d:DesignInstance local:SettingsPage}"
-    d:DesignHeight="450"
+    d:DesignHeight="600"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Page.Resources>
@@ -28,10 +28,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <ui:SymbolIcon
-                        FontSize="39"
-                        Foreground="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}"
-                        Symbol="Person24" />
+                    <ui:SymbolIcon FontSize="39" Symbol="Person24" />
                     <StackPanel
                         Grid.Column="1"
                         Margin="20,0,0,0"
@@ -50,6 +47,7 @@
                                 BorderThickness="1"
                                 CornerRadius="3">
                                 <TextBlock
+                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                     FontSize="{StaticResource SmallFontSize}"
                                     Foreground="{StaticResource MikuRedBrush}"
                                     Text="VOCALOID" />
@@ -59,7 +57,7 @@
                             Margin="{StaticResource MediumStackSpacing}"
                             Padding="0"
                             Content="退出账号登录"
-                            FontSize="{StaticResource MediumFontSize}"
+                            Foreground="{StaticResource MikuGreenBrush}"
                             Icon="SwipeRight24" />
                     </StackPanel>
                 </Grid>
@@ -93,7 +91,22 @@
                     Margin="{StaticResource MediumStackSpacing}"
                     FontSize="{StaticResource MediumFontSize}"
                     Style="{StaticResource DefaultFontFamilyTextBlock}"
-                    Text="窗体背景类型：" />
+                    Text="字体选择：（若字体显示异常，可切换为系统默认字体）" />
+                <Border Width="200" HorizontalAlignment="Left">
+                    <ComboBox
+                        x:Name="FontFamilyBox"
+                        Margin="{StaticResource SmallStackSpacing}"
+                        SelectedValuePath="Tag"
+                        SelectionChanged="OnFontFamilyBoxSelectionChanged">
+                        <ComboBoxItem Content="系统默认" Tag="System" />
+                        <ComboBoxItem Content="Source Han Sans SC" Tag="Source Han Sans SC" />
+                    </ComboBox>
+                </Border>
+                <TextBlock
+                    Margin="{StaticResource MediumStackSpacing}"
+                    FontSize="{StaticResource MediumFontSize}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
+                    Text="窗体背景类型：（若窗体背景显示异常，可切换为纯色背景）" />
                 <Border Width="200" HorizontalAlignment="Left">
                     <ComboBox
                         x:Name="WindowBackdropTypeBox"
@@ -103,7 +116,7 @@
                         <ComboBoxItem Content="Acrylic" Tag="{x:Static appearance:BackgroundType.Acrylic}" />
                         <ComboBoxItem Content="Mica" Tag="{x:Static appearance:BackgroundType.Mica}" />
                         <ComboBoxItem Content="Tabbed" Tag="{x:Static appearance:BackgroundType.Tabbed}" />
-                        <ComboBoxItem Content="默认" Tag="{x:Static appearance:BackgroundType.Auto}" />
+                        <ComboBoxItem Content="纯色" Tag="{x:Static appearance:BackgroundType.Auto}" />
                     </ComboBox>
                 </Border>
             </StackPanel>
