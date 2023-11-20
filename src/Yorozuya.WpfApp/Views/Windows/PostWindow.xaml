@@ -17,6 +17,7 @@
     d:DataContext="{d:DesignInstance local:PostWindow}"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Acrylic"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <ui:UiWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
