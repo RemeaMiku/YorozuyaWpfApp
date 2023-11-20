@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.Interfaces;
 
 namespace Yorozuya.WpfApp.Servcies.Contracts;
 

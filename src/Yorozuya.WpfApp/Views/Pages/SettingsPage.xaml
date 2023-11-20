@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:appearance="clr-namespace:Wpf.Ui.Appearance;assembly=Wpf.Ui"
+    xmlns:cv="clr-namespace:Yorozuya.WpfApp.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,9 +16,22 @@
         <Thickness x:Key="LargeStackSpacing">0,30,0,0</Thickness>
         <Thickness x:Key="MediumStackSpacing">0,15,0,0</Thickness>
         <Thickness x:Key="SmallStackSpacing">0,10,0,0</Thickness>
+        <cv:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
+        <cv:ReversedNullableToVisibilityConverter x:Key="ReversedNullableToVisibilityConverter" />
     </Page.Resources>
-    <Border Padding="30" d:Background="White">
-        <ScrollViewer>
+    <Grid d:Background="White">
+        <ui:Dialog
+            x:Name="Dialog"
+            Panel.ZIndex="1000"
+            d:Visibility="Hidden"
+            ButtonLeftAppearance="Secondary"
+            ButtonLeftName="取消"
+            ButtonLeftVisibility="Visible"
+            ButtonRightAppearance="Danger"
+            ButtonRightName="退出"
+            ButtonRightVisibility="Visible"
+            DialogHeight="200" />
+        <ScrollViewer Padding="30">
             <StackPanel Orientation="Vertical">
                 <TextBlock
                     FontSize="{StaticResource LargeFontSize}"
@@ -29,7 +43,10 @@
                     FontWeight="Bold"
                     Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="账号" />
-                <Grid Margin="{StaticResource LargeStackSpacing}">
+                <Grid
+                    Margin="{StaticResource LargeStackSpacing}"
+                    d:Visibility="Collapsed"
+                    Visibility="{Binding ViewModel.UserInfo, Mode=OneWay, Converter={StaticResource NullableToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -37,26 +54,26 @@
                     <Border
                         Width="64"
                         Height="64"
-                        Padding="10"
                         Background="{StaticResource MeaBlueBrushAlpha}"
-                        CornerRadius="30">
-                        <Viewbox>
-                            <ui:SymbolIcon
-                                Filled="True"
-                                Foreground="{StaticResource MeaBlueBrush}"
-                                Symbol="Person24" />
-                        </Viewbox>
-                    </Border>
+                        CornerRadius="32" />
+                    <Viewbox>
+                        <ui:SymbolIcon
+                            Padding="5"
+                            Filled="True"
+                            Foreground="{StaticResource MeaBlueBrush}"
+                            Symbol="Person24" />
+                    </Viewbox>
                     <StackPanel
                         Grid.Column="1"
                         Margin="20,0,0,0"
                         Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock
+                                d:Text="RemeaMiku_岚曦"
                                 FontSize="{StaticResource MediumFontSize}"
                                 FontWeight="Bold"
                                 Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                Text="RemeaMiku_岚曦" />
+                                Text="{Binding ViewModel.UserInfo.Username, Mode=OneWay}" />
                             <Border
                                 Margin="20,0,0,0"
                                 Padding="5"
@@ -65,25 +82,95 @@
                                 BorderThickness="1"
                                 CornerRadius="3">
                                 <TextBlock
+                                    d:Text="VOCALOID"
                                     FontFamily="{DynamicResource DefaultFontFamily}"
                                     FontSize="{StaticResource SmallFontSize}"
                                     Foreground="{StaticResource MikuRedBrush}"
-                                    Text="VOCALOID" />
+                                    Text="{Binding ViewModel.UserInfo.Field, Mode=OneWay}" />
                             </Border>
                         </StackPanel>
-                        <ui:Hyperlink
+                        <ui:Button
                             Margin="{StaticResource MediumStackSpacing}"
                             Padding="0"
+                            Command="{Binding ViewModel.LogoutCommand, Mode=OneTime}"
                             Content="退出账号登录"
+                            FontSize="{StaticResource MediumFontSize}"
                             Foreground="{StaticResource MikuGreenBrush}"
-                            Icon="SwipeRight24" />
+                            Icon="SignOut24"
+                            MouseOverBackground="Transparent"
+                            MouseOverBorderBrush="{StaticResource MikuGreenBrush}"
+                            Style="{StaticResource BorderlessTransparentUiButtonStyle}" />
                     </StackPanel>
                 </Grid>
+                <Grid Margin="{StaticResource MediumStackSpacing}" Visibility="{Binding ViewModel.UserInfo, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        FontSize="{StaticResource SmallFontSize}"
+                        FontWeight="Bold"
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
+                        Text="登录万事屋你可以" />
+                    <StackPanel
+                        Grid.Row="1"
+                        Margin="{StaticResource MediumStackSpacing}"
+                        Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Thickness x:Key="LeftSmallSpacing">5,0,0,0</Thickness>
+                            <Thickness x:Key="LeftLargeSpacing">20,0,0,0</Thickness>
+                        </StackPanel.Resources>
+                        <ui:SymbolIcon FontSize="{StaticResource MediumFontSize}" Symbol="ViewDesktop24" />
+                        <TextBlock
+                            Margin="{StaticResource LeftSmallSpacing}"
+                            FontSize="{StaticResource SmallFontSize}"
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
+                            Text="浏览各领域问题的回答" />
+                        <ui:SymbolIcon
+                            Margin="{StaticResource LeftLargeSpacing}"
+                            FontSize="{StaticResource MediumFontSize}"
+                            Symbol="Clock24" />
+                        <TextBlock
+                            Margin="{StaticResource LeftSmallSpacing}"
+                            FontSize="{StaticResource SmallFontSize}"
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
+                            Text="同步提问和回答记录" />
+                        <ui:SymbolIcon
+                            Margin="{StaticResource LeftLargeSpacing}"
+                            FontSize="{StaticResource MediumFontSize}"
+                            Symbol="TextBulletListSquare24" />
+                        <TextBlock
+                            Margin="{StaticResource LeftSmallSpacing}"
+                            FontSize="{StaticResource SmallFontSize}"
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
+                            Text="发表问题/回答" />
+                        <ui:SymbolIcon
+                            Margin="{StaticResource LeftLargeSpacing}"
+                            FontSize="{StaticResource MediumFontSize}"
+                            Symbol="CommentCheckmark24" />
+                        <TextBlock
+                            Margin="{StaticResource LeftSmallSpacing}"
+                            FontSize="{StaticResource SmallFontSize}"
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
+                            Text="点赞和采纳回答" />
+                    </StackPanel>
+                    <ui:Button
+                        Grid.Row="2"
+                        Margin="{StaticResource MediumStackSpacing}"
+                        Padding="20,5"
+                        Background="{StaticResource MikuRedBrush}"
+                        Command="{Binding ViewModel.LoginCommand, Mode=OneTime}"
+                        Content="立即登录"
+                        FontSize="{StaticResource SmallFontSize}"
+                        Foreground="White"
+                        MouseOverBackground="{StaticResource MikuGreenBrush}" />
+                </Grid>
                 <Rectangle
-                    Height="0.5"
                     Margin="{StaticResource LargeStackSpacing}"
                     HorizontalAlignment="Stretch"
-                    Stroke="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}" />
+                    Stroke="{StaticResource MikuMeaRedBlueGreenHorizontalBrush}"
+                    StrokeThickness="1" />
                 <TextBlock
                     Margin="{StaticResource LargeStackSpacing}"
                     FontSize="{StaticResource MediumFontSize}"
@@ -140,6 +227,5 @@
                 </Border>
             </StackPanel>
         </ScrollViewer>
-
-    </Border>
+    </Grid>
 </Page>

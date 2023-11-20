@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using Wpf.Ui.Common;
 using Wpf.Ui.Mvvm.Contracts;
 
@@ -12,7 +7,7 @@ namespace Yorozuya.WpfApp.Extensions;
 public static class ISnackbarServiceExtensions
 {
     public static bool ShowErrorMessage(this ISnackbarService snackbarService, string title, string message)
-        => snackbarService.Show(title, message, SymbolRegular.Dismiss24, ControlAppearance.Danger);
+        => snackbarService.Show(title, message, SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
 
     /// <summary>
     /// 显示错误消息
@@ -24,7 +19,7 @@ public static class ISnackbarServiceExtensions
     public static bool ShowErrorMessageIf(this ISnackbarService snackbarService, string title, Func<bool> condition, string message)
     {
         if (condition.Invoke())
-            return snackbarService.Show(title, message, SymbolRegular.Dismiss24, ControlAppearance.Danger);
+            return snackbarService.Show(title, message, SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
         return false;
     }
 

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Configuration;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
 using Yorozuya.WpfApp.ViewModels.Pages;
-using Yorozuya.WpfApp.Views.Windows;
 
 namespace Yorozuya.WpfApp.Views.Pages;
 
@@ -21,6 +16,7 @@ public partial class SettingsPage : Page
         DataContext = this;
         ViewModel = viewModel;
         Loaded += OnSettingsPageLoaded;
+        viewModel.GetDialogService().SetDialogControl(Dialog);
     }
 
     private void OnSettingsPageLoaded(object sender, RoutedEventArgs e)
@@ -31,13 +27,6 @@ public partial class SettingsPage : Page
     }
 
     public SettingsPageViewModel ViewModel { get; }
-
-    private void OnWindowBackdropTypeBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var type = (BackgroundType)WindowBackdropTypeBox.SelectedValue;
-        App.Current.ApplyBackdropType(type);
-        App.Current.WriteBackdropTypeToConfiguration(type);
-    }
 
     private void OnThemeBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -50,5 +39,12 @@ public partial class SettingsPage : Page
         var font = (string)FontFamilyBox.SelectedValue;
         App.Current.ApplyAppFont(font);
         App.Current.WriteAppFontToConfiguration(font);
+    }
+
+    private void OnWindowBackdropTypeBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var type = (BackgroundType)WindowBackdropTypeBox.SelectedValue;
+        App.Current.ApplyBackdropType(type);
+        App.Current.WriteBackdropTypeToConfiguration(type);
     }
 }
