@@ -45,9 +45,9 @@ public partial class LoginWindow : UiWindow
                 BackgroundImage.Source = new BitmapImage(new(loginBackgroundImage));
             App.Current.WriteLoginBackgroundImageToConfiguration(loginBackgroundImage);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _snackbarService.ShowErrorMessage("背景图片加载失败", ex.Message);
+            _snackbarService.ShowErrorMessage("背景图片加载失败", "可能是不支持此格式，请重新选择");
         }
     }
 
@@ -69,4 +69,7 @@ public partial class LoginWindow : UiWindow
         if ((bool)dialog.ShowDialog(this)!)
             ApplyBackground(dialog.FileName);
     }
+
+    private void OnResetButtonClicked(object sender, RoutedEventArgs e) => ApplyBackground("Default");
+
 }

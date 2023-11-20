@@ -80,4 +80,21 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style
+        x:Key="TitleBarUiButtonStyle"
+        BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
+        TargetType="ui:Button">
+        <Setter Property="Width" Value="44" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="MouseOverBackground" Value="{Binding ElementName=TitleBar, Path=ButtonsBackground}" />
+        <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="#AAAAAA" />
+                <Setter Property="Cursor" Value="No" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
