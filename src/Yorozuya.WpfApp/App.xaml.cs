@@ -14,10 +14,6 @@ using Wpf.Ui.Mvvm.Services;
 using System.Configuration;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
-using System.Windows.Documents;
-using System.Collections.Generic;
-using System.Collections.Frozen;
-using System.Xml.Linq;
 
 namespace Yorozuya.WpfApp;
 

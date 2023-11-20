@@ -25,6 +25,14 @@
             <Setter Property="Filled" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=IconFilled}" />
         </Style>
         <Style
+            x:Key="MenuTextBlockStyle"
+            BasedOn="{StaticResource DefaultFontFamilyTextBlock}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=Foreground}" />
+            <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+        </Style>
+        <Style
             x:Key="MenuUiButtonStyle"
             BasedOn="{StaticResource {x:Type ui:Button}}"
             TargetType="ui:Button">
@@ -78,11 +86,7 @@
                             Style="{StaticResource MenuUiButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Style="{StaticResource MenuSymbolIconStyle}" Symbol="Home24" />
-                                <TextBlock
-                                    Margin="10,0,0,0"
-                                    FontSize="{StaticResource MediumFontSize}"
-                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                    Text="首页" />
+                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="首页" />
                             </StackPanel>
                         </ui:Button>
                         <ui:Button
@@ -91,11 +95,7 @@
                             Style="{StaticResource MenuUiButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Style="{StaticResource MenuSymbolIconStyle}" Symbol="Person24" />
-                                <TextBlock
-                                    Margin="10,0,0,0"
-                                    FontSize="{StaticResource MediumFontSize}"
-                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                    Text="个人中心" />
+                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="个人中心" />
                             </StackPanel>
                         </ui:Button>
                     </StackPanel>
@@ -108,9 +108,7 @@
                                     Symbol="WeatherMoon24" />
                                 <TextBlock
                                     x:Name="ThemeText"
-                                    Margin="10,0,0,0"
-                                    FontSize="{StaticResource MediumFontSize}"
-                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
+                                    Style="{StaticResource MenuTextBlockStyle}"
                                     Text="切换至深色模式" />
                             </StackPanel>
                         </ui:Button>
@@ -120,11 +118,7 @@
                             Style="{StaticResource MenuUiButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Style="{StaticResource MenuSymbolIconStyle}" Symbol="Options24" />
-                                <TextBlock
-                                    Margin="10,0,0,0"
-                                    FontSize="{StaticResource MediumFontSize}"
-                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                    Text="设置" />
+                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="设置" />
                             </StackPanel>
                         </ui:Button>
                     </StackPanel>

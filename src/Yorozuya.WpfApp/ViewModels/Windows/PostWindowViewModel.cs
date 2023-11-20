@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Common;
 using Yorozuya.WpfApp.Extensions;
@@ -61,6 +59,8 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
     [RelayCommand]
     void OpenReplyPanel()
     {
+        if (_snackbarService.ShowErrorMessageIf("新建回答失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
+            return;
         IsReplying = true;
     }
 
@@ -80,6 +80,8 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
         set
         {
             if (value == _currentReply)
+                return;
+            if (_snackbarService.ShowErrorMessageIf("加载失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
                 return;
             OnPropertyChanging(nameof(CurrentReply));
             _currentReply = value;
@@ -149,21 +151,25 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
         }
     }
 
-    bool CanBack => _backStack.Any();
+    bool CanBack => _backStack.Count != 0;
 
     [RelayCommand(CanExecute = nameof(CanBack))]
     void Back()
     {
+        if (_snackbarService.ShowErrorMessageIf("操作失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
+            return;
         if (Post is not null)
             _forwardStack.Push(Post);
         Post = _backStack.Pop();
     }
 
-    bool CanForward => _forwardStack.Any();
+    bool CanForward => _forwardStack.Count != 0;
 
     [RelayCommand(CanExecute = nameof(CanForward))]
     void Forward()
     {
+        if (_snackbarService.ShowErrorMessageIf("操作失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
+            return;
         if (Post is not null)
             _backStack.Push(Post);
         Post = _forwardStack.Pop();
@@ -228,7 +234,7 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
         if (_snackbarService.ShowErrorMessageIfAny("采纳回答失败",
             (() => Post is null, _postIsNullErrorMessage),
             (() => CurrentReply is null, _replyIsNullErrorMessage),
-            (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+            (() => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage),
             (() => CurrentReply!.IsAccepted, "该回答已被采纳，请勿重复操作"),
             (() => !IsUserPost, "你不是提问者，无法接受该回答")))
             return;
@@ -259,7 +265,7 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
         if (_snackbarService.ShowErrorMessageIfAny("删除回答失败",
              (() => Post is null, _postIsNullErrorMessage),
              (() => CurrentReply is null, _replyIsNullErrorMessage),
-             (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+             (() => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage),
              (() => CurrentReply!.DelTag != 0, "该回答已被删除，请勿重复操作"),
              (() => !IsUserReply, "你不是此回答的作者，无法删除该回答")))
             return;
@@ -287,7 +293,7 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
     {
         if (_snackbarService.ShowErrorMessageIfAny("删除问题失败",
            (() => Post is null, _postIsNullErrorMessage),
-           (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+           (() => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage),
            (() => !IsUserPost, "你不是提问者，无法删除该问题"),
            (() => Post!.DelTag != 0, "该问题已被删除，请勿重复操作")))
             return;
@@ -311,8 +317,6 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
         }
     }
 
-
-
     [RelayCommand]
     private async Task LoadPostRepliesAsync()
     {
@@ -325,7 +329,7 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
         }
         try
         {
-            if (_snackbarService.ShowErrorMessageIf("加载失败", () => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage))
+            if (_snackbarService.ShowErrorMessageIf("加载失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
                 return;
             IsBusy = true;
             IsUserPost = _postService.GetIsUserPost(Post);
@@ -385,14 +389,15 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
     [RelayCommand]
     private async Task UpdateIsLikedAndIsUserReplyAsync()
     {
+        if (!_userService.IsUserLoggedIn || CurrentReply is null)
+        {
+            IsCurrentReplyLiked = false;
+            IsUserReply = false;
+            return;
+        }
         try
         {
-            if (CurrentReply is null)
-            {
-                IsCurrentReplyLiked = false;
-                IsUserReply = false;
-                return;
-            }
+
             IsBusy = true;
             var isUserReply = _postService.GetIsUserReply(CurrentReply);
             var isLiked = await _postService.GetIsLikedAsync(CurrentReply);
@@ -416,7 +421,7 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
     {
         if (_snackbarService.ShowErrorMessageIfAny("提交回答失败",
             (() => Post is null, _postIsNullErrorMessage),
-            (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+            (() => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage),
             (() => string.IsNullOrEmpty(NewReplyContent), "回答不能为空"),
             (() => NewReplyContent.Length > ReplyMaxLength, $"回答字数不能超过 {ReplyMaxLength} 个字")))
             return;
@@ -444,7 +449,7 @@ public partial class PostWindowViewModel(ILeftRightButtonDialogService dialogSer
     {
         if (_snackbarService.ShowErrorMessageIfAny("点赞或取消点赞失败",
            (() => Post is null, _postIsNullErrorMessage),
-           (() => !_userService.IsUserLoggedIn(), _userNotLoggedInErrorMessage),
+           (() => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage),
            (() => CurrentReply is null, _replyIsNullErrorMessage)))
             return;
         try

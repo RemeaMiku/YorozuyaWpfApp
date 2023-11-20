@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using System.Configuration;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
