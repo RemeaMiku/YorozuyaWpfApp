@@ -33,7 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Images\DefaultLoginBackground.jpg" />
     <None Remove="Assets\SOURCEHANSANSSC-REGULAR.OTF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Images\DefaultLoginBackground.jpg" />
   </ItemGroup>
 
   <ItemGroup>
