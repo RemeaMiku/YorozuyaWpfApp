@@ -54,6 +54,10 @@
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>
 
+    <Style BasedOn="{StaticResource {x:Type ui:PasswordBox}}" TargetType="ui:PasswordBox">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
+
     <Style BasedOn="{StaticResource {x:Type ui:Dialog}}" TargetType="ui:Dialog">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>

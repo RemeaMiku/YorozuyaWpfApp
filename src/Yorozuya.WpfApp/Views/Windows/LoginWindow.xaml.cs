@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
@@ -37,22 +38,22 @@ public partial class LoginWindow : UiWindow
         Theme.Changed += OnThemeChanged;
     }
 
-    private void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
+    private async void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
     {
         if (App.Current.LoginBackgroundImage == "Default")
         {
-            BackgroundImage.Source = new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{currentTheme}.jpg", UriKind.Relative));
+            await ChangeBackgroundAsync(new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{currentTheme}.jpg", UriKind.Relative)));
         }
     }
 
-    private void ApplyBackground(string loginBackgroundImage)
+    private async void ApplyBackground(string loginBackgroundImage)
     {
         try
         {
             if (loginBackgroundImage == "Default")
-                BackgroundImage.Source = new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{Theme.GetAppTheme()}.jpg", UriKind.Relative));
+                await ChangeBackgroundAsync(new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{Theme.GetAppTheme()}.jpg", UriKind.Relative)));
             else
-                BackgroundImage.Source = new BitmapImage(new(loginBackgroundImage));
+                await ChangeBackgroundAsync(new BitmapImage(new(loginBackgroundImage)));
             App.Current.WriteLoginBackgroundImageToConfiguration(loginBackgroundImage);
         }
         catch (Exception)
@@ -82,4 +83,14 @@ public partial class LoginWindow : UiWindow
 
     private void OnResetButtonClicked(object sender, RoutedEventArgs e) => ApplyBackground("Default");
 
+    private async Task ChangeBackgroundAsync(ImageSource newImageSource)
+    {
+        BackgroundImage2.Source = BackgroundImage.Source;
+        BackgroundImage.Source = newImageSource;
+        var duration = TimeSpan.FromSeconds(0.5);
+        BackgroundImage2.BeginAnimation(OpacityProperty, new DoubleAnimation(1, 0, duration));
+        BackgroundImage.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, duration));
+        await Task.Delay(duration);
+        BackgroundImage2.Source = default;
+    }
 }
