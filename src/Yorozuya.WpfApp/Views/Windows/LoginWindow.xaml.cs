@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Extensions;
@@ -33,6 +34,15 @@ public partial class LoginWindow : UiWindow
         snackbarService.SetSnackbarControl(Snackbar);
         DataContext = this;
         ApplyBackground(App.Current.LoginBackgroundImage);
+        Theme.Changed += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
+    {
+        if (App.Current.LoginBackgroundImage == "Default")
+        {
+            BackgroundImage.Source = new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{currentTheme}.jpg", UriKind.Relative));
+        }
     }
 
     private void ApplyBackground(string loginBackgroundImage)
@@ -40,7 +50,7 @@ public partial class LoginWindow : UiWindow
         try
         {
             if (loginBackgroundImage == "Default")
-                BackgroundImage.Source = new BitmapImage(new("/Assets/Images/DefaultLoginBackground.jpg", UriKind.Relative));
+                BackgroundImage.Source = new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{Theme.GetAppTheme()}.jpg", UriKind.Relative));
             else
                 BackgroundImage.Source = new BitmapImage(new(loginBackgroundImage));
             App.Current.WriteLoginBackgroundImageToConfiguration(loginBackgroundImage);

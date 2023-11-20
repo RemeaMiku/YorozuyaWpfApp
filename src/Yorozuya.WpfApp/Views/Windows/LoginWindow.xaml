@@ -25,7 +25,7 @@
             Timeout="5000" />
         <Image
             x:Name="BackgroundImage"
-            d:Source="/Assets/Images/DefaultLoginBackground.jpg"
+            d:Source="/Assets/Images/DefaultLoginBackground-Light.jpg"
             Stretch="UniformToFill" />
         <controls:BlurHost
             Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualHeight}"
