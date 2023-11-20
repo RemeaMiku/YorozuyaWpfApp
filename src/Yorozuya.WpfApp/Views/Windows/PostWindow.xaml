@@ -17,6 +17,7 @@
     d:DataContext="{d:DesignInstance local:PostWindow}"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Acrylic"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <ui:UiWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -24,22 +25,6 @@
         <cv:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
         <cv:ReversedBooleanToVisibilityConverter x:Key="ReversedBooleanToVisibilityConverter" />
         <cv:ReversedNullableToVisibilityConverter x:Key="ReversedNullableToVisibilityConverter" />
-        <Style
-            x:Key="TitleBarUiButtonStyle"
-            BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}"
-            TargetType="ui:Button">
-            <Setter Property="Width" Value="44" />
-            <Setter Property="Height" Value="30" />
-            <Setter Property="CornerRadius" Value="0" />
-            <Setter Property="MouseOverBackground" Value="{Binding ElementName=Titlebar, Path=ButtonsBackground}" />
-            <Setter Property="FontSize" Value="{StaticResource MediumFontSize}" />
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="#AAAAAA" />
-                    <Setter Property="Cursor" Value="No" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
     </ui:UiWindow.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -79,7 +64,7 @@
                     ToolTip="前进到下一个问题" />
             </StackPanel>
             <ui:TitleBar
-                x:Name="Titlebar"
+                x:Name="TitleBar"
                 Grid.Column="1"
                 Background="{ui:ThemeResource}" />
         </Grid>

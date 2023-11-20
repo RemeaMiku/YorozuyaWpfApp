@@ -14,6 +14,7 @@ using Wpf.Ui.Mvvm.Services;
 using System.Configuration;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using System.IO;
 
 namespace Yorozuya.WpfApp;
 
@@ -40,6 +41,7 @@ public partial class App : Application
         .AddSingleton<HomePage>()
         .AddSingleton<PersonPage>()
         .AddSingleton<SettingsPage>()
+        .AddSingleton<LoginWindow>()
         .AddSingleton<PostWindow>()
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
@@ -54,11 +56,16 @@ public partial class App : Application
         ApplyBackdropType(WindowBackdropType);
         ApplyAppFont(AppFont);
         mainWindow.Show();
+        ServiceProvider.GetRequiredService<LoginWindow>().Show();
     }
+
+    #region App Configuration
 
     private string? _appTheme;
     private BackgroundType? _windowBackgroundType;
     private string? _appFont;
+    private string? _loginBackgroundImage;
+
 
     public string AppTheme
     {
@@ -86,6 +93,17 @@ public partial class App : Application
             return _appFont;
         }
     }
+
+    public string LoginBackgroundImage
+    {
+        get
+        {
+            _loginBackgroundImage ??= ReadLoginBackgroundImageFromConfiguration();
+            return _loginBackgroundImage;
+        }
+    }
+
+
 
     public Configuration Configuration { get; } = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -117,6 +135,16 @@ public partial class App : Application
         if (element.Value == "System" || element.Value == "Source Han Sans SC")
             return element.Value;
         return "System";
+    }
+
+    private string ReadLoginBackgroundImageFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["Login Background Image"];
+        if (element is null)
+            return "Default";
+        if (Path.Exists(element.Value))
+            return element.Value;
+        return "Default";
     }
 
     public void ApplyAppTheme(string theme)
@@ -188,4 +216,17 @@ public partial class App : Application
             element.Value = font;
         Configuration.Save();
     }
+
+    public void WriteLoginBackgroundImageToConfiguration(string loginBackgroundImage)
+    {
+        _loginBackgroundImage = loginBackgroundImage;
+        var element = Configuration.AppSettings.Settings["Login Background Image"];
+        if (element is null)
+            Configuration.AppSettings.Settings.Add("Login Background Image", loginBackgroundImage);
+        else
+            element.Value = loginBackgroundImage;
+        Configuration.Save();
+    }
+
+    #endregion
 }

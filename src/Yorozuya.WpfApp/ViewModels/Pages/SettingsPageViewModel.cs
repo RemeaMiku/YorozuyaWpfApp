@@ -15,7 +15,7 @@ public partial class SettingsPageViewModel(IUserService userService, ILeftRightB
     [RelayCommand]
     void Login()
     {
-
+        //TODO: Login
     }
 
     [RelayCommand]

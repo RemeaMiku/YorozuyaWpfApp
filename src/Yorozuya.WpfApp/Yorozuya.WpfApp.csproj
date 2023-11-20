@@ -33,11 +33,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Assets\Images\DefaultLoginBackground-Dark.jpg" />
+    <None Remove="Assets\Images\DefaultLoginBackground-Light.jpg" />
+    <None Remove="Assets\Images\Yorozuya.png" />
     <None Remove="Assets\SOURCEHANSANSSC-REGULAR.OTF" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Fonts\SOURCEHANSANSSC-REGULAR.OTF" />          
+    <Resource Include="Assets\Images\DefaultLoginBackground-Dark.jpg" />
+    <Resource Include="Assets\Images\DefaultLoginBackground-Light.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Fonts\SOURCEHANSANSSC-REGULAR.OTF" />
+    <Resource Include="Assets\Images\Yorozuya.png" />          
   </ItemGroup>
 
   <ItemGroup>
