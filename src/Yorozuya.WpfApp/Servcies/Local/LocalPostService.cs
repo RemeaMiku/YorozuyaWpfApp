@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Yorozuya.WpfApp.Models;
@@ -27,7 +28,7 @@ public class LocalPostService(IUserService userService) : IPostService
         return _localLikes.Exists(l => l.ReplyId == reply.Id && l.UserId == _userService.UserInfo.Id);
     }
 
-    readonly List<Reply> _localReplies =
+    readonly List<Reply> _localReplies = 
     [
         new() { Id = 0, PostId = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答0", Likes = 831 },
         new() { Id = 1, PostId = 0, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答1", Likes = 123, IsAccepted = true },
@@ -121,10 +122,71 @@ public class LocalPostService(IUserService userService) : IPostService
         _localReplies.Remove(reply);
     }
 
-    public async Task<IEnumerable<Post>?> GetPostsByFieldAsync(string field)
+    public async Task<IEnumerable<Post>?> GetPostsByFieldAsync(string filed)
     {
         ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(500);
-        return _localPosts.Where(p => p.Field == field);
+        var temp = new List<Post>();
+        Random random = new();
+        for (int i = 1; i <= 10; ++i)
+        {
+            temp.Add(new Post()
+            {
+                AskerId = i,
+                Content = $"aya kawaii {random.Next()} 文文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏",
+                CreateTime = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                DelTag = 0,
+                Field = filed,
+                Id = i,
+                Title = $"Is aya kawaii? {i} {filed} 文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏",
+                UpdateTime = DateTime.Now.ToString(CultureInfo.CurrentCulture),
+                Views = 233 * i,
+            });
+        }
+        return temp;
+    }
+
+    public async Task<IEnumerable<Post>?> GetUserPostsAsync(string token)
+    {
+        await Task.Delay(500);
+        return new[]
+        {
+            new Post
+            {
+                AskerId = 0, Content = "问题0", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 0, Title = "问题0",
+                Views = 123, Field = "Test"
+            },
+            new Post
+            {
+                AskerId = 1, Content = "问题1", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 1, Title = "问题1",
+                Views = 831, Field = "Test"
+            },
+            new Post
+            {
+                AskerId = 2, Content = "问题2", CreateTime = "2023.08.31 11:45:14", DelTag = 0, Id = 2, Title = "问题2",
+                Views = 250, Field = "Test"
+            },
+        };
+    }
+
+    public async Task<IEnumerable<Reply>?> GetUserRepliesAsync(string token)
+    {
+        await Task.Delay(500);
+        return new[]
+        {
+            new Reply
+            {
+                Id = 0, PostId = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答0", Likes = 831
+            },
+            new Reply
+            {
+                Id = 1, PostId = 0, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答1", Likes = 123,
+                IsAccepted = true
+            },
+            new Reply
+            {
+                Id = 2, PostId = 1, UserId = 2, CreateTime = "2021.08.31 11:45:14", Content = "回答2", Likes = 233
+            },
+        };
     }
 }

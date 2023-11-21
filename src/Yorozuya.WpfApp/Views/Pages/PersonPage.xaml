@@ -5,15 +5,63 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{d:DesignInstance local:PersonPage}"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <Grid d:Background="White">
-        <TextBlock
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Style="{StaticResource DynamicForegroundTextBlock}"
-            Text="PersonPage" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Margin="0,5,0,10" Text="{Binding Path=ViewModel.NowUserInfo.Username}" d:Text="Aya" FontWeight="Bold" FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DynamicForegroundTextBlock}" TextAlignment="Center"/>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+            <ui:CardExpander Margin="10" Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}" BorderThickness="0" Padding="20,10">
+                <ui:CardExpander.Header>
+                    <TextBlock Text="历史提问" FontSize="{StaticResource LargeFontSize}"></TextBlock>
+                </ui:CardExpander.Header>
+                <ui:CardExpander.Content>
+                    <ItemsControl ItemsSource="{Binding Path=ViewModel.PostSource}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:CardAction Margin="0, 5" Command="{Binding Path=OpenPostCommand}">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Path=Post.Title}" FontSize="{StaticResource MediumFontSize}" FontWeight="Bold"/>
+                                        <TextBlock Margin="0,3,0,0" Text="{Binding Path=Post.Content}" FontSize="{StaticResource MediumFontSize}" />
+                                    </StackPanel>
+                                </ui:CardAction>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ui:CardExpander.Content>
+            </ui:CardExpander>
+            <ui:CardExpander Margin="10" Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}" BorderThickness="0" Padding="20,10">
+                <ui:CardExpander.Header>
+                    <TextBlock Text="历史回答" FontSize="{StaticResource LargeFontSize}"></TextBlock>
+                </ui:CardExpander.Header>
+                <ui:CardExpander.Content>
+                    <ItemsControl ItemsSource="{Binding Path=ViewModel.ReplySource}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:CardAction Margin="0, 5" Command="{Binding Path=OpenReplyCommand}">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Path=Reply.Content}" FontSize="{StaticResource MediumFontSize}"/>
+                                        <TextBlock Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
+                                            <Run Text="点赞数："/>
+                                            <Run Text="{Binding Path=Reply.Likes}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </ui:CardAction>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ui:CardExpander.Content>
+            </ui:CardExpander>
+            </StackPanel>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </Page>
