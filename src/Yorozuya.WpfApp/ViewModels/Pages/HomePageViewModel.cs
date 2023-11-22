@@ -59,11 +59,17 @@ public partial class HomePageViewModel : BaseValidatorViewModel
     private readonly IPostService _nowPostService;
     private readonly IMessenger _messenger;
     public HomePageViewModel(IPostService nowPostService, IMessenger messenger)
-    {
+    {        
         _nowPostService = nowPostService;
         _messenger = messenger;
         FieldSource.Source = _fields;
         FieldSource.View.Refresh();
         NowSelectedField = _fields[0];
+        var posts = await _postService.GetPostsByFieldAsync("Test");
+        foreach (var post in posts!)
+        {
+            _messenger.Send(post);
+            await Task.Delay(3000);
+        }
     }
 }

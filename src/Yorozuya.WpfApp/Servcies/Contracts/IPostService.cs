@@ -17,9 +17,9 @@ public interface IPostService
 
     public Task<bool> GetIsLikedAsync(Reply reply);
 
-    public bool GetIsUserPost(Post post);
+    //public bool GetIsUserPost(Post post);
 
-    public bool GetIsUserReply(Reply reply);
+    //public bool GetIsUserReply(Reply reply);
 
     public Task AcceptReplyAsync(Post post, Reply reply);
 

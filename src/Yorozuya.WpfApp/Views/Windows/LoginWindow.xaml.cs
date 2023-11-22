@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,6 +19,7 @@ using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Extensions;
+using Yorozuya.WpfApp.ViewModels.Windows;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
@@ -28,22 +30,30 @@ public partial class LoginWindow : UiWindow
 {
     readonly ISnackbarService _snackbarService;
 
-    public LoginWindow(ISnackbarService snackbarService)
+    public LoginWindow(LoginWindowViewModel viewModel, ISnackbarService snackbarService)
     {
         InitializeComponent();
         _snackbarService = snackbarService;
+        ViewModel = viewModel;
         snackbarService.SetSnackbarControl(Snackbar);
         DataContext = this;
         ApplyBackground(App.Current.LoginBackgroundImage);
         Theme.Changed += OnThemeChanged;
+        _navigateDictionary = new Dictionary<object, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)>()
+        {
+            { RegisterButton, (false, FieldGenderPanel, UsernamePasswordPanel) },
+            { BackButton, (true, UsernamePasswordPanel, FieldGenderPanel) },
+            { ContinueButton, (false, CheckInfomationPanel, FieldGenderPanel) },
+            { CancelButton, (true, UsernamePasswordPanel, CheckInfomationPanel) },
+        }.ToFrozenDictionary();
     }
+
+    public LoginWindowViewModel ViewModel { get; }
 
     private async void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
     {
         if (App.Current.LoginBackgroundImage == "Default")
-        {
             await ChangeBackgroundAsync(new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{currentTheme}.jpg", UriKind.Relative)));
-        }
     }
 
     private async void ApplyBackground(string loginBackgroundImage)
@@ -92,5 +102,35 @@ public partial class LoginWindow : UiWindow
         BackgroundImage.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, duration));
         await Task.Delay(duration);
         BackgroundImage2.Source = default;
+    }
+
+    bool _isSwitching = false;
+
+    private readonly FrozenDictionary<object, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)> _navigateDictionary;
+
+    private async void OnNavigateButtonClicked(object sender, RoutedEventArgs e)
+    {
+        if (_isSwitching)
+            return;
+        _isSwitching = true;
+        var duration = TimeSpan.FromSeconds(0.5);
+        var ease = new QuarticEase { EasingMode = EasingMode.EaseInOut };
+        var distance = 300;
+        (var isFromLeft, var inElement, var outElement) = _navigateDictionary[sender];
+        var inMargin = new Thickness(distance, 0, 0, 0);
+        var outMargin = new Thickness(0, 0, distance, 0);
+        if (isFromLeft)
+            (inMargin, outMargin) = (outMargin, inMargin);
+        await outElement.SlideAndFadeOutAsync(duration, outMargin, ease);
+        inElement.Visibility = Visibility.Visible;
+        await inElement.SlideAndFadeInAsync(duration, inMargin, ease);
+        outElement.Visibility = Visibility.Collapsed;
+        _isSwitching = false;
+    }
+
+    private void OnPasswordChanged(object sender, RoutedEventArgs e)
+    {
+        var passwordBox = (Wpf.Ui.Controls.PasswordBox)sender;
+        ViewModel.Password = passwordBox.Password;
     }
 }

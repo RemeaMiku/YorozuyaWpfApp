@@ -20,6 +20,7 @@ public partial class PostWindow : UiWindow, IRecipient<Post>
         InitializeComponent();
         DataContext = this;
         ViewModel = viewModel;
+        ViewModel.IsActive = true;
         ViewModel.GetCancelConfirmDialogService().SetDialogControl(Dialog);
         ViewModel.GetSnackbarService().SetSnackbarControl(Snackbar);
         messenger.Register(this);
@@ -59,8 +60,5 @@ public partial class PostWindow : UiWindow, IRecipient<Post>
         if (!IsVisible)
             Show();
         Focus();
-        ViewModel.PushBackward();
-        ViewModel.Post = message;
-        ViewModel.CheckForward();
     }
 }

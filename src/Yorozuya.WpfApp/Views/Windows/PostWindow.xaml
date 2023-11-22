@@ -5,6 +5,7 @@
     xmlns:appearance="clr-namespace:Wpf.Ui.Appearance;assembly=Wpf.Ui"
     xmlns:cv="clr-namespace:Yorozuya.WpfApp.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:Yorozuya.WpfApp.Models"
@@ -55,11 +56,13 @@
                 <ui:Button
                     Command="{Binding ViewModel.BackCommand, Mode=OneTime}"
                     Icon="ChevronLeft24"
+                    IsEnabled="{Binding ViewModel.IsNotBusy, Mode=OneWay}"
                     Style="{StaticResource TitleBarUiButtonStyle}"
                     ToolTip="返回到上一个问题" />
                 <ui:Button
                     Command="{Binding ViewModel.ForwardCommand, Mode=OneTime}"
                     Icon="ChevronRight24"
+                    IsEnabled="{Binding ViewModel.IsNotBusy, Mode=OneWay}"
                     Style="{StaticResource TitleBarUiButtonStyle}"
                     ToolTip="前进到下一个问题" />
             </StackPanel>
@@ -107,20 +110,32 @@
                         <ListView
                             Grid.Row="1"
                             Margin="0,10,0,0"
+                            d:SelectedIndex="0"
                             IsSynchronizedWithCurrentItem="True"
                             ItemsSource="{Binding ViewModel.RepliesViewSource.View, Mode=OneWay}"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             SelectedIndex="{Binding ViewModel.SelectedIndex}"
-                            SelectedItem="{Binding ViewModel.CurrentReply}">
+                            SelectedItem="{Binding ViewModel.CurrentReply}"
+                            SelectionMode="Single">
+                            <d:ListView.ItemsSource>
+                                <x:Array Type="models:Reply">
+                                    <models:Reply Content="11111" />
+                                    <models:Reply Content="22222" />
+                                    <models:Reply Content="33333" />
+                                </x:Array>
+                            </d:ListView.ItemsSource>
                             <ListView.ItemTemplate>
                                 <DataTemplate DataType="models:Reply">
-                                    <TextBlock Text="{Binding Content, Mode=OneWay}" TextTrimming="WordEllipsis" />
+                                    <TextBlock
+                                        Style="{StaticResource DefaultFontFamilyTextBlock}"
+                                        Text="{Binding Content, Mode=OneWay}"
+                                        TextTrimming="WordEllipsis" />
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                             <ListView.ItemContainerStyle>
                                 <Style BasedOn="{StaticResource {x:Type ListViewItem}}" TargetType="ListViewItem">
-                                    <Setter Property="Height" Value="30" />
-                                    <Setter Property="Padding" Value="10,0,0,0" />
+                                    <Setter Property="Padding" Value="10" />
+                                    <Setter Property="Height" Value="40" />
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
@@ -419,7 +434,7 @@
                                 Text="{Binding ElementName=NewReplyBox, Path=Text.Length, StringFormat='已输入 {0}/10000 字'}" />
                             <ui:Button
                                 Margin="10,0,0,0"
-                                Command="{Binding ViewModel.CancelReplyCommand, Mode=OneTime}"
+                                Command="{Binding ViewModel.CloseReplyPanelCommand, Mode=OneTime}"
                                 FontSize="{StaticResource LargeFontSize}"
                                 Icon="Dismiss24"
                                 Style="{StaticResource BorderlessTransparentUiButtonStyle}"

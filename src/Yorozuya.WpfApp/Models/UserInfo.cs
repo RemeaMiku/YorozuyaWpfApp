@@ -13,6 +13,9 @@ public class UserInfo
     [JsonPropertyName("field")]
     public string Field { get; set; } = null!;
 
+    /// <summary>
+    /// 1是男
+    /// </summary>
     [JsonPropertyName("gender")]
     public string Gender { get; set; } = null!;
 

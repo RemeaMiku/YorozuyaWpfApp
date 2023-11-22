@@ -52,10 +52,42 @@
 
     <Style BasedOn="{StaticResource {x:Type ui:TextBox}}" TargetType="ui:TextBox">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <AdornedElementPlaceholder />
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Foreground="{StaticResource MikuRedBrush}" Text="{Binding ErrorContent}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type ui:PasswordBox}}" TargetType="ui:PasswordBox">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="Validation.ErrorTemplate">
+            <Setter.Value>
+                <ControlTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <AdornedElementPlaceholder />
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Foreground="{StaticResource MikuRedBrush}" Text="{Binding ErrorContent}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type ui:Dialog}}" TargetType="ui:Dialog">
@@ -63,6 +95,10 @@
     </Style>
 
     <Style BasedOn="{StaticResource {x:Type ui:Snackbar}}" TargetType="ui:Snackbar">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type ui:ToggleSwitch}}" TargetType="ui:ToggleSwitch">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>
 
