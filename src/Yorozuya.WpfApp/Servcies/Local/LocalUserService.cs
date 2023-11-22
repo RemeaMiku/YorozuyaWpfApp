@@ -15,6 +15,8 @@ public class LocalUserService : IUserService
         set => _localUserInfo = value;
     }
 
+    public string Token { get; set; } = "1";
+
     public Task<UserInfo> UserLoginAsync()
     {
         throw new NotImplementedException();
