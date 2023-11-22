@@ -11,7 +11,7 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.ViewModels.Pages;
 
-public partial class HomePageViewModel : BaseViewModel
+public partial class HomePageViewModel : BaseValidatorViewModel
 {
     private readonly List<string> _fields = new() { "文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏", "aaa", "bbb"};
 
@@ -21,8 +21,8 @@ public partial class HomePageViewModel : BaseViewModel
     public ObservableCollection<PostButton> PostSource { get; } = new();
 
     partial void OnNowSelectedFieldChanged(string value)
-    { 
-        RefreshPosts();
+    {
+        RefreshPostsCommand.Execute(default);
     }
 
     public class PostButton(Post post, IRelayCommand openPostCommand)
@@ -31,27 +31,29 @@ public partial class HomePageViewModel : BaseViewModel
         public IRelayCommand OpenPostCommand { get; } = openPostCommand;
     }
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(RefreshPostsCommand))]
-    private bool _isNotRefreshing = true;
-
-    [RelayCommand(CanExecute = nameof(IsNotRefreshing))]
+    [RelayCommand]
     private async Task RefreshPosts()
     {
-        IsNotRefreshing = false;
-        var source = await _nowPostService.GetPostsByFieldAsync(NowSelectedField);
-        //List<PostButton> postButtons = new();
-        PostSource.Clear();
-        if (source is null) return;
-        foreach (Post post in source)
+        IsBusy = true;
+        try
         {
-            PostSource.Add(new(post, new RelayCommand(() =>
+            var source = await _nowPostService.GetPostsByFieldAsync(NowSelectedField);
+            PostSource.Clear();
+            if (source is null) return;
+            foreach (Post post in source)
             {
-                _messenger.Send(post);
-            })));
+                PostSource.Add(new(post, new RelayCommand(() => { _messenger.Send(post); })));
+            }
         }
-
-        IsNotRefreshing = true;
+        catch(Exception e)
+        {
+            //TODO: ErrorDialog
+            Console.WriteLine(e);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private readonly IPostService _nowPostService;

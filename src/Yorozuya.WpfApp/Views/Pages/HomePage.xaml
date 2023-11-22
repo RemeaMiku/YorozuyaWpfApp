@@ -6,7 +6,6 @@
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:localViewModel="clr-namespace:Yorozuya.WpfApp.ViewModels.Pages"
     d:DataContext="{d:DesignInstance local:HomePage}"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -33,18 +32,15 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
             <Grid Grid.Row="0" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock d:Text="文文可爱捏"  Grid.Column="0" Text="{Binding Path=ViewModel.NowSelectedField}" TextAlignment="Center" FontWeight="Bold" FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DynamicForegroundTextBlock}" />
+                <TextBlock d:Text="文文可爱捏"  Grid.Column="0" Text="{Binding Path=ViewModel.NowSelectedField, Mode=OneWay}" TextAlignment="Center" FontWeight="Bold" FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DynamicForegroundTextBlock}" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <ui:Button ToolTip="发布一个新问题" Icon="Add28" Style="{StaticResource BorderlessTransparentUiButtonStyle}"/>
-                    <ui:Button ToolTip="刷新" Margin="5, 0, 0, 0" Icon="ArrowClockwise28" Command="{Binding Path=ViewModel.RefreshPostsCommand}"/>
+                    <ui:Button ToolTip="发布一个新问题" Icon="Add28" Appearance="Primary"/>
+                    <ui:Button ToolTip="刷新" Margin="5, 0, 0, 0" Icon="ArrowClockwise28" Command="{Binding Path=ViewModel.RefreshPostsCommand, Mode=OneTime}"/>
                 </StackPanel>
             </Grid>
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
@@ -65,7 +61,7 @@
                                 <TextBlock MaxHeight="75" Grid.Row="1" Text="{Binding Path=Post.Content}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontSize="{StaticResource MediumFontSize}"/>
                                 <TextBlock Grid.Row="2" Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
                                     <Run Text="浏览数：" />
-                                    <Run Text="{Binding Path=Post.Views}"/>
+                                    <Run Text="{Binding Path=Post.Views, Mode=OneWay}"/>
                                 </TextBlock>
                             </Grid>
                         </ui:CardAction>

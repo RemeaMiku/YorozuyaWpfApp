@@ -27,9 +27,9 @@
                     <ItemsControl ItemsSource="{Binding Path=ViewModel.PostSource}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ui:CardAction Margin="0, 5" Command="{Binding Path=OpenPostCommand}">
+                                <ui:CardAction Margin="0, 5" Command="{Binding RelativeSource={RelativeSource AncestorType=Page},Path=ViewModel.OpenPostCommand}" CommandParameter="{Binding}">
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Path=Post.Title}" FontSize="{StaticResource MediumFontSize}" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Path=Title}" FontSize="{StaticResource MediumFontSize}" FontWeight="Bold"/>
                                         <TextBlock Margin="0,3,0,0" Text="{Binding Path=Post.Content}" FontSize="{StaticResource MediumFontSize}" />
                                     </StackPanel>
                                 </ui:CardAction>
@@ -44,10 +44,10 @@
                 </ui:CardExpander.Header>
                 <ui:CardExpander.Content>
                     <ItemsControl ItemsSource="{Binding Path=ViewModel.ReplySource}">
-                        <ItemsControl.ItemTemplate>
+s                        <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ui:CardAction Margin="0, 5" Command="{Binding Path=OpenReplyCommand}">
-                                    <StackPanel>
+                                        <ui:CardAction Margin="0, 5" Command="{Binding RelativeSource={RelativeSource AncestorType=Page},Path=ViewModel.OpenReplyCommand}" CommandParameter="{Binding}">
+                                            <StackPanel>
                                         <TextBlock Text="{Binding Path=Reply.Content}" FontSize="{StaticResource MediumFontSize}"/>
                                         <TextBlock Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
                                             <Run Text="点赞数："/>

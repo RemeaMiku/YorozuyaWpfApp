@@ -102,10 +102,4 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="PrimaryButton" BasedOn="{StaticResource BorderlessTransparentUiButtonStyle}" TargetType="ui:Button">
-        <Setter Property="Background" Value="HotPink" />
-        <Setter Property="MouseOverBackground" Value="LightPink" />
-        <Setter Property="PressedBackground" Value="DeepPink" />
-    </Style>
-
 </ResourceDictionary>

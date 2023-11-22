@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,33 +16,28 @@ public partial class PersonPageViewModel : BaseViewModel
 
     [ObservableProperty] private UserInfo? _nowUserInfo;
 
-    [ObservableProperty] private List<HomePageViewModel.PostButton> _postSource = new();
+    [ObservableProperty] private List<Post> _postSource = new();
 
-    [ObservableProperty] private List<ReplyButton> _replySource = new();
+    [ObservableProperty] private List<Reply> _replySource = new();
 
-    public class ReplyButton(Reply reply, IRelayCommand openReplyCommand)
+    [RelayCommand]
+    private void OpenPost(Post post)
     {
-        public Reply Reply { get; } = reply;
-        public IRelayCommand OpenReplyCommand { get; } = openReplyCommand;
+        _messenger.Send(post);
+    }
+
+    [RelayCommand]
+    private void OpenReply(Reply reply)
+    {
+        //_messenger.Send(reply);
     }
 
     private async void SetActionCard()
     {
         var posts = await _postService.GetUserPostsAsync(_userService.Token);
-        List<HomePageViewModel.PostButton> postSource = new();
-        if (posts is not null)
-        {
-            postSource.AddRange(posts.Select(post => new HomePageViewModel.PostButton(post, new RelayCommand(() => { _messenger.Send(post); }))));
-            PostSource = postSource;
-        }
-
         var replies = await _postService.GetUserRepliesAsync(_userService.Token);
-        List<ReplyButton> replySource = new();
-        if (replies is not null)
-        {
-            replySource.AddRange(replies.Select(reply => new ReplyButton(reply, new RelayCommand(() => { Console.WriteLine(reply.Id); }))));
-            ReplySource = replySource;
-        }
+        PostSource = posts?.ToList() ?? new();
+        ReplySource = replies?.ToList() ?? new();
     }
 
     public PersonPageViewModel(IUserService userService, IPostService postService, IMessenger messenger)
