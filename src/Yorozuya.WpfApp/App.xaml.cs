@@ -33,6 +33,7 @@ public partial class App : Application
         .AddTransient<ILeftRightButtonDialogService, LeftRightButtonDialogService>()
         .AddSingleton<IUserService, LocalUserService>()
         .AddSingleton<IPostService, LocalPostService>()
+        .AddSingleton<LoginWindowViewModel>()
         .AddSingleton<HomePageViewModel>()
         .AddSingleton<PersonPageViewModel>()
         .AddSingleton<SettingsPageViewModel>()
