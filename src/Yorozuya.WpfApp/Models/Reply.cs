@@ -31,8 +31,11 @@ public class Reply
     [JsonPropertyName("id")]
     public long Id { get; set; }
 
+    /// <summary>
+    /// 1是采纳
+    /// </summary>
     [JsonPropertyName("isAccepted")]
-    public bool IsAccepted { get; set; }
+    public int IsAccepted { get; set; }
 
     [JsonPropertyName("likes")]
     public long Likes { get; set; }

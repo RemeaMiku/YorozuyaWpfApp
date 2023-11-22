@@ -15,6 +15,9 @@ public partial class HomePageViewModel(IPostService postService, IMessenger mess
     {
         var posts = await _postService.GetPostsByFieldAsync("Test");
         foreach (var post in posts!)
+        {
             _messenger.Send(post);
+            await Task.Delay(3000);
+        }
     }
 }

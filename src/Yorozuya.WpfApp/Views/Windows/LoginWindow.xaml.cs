@@ -41,9 +41,7 @@ public partial class LoginWindow : UiWindow
     private async void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
     {
         if (App.Current.LoginBackgroundImage == "Default")
-        {
             await ChangeBackgroundAsync(new BitmapImage(new($"/Assets/Images/DefaultLoginBackground-{currentTheme}.jpg", UriKind.Relative)));
-        }
     }
 
     private async void ApplyBackground(string loginBackgroundImage)
