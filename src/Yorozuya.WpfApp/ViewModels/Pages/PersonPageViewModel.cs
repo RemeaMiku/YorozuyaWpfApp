@@ -16,9 +16,9 @@ public partial class PersonPageViewModel : BaseViewModel
 
     [ObservableProperty] private UserInfo? _nowUserInfo;
 
-    [ObservableProperty] private List<Post> _postSource = new();
+    [ObservableProperty] private List<Post> _postSource = [];
 
-    [ObservableProperty] private List<Reply> _replySource = new();
+    [ObservableProperty] private List<Reply> _replySource = [];
 
     [RelayCommand]
     private void OpenPost(Post post)
@@ -29,15 +29,15 @@ public partial class PersonPageViewModel : BaseViewModel
     [RelayCommand]
     private void OpenReply(Reply reply)
     {
-        //_messenger.Send(reply);
+        _messenger.Send(reply);
     }
 
     private async void SetActionCard()
     {
         var posts = await _postService.GetUserPostsAsync(_userService.Token);
         var replies = await _postService.GetUserRepliesAsync(_userService.Token);
-        PostSource = posts?.ToList() ?? new();
-        ReplySource = replies?.ToList() ?? new();
+        PostSource = posts?.ToList() ?? [];
+        ReplySource = replies?.ToList() ?? [];
     }
 
     public PersonPageViewModel(IUserService userService, IPostService postService, IMessenger messenger)

@@ -28,7 +28,7 @@ public class LocalPostService(IUserService userService) : IPostService
         return _localLikes.Exists(l => l.ReplyId == reply.Id && l.UserId == _userService.UserInfo.Id);
     }
 
-    readonly List<Reply> _localReplies = 
+    readonly List<Reply> _localReplies =
     [
         new() { Id = 0, PostId = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答0", Likes = 831 },
         new() { Id = 1, PostId = 0, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答1", Likes = 123, IsAccepted = 1 },
@@ -181,7 +181,7 @@ public class LocalPostService(IUserService userService) : IPostService
             new Reply
             {
                 Id = 1, PostId = 0, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答1", Likes = 123,
-                IsAccepted = true
+                IsAccepted = 1
             },
             new Reply
             {
