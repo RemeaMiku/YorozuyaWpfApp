@@ -13,22 +13,22 @@ namespace Yorozuya.WpfApp.ViewModels.Pages;
 
 public partial class HomePageViewModel : BaseValidatorViewModel
 {
-    private readonly List<string> _fields = new() { "文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏", "aaa", "bbb"};
+    private readonly List<string> _fields = ["文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏", "aaa", "bbb"];
 
     [ObservableProperty] private string _nowSelectedField;
 
     public CollectionViewSource FieldSource { get; } = new();
-    public ObservableCollection<PostButton> PostSource { get; } = new();
+    public ObservableCollection<Post> PostSource { get; } = [];
 
     partial void OnNowSelectedFieldChanged(string value)
     {
         RefreshPostsCommand.Execute(default);
     }
 
-    public class PostButton(Post post, IRelayCommand openPostCommand)
+    [RelayCommand]
+    void OpenPost(Post post)
     {
-        public Post Post { get; } = post;
-        public IRelayCommand OpenPostCommand { get; } = openPostCommand;
+        _messenger.Send(post);
     }
 
     [RelayCommand]
@@ -37,15 +37,15 @@ public partial class HomePageViewModel : BaseValidatorViewModel
         IsBusy = true;
         try
         {
-            var source = await _nowPostService.GetPostsByFieldAsync(NowSelectedField);
+            var source = await _postService.GetPostsByFieldAsync(NowSelectedField);
             PostSource.Clear();
             if (source is null) return;
             foreach (Post post in source)
             {
-                PostSource.Add(new(post, new RelayCommand(() => { _messenger.Send(post); })));
+                PostSource.Add(post);
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             //TODO: ErrorDialog
             Console.WriteLine(e);
@@ -56,20 +56,27 @@ public partial class HomePageViewModel : BaseValidatorViewModel
         }
     }
 
-    private readonly IPostService _nowPostService;
+    private readonly IPostService _postService;
     private readonly IMessenger _messenger;
+
+    //[RelayCommand]
+    //async Task Test()
+    //{
+    //    var posts = await _postService.GetPostsByFieldAsync("Test");
+    //    foreach (var post in posts!)
+    //    {
+    //        _messenger.Send(post);
+    //        await Task.Delay(3000);
+    //    }
+    //}
+
     public HomePageViewModel(IPostService nowPostService, IMessenger messenger)
-    {        
-        _nowPostService = nowPostService;
+    {
+        _postService = nowPostService;
         _messenger = messenger;
         FieldSource.Source = _fields;
         FieldSource.View.Refresh();
         NowSelectedField = _fields[0];
-        var posts = await _postService.GetPostsByFieldAsync("Test");
-        foreach (var post in posts!)
-        {
-            _messenger.Send(post);
-            await Task.Delay(3000);
-        }
+        //TestCommand.Execute(default);
     }
 }
