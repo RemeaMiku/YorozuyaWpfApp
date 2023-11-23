@@ -52,12 +52,15 @@ public partial class App : Application
     {
         // 从容器中获取MainWindow并显示
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+        var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
         ServiceProvider.GetRequiredService<PostWindow>();
         ApplyAppTheme(AppTheme);
         ApplyBackdropType(WindowBackdropType);
         ApplyAppFont(AppFont);
         mainWindow.Show();
-        ServiceProvider.GetRequiredService<LoginWindow>().Show();
+        loginWindow.Show();
+        //TODO:启动登录测试
+        ServiceProvider.GetRequiredService<IUserService>().UserLoginAsync("Developer", "Password");
     }
 
     #region App Configuration
