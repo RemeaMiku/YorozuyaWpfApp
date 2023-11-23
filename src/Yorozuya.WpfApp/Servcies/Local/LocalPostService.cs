@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;

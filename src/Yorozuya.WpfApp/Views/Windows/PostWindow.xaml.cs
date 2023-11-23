@@ -4,8 +4,6 @@ using Yorozuya.WpfApp.ViewModels.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using CommunityToolkit.Mvvm.Messaging;
-using Yorozuya.WpfApp.Models;
 using System.ComponentModel;
 
 namespace Yorozuya.WpfApp.Views.Windows;
@@ -22,7 +20,7 @@ public partial class PostWindow : UiWindow
         ViewModel = viewModel;
         ViewModel.GetCancelConfirmDialogService().SetDialogControl(Dialog);
         ViewModel.GetSnackbarService().SetSnackbarControl(Snackbar);
-        ViewModel.WindowOpened += (sender, e) =>
+        ViewModel.WindowOpened += (_, _) =>
         {
             Show();
             Focus();

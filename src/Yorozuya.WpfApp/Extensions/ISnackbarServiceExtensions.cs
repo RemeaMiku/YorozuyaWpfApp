@@ -9,17 +9,20 @@ public static class ISnackbarServiceExtensions
     public static bool ShowErrorMessage(this ISnackbarService snackbarService, string title, string message)
         => snackbarService.Show(title, message, SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
 
-    /// <summary>
-    /// 显示错误消息
-    /// </summary>
-    /// <param name="snackbarService"></param>
-    /// <param name="condition"></param>
-    /// <param name="message"></param>
-    /// <returns></returns>
+    public static bool ShowSuccessMessage(this ISnackbarService snackbarService, string title, string message)
+        => snackbarService.Show(title, message, SymbolRegular.CheckmarkCircle24, ControlAppearance.Success);
+
     public static bool ShowErrorMessageIf(this ISnackbarService snackbarService, string title, Func<bool> condition, string message)
     {
         if (condition.Invoke())
             return snackbarService.Show(title, message, SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
+        return false;
+    }
+
+    public static bool ShowSuccessMessageIf(this ISnackbarService snackbarService, string title, Func<bool> condition, string message)
+    {
+        if (condition.Invoke())
+            return snackbarService.Show(title, message, SymbolRegular.CheckmarkCircle24, ControlAppearance.Success);
         return false;
     }
 

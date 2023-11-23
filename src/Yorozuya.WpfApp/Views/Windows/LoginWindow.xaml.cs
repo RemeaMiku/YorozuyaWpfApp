@@ -2,18 +2,13 @@
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -30,22 +25,39 @@ public partial class LoginWindow : UiWindow
 {
     readonly ISnackbarService _snackbarService;
 
-    public LoginWindow(LoginWindowViewModel viewModel, ISnackbarService snackbarService)
+    public LoginWindow(LoginWindowViewModel viewModel)
     {
         InitializeComponent();
-        _snackbarService = snackbarService;
         ViewModel = viewModel;
-        snackbarService.SetSnackbarControl(Snackbar);
+        _snackbarService = ViewModel.SnackbarService;
+        _snackbarService.SetSnackbarControl(Snackbar);
         DataContext = this;
         ApplyBackground(App.Current.LoginBackgroundImage);
         Theme.Changed += OnThemeChanged;
-        _navigateDictionary = new Dictionary<object, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)>()
+        _navigateDictionary = new Dictionary<string, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)>()
         {
-            { RegisterButton, (false, FieldGenderPanel, UsernamePasswordPanel) },
-            { BackButton, (true, UsernamePasswordPanel, FieldGenderPanel) },
-            { ContinueButton, (false, CheckInfomationPanel, FieldGenderPanel) },
-            { CancelButton, (true, UsernamePasswordPanel, CheckInfomationPanel) },
+            { "Register", (false, FieldGenderPanel, UsernamePasswordPanel) },
+            { "Back", (true, UsernamePasswordPanel, FieldGenderPanel) },
+            { "Continue", (false, CheckInfomationPanel, FieldGenderPanel) },
+            { "Cancel", (true, UsernamePasswordPanel, CheckInfomationPanel) },
+            { "TryLogin",(false,BusyPanel,UsernamePasswordPanel) },
+            { "TryRegister",(false,BusyPanel,CheckInfomationPanel) },
+            { "Successed",(false,UsernamePasswordPanel,BusyPanel) },
+            { "NotLogined",(true,UsernamePasswordPanel,BusyPanel) },
+            { "NotRegistered",(true,UsernamePasswordPanel,BusyPanel)}
         }.ToFrozenDictionary();
+        ViewModel.NavigateRequsted += async (_, e) =>
+        {
+            if (e == "Successed")
+                PasswordBox.Password = string.Empty;
+            await NavigateAsync(e);
+        };
+        ViewModel.LoginRequested += (_, _) =>
+        {
+            Show();
+            Focus();
+        };
+        ViewModel.UserLoggedIn += (_, _) => { Hide(); };
     }
 
     public LoginWindowViewModel ViewModel { get; }
@@ -104,33 +116,48 @@ public partial class LoginWindow : UiWindow
         BackgroundImage2.Source = default;
     }
 
-    bool _isSwitching = false;
+    bool _isNavigating = false;
 
-    private readonly FrozenDictionary<object, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)> _navigateDictionary;
+    private readonly FrozenDictionary<string, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)> _navigateDictionary;
 
-    private async void OnNavigateButtonClicked(object sender, RoutedEventArgs e)
+    private async Task NavigateAsync(string args)
     {
-        if (_isSwitching)
+        var duration = TimeSpan.FromSeconds(0.3);
+        if (_isNavigating)
+        {
+            await Task.Delay(2 * duration);
+            await NavigateAsync(args);
             return;
-        _isSwitching = true;
-        var duration = TimeSpan.FromSeconds(0.5);
+        }
+        _isNavigating = true;
+        (var isFromLeft, var inElement, var outElement) = _navigateDictionary[args];
         var ease = new QuarticEase { EasingMode = EasingMode.EaseInOut };
         var distance = 300;
-        (var isFromLeft, var inElement, var outElement) = _navigateDictionary[sender];
+        inElement.IsEnabled = false;
+        outElement.IsEnabled = false;
         var inMargin = new Thickness(distance, 0, 0, 0);
         var outMargin = new Thickness(0, 0, distance, 0);
         if (isFromLeft)
             (inMargin, outMargin) = (outMargin, inMargin);
         await outElement.SlideAndFadeOutAsync(duration, outMargin, ease);
+        outElement.Visibility = Visibility.Collapsed;
         inElement.Visibility = Visibility.Visible;
         await inElement.SlideAndFadeInAsync(duration, inMargin, ease);
-        outElement.Visibility = Visibility.Collapsed;
-        _isSwitching = false;
+        _isNavigating = false;
+        inElement.IsEnabled = true;
+        outElement.IsEnabled = true;
     }
 
     private void OnPasswordChanged(object sender, RoutedEventArgs e)
     {
         var passwordBox = (Wpf.Ui.Controls.PasswordBox)sender;
         ViewModel.Password = passwordBox.Password;
+    }
+
+    private void OnBackgroundMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (e.ChangedButton == MouseButton.Left)
+            DragMove();
     }
 }

@@ -22,7 +22,7 @@ public partial class PostWindowViewModel : BaseViewModel
     readonly Stack<Post> _forwardStack = new();
     readonly ISnackbarService _snackbarService;
 
-    public EventHandler<EventArgs>? WindowOpened;
+    public EventHandler? WindowOpened;
 
     public PostWindowViewModel(ILeftRightButtonDialogService dialogService, ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)
     {
