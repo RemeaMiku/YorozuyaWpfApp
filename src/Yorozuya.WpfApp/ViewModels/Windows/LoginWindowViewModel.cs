@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
-public partial class LoginWindowViewModel : BaseValidatorViewModel
+public partial class LoginWindowViewModel : BaseRecipientValidatorViewModel
 {
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -21,4 +22,11 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [MinLength(8, ErrorMessage = "用户名长度不得小于8")]
     [MaxLength(16, ErrorMessage = "用户名长度不得大于16")]
     string _password = string.Empty;
+
+    protected override void OnActivated()
+    {
+        //TODO:注册消息
+    }
+
+
 }
