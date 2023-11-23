@@ -15,6 +15,10 @@ using System.Configuration;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using System.IO;
+using System.Text.Json;
+using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Models;
+using System.Collections.Generic;
 
 namespace Yorozuya.WpfApp;
 
@@ -50,6 +54,30 @@ public partial class App : Application
     // 重写启动方法
     protected override void OnStartup(StartupEventArgs e)
     {
+        var json =
+            """
+                        {
+                "code": 0,
+                "msg": "string",
+                "data": {
+                    "postList": [
+                        {
+                            "id": 0,
+                            "title": "string",
+                            "content": "string",
+                            "askerId": 0,
+                            "createTime": "string",
+                            "updateTime": "string",
+                            "views": 0,
+                            "delTag": 0
+                        }
+                    ]
+                }
+            }
+            """;
+        var response = JsonSerializer.Deserialize<Response<Dictionary<string, JsonElement>>>(json);
+        var list = response.Data["postList"];
+        var posts = list.Deserialize<IEnumerable<Post>>();
         // 从容器中获取MainWindow并显示
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
         var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
