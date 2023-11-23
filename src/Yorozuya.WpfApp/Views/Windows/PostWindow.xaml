@@ -278,7 +278,7 @@
                                             <ui:SymbolIcon
                                                 Foreground="White"
                                                 Symbol="CheckmarkStarburst24"
-                                                Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                                Visibility="{Binding ViewModel.IsCurrentReplyAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                             <TextBlock
                                                 Margin="5,0,0,0"
                                                 VerticalAlignment="Center"
@@ -287,7 +287,7 @@
                                                 FontWeight="Bold"
                                                 Foreground="White"
                                                 Text="已被采纳"
-                                                Visibility="{Binding ViewModel.CurrentReply.IsAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
+                                                Visibility="{Binding ViewModel.IsCurrentReplyAccepted, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                             <ui:SymbolIcon
                                                 Margin="15,0,0,0"
                                                 Foreground="White"

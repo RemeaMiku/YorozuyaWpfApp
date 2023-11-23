@@ -10,6 +10,10 @@ namespace Yorozuya.WpfApp.ViewModels.Pages;
 
 public partial class PersonPageViewModel : BaseViewModel
 {
+    //TODO：发送打开Post请求消息
+
+    //TODO：发送打开Reply请求消息
+
     private readonly IUserService _userService;
     private readonly IPostService _postService;
     private readonly IMessenger _messenger;

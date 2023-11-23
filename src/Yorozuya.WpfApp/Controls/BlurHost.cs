@@ -5,7 +5,7 @@ using System.Windows;
 
 #pragma warning disable
 
-namespace Yorozuya.WpfApp.Common.Controls;
+namespace Yorozuya.WpfApp.Controls;
 
 public class BlurHost : ContentControl
 {

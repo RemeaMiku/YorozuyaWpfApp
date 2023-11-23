@@ -17,7 +17,7 @@ public class UserInfo
     /// 1是男
     /// </summary>
     [JsonPropertyName("gender")]
-    public string Gender { get; set; } = null!;
+    public int Gender { get; set; }
 
     [JsonPropertyName("id")]
     public long Id { get; set; }

@@ -3,9 +3,9 @@
 namespace Yorozuya.WpfApp.Common;
 
 /// <summary>
-/// API 响应
+/// API 响应类
 /// </summary>
-/// <typeparam name="TData">数据类型</typeparam>
+/// <typeparam name="TData">数据类型，在 Data 包含多个数据时使用Dictionary<string,JsonElement>以进一步反序列化 </typeparam>
 public class Response<TData>
 {
     [JsonPropertyName("code")]

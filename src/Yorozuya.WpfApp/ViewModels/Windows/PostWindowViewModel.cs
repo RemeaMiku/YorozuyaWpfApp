@@ -22,6 +22,8 @@ public partial class PostWindowViewModel : BaseViewModel
     readonly Stack<Post> _forwardStack = new();
     readonly ISnackbarService _snackbarService;
 
+    public EventHandler? WindowOpened;
+
     public PostWindowViewModel(ILeftRightButtonDialogService dialogService, ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)
     {
         _dialogService = dialogService;
@@ -33,6 +35,7 @@ public partial class PostWindowViewModel : BaseViewModel
 
     async Task OpenPostAsync(Post post)
     {
+        WindowOpened?.Invoke(this, EventArgs.Empty);
         if (_snackbarService.ShowErrorMessageIf("加载失败", () => IsBusy, "正在忙碌，请稍后重试"))
             return;
         if (Post is not null && Post.Id != post.Id)
@@ -121,7 +124,7 @@ public partial class PostWindowViewModel : BaseViewModel
 
     public bool IsNotLastReply => CurrentReplyIndex < RepliesCount;
 
-    public bool IsCurrentReplyMostLiked => CurrentReply == _mostLikedReply;
+    public bool IsCurrentReplyMostLiked => CurrentReply is not null && _mostLikedReply is not null && CurrentReply.Id == _mostLikedReply.Id;
 
     public ReplyState CurrentReplyState
     {
@@ -192,14 +195,13 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            Trace.WriteLine("IsBusy");
             Post = post;
             var replies = await _postService.GetPostRepliesAsync(post.Id);
             await UpdateRepliesAndSelectReplyAsync(replies, prediction);
         }
         catch (Exception)
         {
-
+            //TODO:异常处理 
         }
         finally
         {
@@ -234,7 +236,7 @@ public partial class PostWindowViewModel : BaseViewModel
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsCurrentReplyMostLiked), nameof(CurrentReplyState))]
+    [NotifyPropertyChangedFor(nameof(IsCurrentReplyMostLiked), nameof(CurrentReplyState), nameof(IsCurrentReplyAccepted))]
     [NotifyCanExecuteChangedFor(nameof(AcceptReplyCommand))]
     private Reply? _currentReply;
 
@@ -259,7 +261,9 @@ public partial class PostWindowViewModel : BaseViewModel
 
     public bool IsUserReply => CurrentReply is not null && _userService.IsUserLoggedIn && CurrentReply.UserId == _userService.UserInfo!.Id;
 
-    public bool CanAcceptReply => CurrentReply is not null && IsUserPost && CurrentReply.IsAccepted != 1;
+    public bool CanAcceptReply => IsUserPost && !IsCurrentReplyAccepted;
+
+    public bool IsCurrentReplyAccepted => CurrentReply is not null && CurrentReply.IsAccepted == 1;
 
     const string _postIsNullErrorMessage = "问题不存在或已被删除";
 
@@ -285,7 +289,11 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = true;
             await _postService.AcceptReplyAsync(_userService.Token, CurrentReply!.Id);
             var replies = await _postService.GetPostRepliesAsync(Post!.Id);
-            await UpdateRepliesAndSelectReplyAsync(replies, r => r.Id == CurrentReply!.Id);
+            var targetId = CurrentReply!.Id;
+            await UpdateRepliesAndSelectReplyAsync(replies, r => r.Id == targetId);
+            // 仅在本地时保留
+            OnPropertyChanged(nameof(IsCurrentReplyAccepted));
+            OnPropertyChanged(nameof(CurrentReplyState));
         }
         catch (Exception ex)
         {
@@ -361,6 +369,7 @@ public partial class PostWindowViewModel : BaseViewModel
         if (replies is not null)
         {
             RepliesViewSource.Source = replies;
+            RepliesViewSource.View.Refresh();
             RepliesCount = replies.Count();
             UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
             _mostLikedReply = replies.MaxBy(r => r.Likes);
