@@ -91,7 +91,7 @@ public class LocalPostService(IUserService userService) : IPostService
     {
         ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
-        reply.Likes++;
+        //reply.Likes++;
         _localLikes.Add(new() { ReplyId = reply.Id, UserId = _userService.UserInfo.Id });
     }
 
@@ -99,7 +99,7 @@ public class LocalPostService(IUserService userService) : IPostService
     {
         ArgumentNullException.ThrowIfNull(_userService.UserInfo);
         await Task.Delay(1000);
-        reply.Likes--;
+        //reply.Likes--;
         _localLikes.RemoveAll(l => l.ReplyId == reply.Id && l.UserId == _userService.UserInfo.Id);
     }
 
@@ -128,7 +128,7 @@ public class LocalPostService(IUserService userService) : IPostService
         await Task.Delay(500);
         var temp = new List<Post>();
         Random random = new();
-        for (int i = 1; i <= 10; ++i)
+        for (int i = 0; i <= 10; ++i)
         {
             temp.Add(new Post()
             {

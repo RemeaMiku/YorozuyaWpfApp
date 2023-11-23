@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:Yorozuya.WpfApp.Models"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="QuestionWindow"
+    Title="PostWindow"
     Width="1000"
     Height="560"
     MinWidth="{Binding Width, Mode=OneTime}"
@@ -126,15 +126,20 @@
                             </d:ListView.ItemsSource>
                             <ListView.ItemTemplate>
                                 <DataTemplate DataType="models:Reply">
-                                    <TextBlock
-                                        Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                        Text="{Binding Content, Mode=OneWay}"
-                                        TextTrimming="WordEllipsis" />
+                                    <ui:CardAction
+                                        Padding="10"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ViewModel.SelectReplyCommand, Mode=OneTime}"
+                                        CommandParameter="{Binding}">
+                                        <TextBlock
+                                            Style="{StaticResource DefaultFontFamilyTextBlock}"
+                                            Text="{Binding Content, Mode=OneWay}"
+                                            TextTrimming="WordEllipsis" />
+                                    </ui:CardAction>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                             <ListView.ItemContainerStyle>
                                 <Style BasedOn="{StaticResource {x:Type ListViewItem}}" TargetType="ListViewItem">
-                                    <Setter Property="Padding" Value="10" />
+                                    <Setter Property="Padding" Value="0" />
                                     <Setter Property="Height" Value="40" />
                                 </Style>
                             </ListView.ItemContainerStyle>
