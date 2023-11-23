@@ -13,7 +13,7 @@ namespace Yorozuya.WpfApp.ViewModels.Pages;
 
 public partial class HomePageViewModel : BaseValidatorViewModel
 {
-    private readonly List<string> _fields = ["文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏", "aaa", "bbb"];
+    private readonly List<string> _fields = ["文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏文文可爱捏", "aaa", "bbb", "Test"];
 
     [ObservableProperty] private string _nowSelectedField;
 

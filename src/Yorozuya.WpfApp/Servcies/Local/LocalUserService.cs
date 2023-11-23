@@ -13,8 +13,6 @@ public class LocalUserService : IUserService
     public UserInfo? UserInfo { get; private set; }
     public string? Token { get; private set; }
 
-    public bool IsUserLoggedIn => throw new NotImplementedException();
-
     public bool TryGetToken([NotNullWhen(true)] out string? token)
     {
         token = Token;
@@ -42,7 +40,7 @@ public class LocalUserService : IUserService
 
     public void UserLogout()
     {
-        if (IsUserLoggedIn)
+        if (UserInfo is not null && Token is not null)
         {
             UserInfo = default;
             Token = default;

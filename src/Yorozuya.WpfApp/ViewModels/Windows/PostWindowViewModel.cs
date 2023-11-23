@@ -22,6 +22,8 @@ public partial class PostWindowViewModel : BaseViewModel
     readonly Stack<Post> _forwardStack = new();
     readonly ISnackbarService _snackbarService;
 
+    public EventHandler<EventArgs>? WindowOpened;
+
     public PostWindowViewModel(ILeftRightButtonDialogService dialogService, ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)
     {
         _dialogService = dialogService;
@@ -33,6 +35,7 @@ public partial class PostWindowViewModel : BaseViewModel
 
     async Task OpenPostAsync(Post post)
     {
+        WindowOpened?.Invoke(this, EventArgs.Empty);
         if (_snackbarService.ShowErrorMessageIf("加载失败", () => IsBusy, "正在忙碌，请稍后重试"))
             return;
         if (Post is not null && Post.Id != post.Id)

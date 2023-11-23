@@ -13,16 +13,20 @@ namespace Yorozuya.WpfApp.Views.Windows;
 /// <summary>
 /// QuestionWindow.xaml 的交互逻辑
 /// </summary>
-public partial class PostWindow : UiWindow, IRecipient<Post>
+public partial class PostWindow : UiWindow
 {
-    public PostWindow(PostWindowViewModel viewModel, IMessenger messenger)
+    public PostWindow(PostWindowViewModel viewModel)
     {
         InitializeComponent();
         DataContext = this;
         ViewModel = viewModel;
         ViewModel.GetCancelConfirmDialogService().SetDialogControl(Dialog);
         ViewModel.GetSnackbarService().SetSnackbarControl(Snackbar);
-        messenger.Register(this);
+        ViewModel.WindowOpened += (sender, e) =>
+        {
+            Show();
+            Focus();
+        };
     }
 
     public PostWindowViewModel ViewModel { get; }
@@ -52,12 +56,5 @@ public partial class PostWindow : UiWindow, IRecipient<Post>
     {
         Hide();
         e.Cancel = true;
-    }
-
-    public void Receive(Post message)
-    {
-        if (!IsVisible)
-            Show();
-        Focus();
     }
 }

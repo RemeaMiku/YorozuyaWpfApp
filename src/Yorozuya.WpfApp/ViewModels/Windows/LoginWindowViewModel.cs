@@ -9,7 +9,7 @@ using CommunityToolkit.Mvvm.Messaging;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
-public partial class LoginWindowViewModel : BaseRecipientValidatorViewModel
+public partial class LoginWindowViewModel : BaseValidatorViewModel
 {
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -23,10 +23,7 @@ public partial class LoginWindowViewModel : BaseRecipientValidatorViewModel
     [MaxLength(16, ErrorMessage = "用户名长度不得大于16")]
     string _password = string.Empty;
 
-    protected override void OnActivated()
-    {
-        //TODO:注册消息
-    }
+    //TODO:发送登录消息
 
-
+    //TODO:接收登录请求
 }
