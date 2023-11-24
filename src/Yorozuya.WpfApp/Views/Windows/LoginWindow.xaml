@@ -14,36 +14,44 @@
     MinWidth="{Binding Width, Mode=OneTime}"
     MinHeight="{Binding Height, Mode=OneTime}"
     d:DataContext="{d:DesignInstance local:LoginWindow}"
+    d:Height="1080"
+    d:Width="1960"
+    d:WindowState="Maximized"
     ExtendsContentIntoTitleBar="True"
-    ResizeMode="NoResize"
+    WindowBackdropType="None"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.5*" />
+            <ColumnDefinition Width="*" MaxWidth="550" />
+        </Grid.ColumnDefinitions>
         <ui:Snackbar
             x:Name="Snackbar"
+            Grid.ColumnSpan="2"
             HorizontalAlignment="Right"
             Panel.ZIndex="1000"
             Timeout="5000" />
         <Image
             x:Name="BackgroundImage"
+            Grid.ColumnSpan="2"
             d:Source="/Assets/Images/DefaultLoginBackground-Light.jpg"
-            MouseDown="OnBackgroundMouseDown"
+            MouseLeftButtonDown="OnBackgroundMouseLeftButtonDown"
             Stretch="UniformToFill" />
         <Image
             x:Name="BackgroundImage2"
+            Grid.ColumnSpan="2"
             d:Opacity="0.5"
             d:Source="/Assets/Images/DefaultLoginBackground-Dark.jpg"
             Opacity="0"
             Stretch="UniformToFill" />
         <controls:BlurHost
-            Width="400"
+            Grid.Column="1"
             Height="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=ActualHeight}"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            d:Height="550"
+            HorizontalAlignment="Stretch"
             BlurBackground="{Binding ElementName=BackgroundImage}">
             <Grid
                 x:Name="MainPanel"
@@ -53,7 +61,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <ui:TitleBar x:Name="TitleBar" ShowMaximize="False">
+                <ui:TitleBar x:Name="TitleBar">
                     <ui:TitleBar.Header>
                         <StackPanel Orientation="Horizontal">
                             <ui:Button
@@ -79,9 +87,8 @@
                 <Border
                     x:Name="UsernamePasswordPanel"
                     Grid.Row="1"
-                    Width="400"
                     Padding="50"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     d:Visibility="Collapsed">
                     <StackPanel Orientation="Vertical">
@@ -138,9 +145,8 @@
                 <Border
                     x:Name="FieldGenderPanel"
                     Grid.Row="1"
-                    Width="400"
                     Padding="50"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Visibility="Collapsed">
                     <StackPanel Orientation="Vertical">
@@ -199,9 +205,8 @@
                 <Border
                     x:Name="CheckInfomationPanel"
                     Grid.Row="1"
-                    Width="400"
                     MaxHeight="300"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Visibility="Collapsed">
                     <Grid>
@@ -293,13 +298,12 @@
                 <Border
                     x:Name="BusyPanel"
                     Grid.Row="1"
-                    Width="400"
                     Padding="50"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
                     d:Visibility="Visible"
                     Visibility="Collapsed">
-                    <Grid Margin="0,60,0,0">
+                    <StackPanel Orientation="Vertical">
                         <TextBlock
                             VerticalAlignment="Top"
                             d:Text="正在尝试让你登录..."
@@ -307,10 +311,11 @@
                             Style="{StaticResource DefaultFontFamilyTextBlock}"
                             Text="{Binding ViewModel.BusyMessage, Mode=OneWay}" />
                         <ui:ProgressRing
+                            Margin="0,30,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             IsIndeterminate="True" />
-                    </Grid>
+                    </StackPanel>
                 </Border>
             </Grid>
         </controls:BlurHost>

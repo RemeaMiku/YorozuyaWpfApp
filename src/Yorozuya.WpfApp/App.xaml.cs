@@ -35,6 +35,7 @@ public partial class App : Application
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(PostWindowViewModel))
+        .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(SettingsPageViewModel))
         .AddSingleton<IUserService, LocalUserService>()
         .AddSingleton<IPostService, LocalPostService>()
         .AddSingleton<LoginWindowViewModel>()
@@ -148,7 +149,7 @@ public partial class App : Application
     public void ApplyBackdropType(BackgroundType type)
     {
         foreach (var window in Windows)
-            if (window is UiWindow uiWindow)
+            if (window is UiWindow uiWindow && uiWindow is not LoginWindow)
                 uiWindow.WindowBackdropType = type;
     }
 

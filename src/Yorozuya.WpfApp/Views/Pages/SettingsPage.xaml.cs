@@ -1,7 +1,9 @@
 ﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
+using Yorozuya.WpfApp.Servcies.Contracts;
 using Yorozuya.WpfApp.ViewModels.Pages;
 
 namespace Yorozuya.WpfApp.Views.Pages;
@@ -19,7 +21,7 @@ public partial class SettingsPage : Page
         DataContext = this;
         ViewModel = viewModel;
         Loaded += OnSettingsPageLoaded;
-        viewModel.GetDialogService().SetDialogControl(Dialog);
+        App.Current.ServiceProvider.GetRequiredKeyedService<ILeftRightButtonDialogService>(nameof(SettingsPageViewModel)).SetDialogControl(Dialog);
     }
 
     #endregion Public Constructors

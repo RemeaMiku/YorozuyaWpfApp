@@ -1,12 +1,15 @@
 ﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
+using Yorozuya.WpfApp.Common;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.ViewModels.Pages;
 
-public partial class SettingsPageViewModel(IUserService userService, ILeftRightButtonDialogService dialogService) : BaseViewModel
+public partial class SettingsPageViewModel(IUserService userService, [FromKeyedServices(nameof(SettingsPageViewModel))] ILeftRightButtonDialogService dialogService, IMessenger messenger) : BaseViewModel
 {
     #region Public Properties
 
@@ -14,17 +17,13 @@ public partial class SettingsPageViewModel(IUserService userService, ILeftRightB
 
     #endregion Public Properties
 
-    #region Public Methods
-
-    public ILeftRightButtonDialogService GetDialogService() => _dialogService;
-
-    #endregion Public Methods
-
     #region Private Fields
 
     private readonly IUserService _userService = userService;
 
     private readonly ILeftRightButtonDialogService _dialogService = dialogService;
+
+    private readonly IMessenger _messenger = messenger;
 
     #endregion Private Fields
 
@@ -33,7 +32,7 @@ public partial class SettingsPageViewModel(IUserService userService, ILeftRightB
     [RelayCommand]
     private void Login()
     {
-        //TODO: Login
+        _messenger.Send(Messages.RequestUserLogin);
     }
 
     [RelayCommand]
