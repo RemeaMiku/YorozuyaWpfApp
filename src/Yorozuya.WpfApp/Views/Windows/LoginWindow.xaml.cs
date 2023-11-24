@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,8 +10,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Extensions;
@@ -23,14 +26,13 @@ namespace Yorozuya.WpfApp.Views.Windows;
 /// </summary>
 public partial class LoginWindow : UiWindow
 {
-    readonly ISnackbarService _snackbarService;
+    #region Public Constructors
 
     public LoginWindow(LoginWindowViewModel viewModel)
     {
         InitializeComponent();
         ViewModel = viewModel;
-        _snackbarService = ViewModel.SnackbarService;
-        _snackbarService.SetSnackbarControl(Snackbar);
+        App.Current.ServiceProvider.GetRequiredKeyedService<ISnackbarService>(nameof(LoginWindowViewModel)).SetSnackbarControl(Snackbar);
         DataContext = this;
         ApplyBackground(App.Current.LoginBackgroundImage);
         Theme.Changed += OnThemeChanged;
@@ -60,7 +62,33 @@ public partial class LoginWindow : UiWindow
         ViewModel.UserLoggedIn += (_, _) => { Hide(); };
     }
 
+    #endregion Public Constructors
+
+    #region Public Properties
+
     public LoginWindowViewModel ViewModel { get; }
+
+    #endregion Public Properties
+
+    #region Protected Methods
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        Hide();
+        e.Cancel = true;
+    }
+
+    #endregion Protected Methods
+
+    #region Private Fields
+
+    private readonly FrozenDictionary<string, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)> _navigateDictionary;
+
+    private bool _isNavigating = false;
+
+    #endregion Private Fields
+
+    #region Private Methods
 
     private async void OnThemeChanged(ThemeType currentTheme, Color systemAccent)
     {
@@ -80,14 +108,8 @@ public partial class LoginWindow : UiWindow
         }
         catch (Exception)
         {
-            _snackbarService.ShowErrorMessage("背景图片加载失败", "可能是不支持此格式，请重新选择");
+            Snackbar.Show("更换背景图片失败", "可能是图片格式不受支持", SymbolRegular.ErrorCircle24, ControlAppearance.Danger);
         }
-    }
-
-    protected override void OnClosing(CancelEventArgs e)
-    {
-        Hide();
-        e.Cancel = true;
     }
 
     private void OnBackgroundSettingButtonClicked(object sender, RoutedEventArgs e)
@@ -115,10 +137,6 @@ public partial class LoginWindow : UiWindow
         await Task.Delay(duration);
         BackgroundImage2.Source = default;
     }
-
-    bool _isNavigating = false;
-
-    private readonly FrozenDictionary<string, (bool IsFromLeft, FrameworkElement InElement, FrameworkElement OutElement)> _navigateDictionary;
 
     private async Task NavigateAsync(string args)
     {
@@ -160,4 +178,6 @@ public partial class LoginWindow : UiWindow
         if (e.ChangedButton == MouseButton.Left)
             DragMove();
     }
+
+    #endregion Private Methods
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
@@ -7,19 +8,36 @@ namespace Yorozuya.WpfApp.ViewModels.Pages;
 
 public partial class SettingsPageViewModel(IUserService userService, ILeftRightButtonDialogService dialogService) : BaseViewModel
 {
-    readonly IUserService _userService = userService;
-    readonly ILeftRightButtonDialogService _dialogService = dialogService;
+    #region Public Properties
 
     public UserInfo? UserInfo => _userService.UserInfo;
 
+    #endregion Public Properties
+
+    #region Public Methods
+
+    public ILeftRightButtonDialogService GetDialogService() => _dialogService;
+
+    #endregion Public Methods
+
+    #region Private Fields
+
+    private readonly IUserService _userService = userService;
+
+    private readonly ILeftRightButtonDialogService _dialogService = dialogService;
+
+    #endregion Private Fields
+
+    #region Private Methods
+
     [RelayCommand]
-    void Login()
+    private void Login()
     {
         //TODO: Login
     }
 
     [RelayCommand]
-    async Task Logout()
+    private async Task Logout()
     {
         await _dialogService.ShowDialogAsync("确定退出当前账号吗？", "警告", "取消", "退出");
         if (_dialogService.GetIsRightButtonClicked())
@@ -29,5 +47,5 @@ public partial class SettingsPageViewModel(IUserService userService, ILeftRightB
         }
     }
 
-    public ILeftRightButtonDialogService GetDialogService() => _dialogService;
+    #endregion Private Methods
 }

@@ -1,10 +1,12 @@
-﻿using System;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Common;
 using Yorozuya.WpfApp.Extensions;
@@ -14,23 +16,50 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class LoginWindowViewModel : BaseValidatorViewModel
 {
-    readonly IUserService _userService;
-    readonly ISnackbarService _snackbarService;
-    readonly IMessenger _messenger;
+    #region Public Fields
 
-    public ISnackbarService SnackbarService => _snackbarService;
+    public EventHandler? LoginRequested;
 
-    public LoginWindowViewModel(IUserService userService, ISnackbarService snackbarService, IMessenger messenger)
+    public EventHandler? UserLoggedIn;
+
+    public EventHandler<string>? NavigateRequsted;
+
+    #endregion Public Fields
+
+    #region Public Constructors
+
+    public LoginWindowViewModel(IUserService userService, [FromKeyedServices(nameof(LoginWindowViewModel))] ISnackbarService snackbarService, IMessenger messenger)
     {
         _userService = userService;
         _snackbarService = snackbarService;
         _messenger = messenger;
         messenger.Register<LoginWindowViewModel, string>(this, (viewModel, token) =>
         {
-            if (token == MessageTokens.RequestUserLogin)
+            if (token == MessageTokens.RequestUserLogin && !_userService.IsUserLoggedIn)
                 viewModel.ReplyLoginRequest();
         });
     }
+
+    #endregion Public Constructors
+
+    #region Public Properties
+
+    public string? DisplayGender => Gender switch
+    {
+        0 => "女",
+        1 => "男",
+        _ => default,
+    };
+
+    public string DisplayPassword => IsPasswordShown && Password is not null ? Password : "******";
+
+    public bool IsUserNameAndPasswordValid => !GetErrors(nameof(UserName)).Any() && !GetErrors(nameof(Password)).Any();
+
+    public bool IsFieldAndGenderValid => !GetErrors(nameof(Field)).Any() && !GetErrors(nameof(Gender)).Any();
+
+    #endregion Public Properties
+
+    #region Public Methods
 
     public void ReplyLoginRequest()
     {
@@ -44,11 +73,15 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         LoginRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    public EventHandler? LoginRequested;
+    #endregion Public Methods
 
-    public EventHandler? UserLoggedIn;
+    #region Private Fields
 
-    public EventHandler<string>? NavigateRequsted;
+    private readonly IUserService _userService;
+
+    private readonly ISnackbarService _snackbarService;
+
+    private readonly IMessenger _messenger;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -57,7 +90,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [Required(ErrorMessage = "用户名不能为空")]
     [MinLength(1, ErrorMessage = "用户名长度不得小于1")]
     [MaxLength(10, ErrorMessage = "用户名长度不得大于10")]
-    string? _userName;
+    private string? _userName;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
@@ -66,43 +99,34 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [Required(ErrorMessage = "密码不能为空")]
     [MinLength(8, ErrorMessage = "密码长度不得小于8")]
     [MaxLength(16, ErrorMessage = "密码长度不得大于16")]
-    string? _password;
+    private string? _password;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [NotifyCanExecuteChangedFor(nameof(MoveToCheckInfomationPanelCommand))]
     [Required(ErrorMessage = "领域不能为空")]
-    string? _field;
+    private string? _field;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [NotifyPropertyChangedFor(nameof(DisplayGender))]
     [NotifyCanExecuteChangedFor(nameof(MoveToCheckInfomationPanelCommand))]
     [Required(ErrorMessage = "性别不能为空")]
-    int? _gender;
-
-    public string? DisplayGender => Gender switch
-    {
-        0 => "女",
-        1 => "男",
-        _ => default,
-    };
+    private int? _gender;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayPassword))]
-    bool _isPasswordShown = false;
-
-    public string DisplayPassword => IsPasswordShown && Password is not null ? Password : "******";
+    private bool _isPasswordShown = false;
 
     [ObservableProperty]
-    string? _busyMessage;
+    private string? _busyMessage;
 
-    public bool IsUserNameAndPasswordValid => !GetErrors(nameof(UserName)).Any() && !GetErrors(nameof(Password)).Any();
+    #endregion Private Fields
 
-    public bool IsFieldAndGenderValid => !GetErrors(nameof(Field)).Any() && !GetErrors(nameof(Gender)).Any();
+    #region Private Methods
 
     [RelayCommand(CanExecute = nameof(IsUserNameAndPasswordValid))]
-    async Task LoginAsync()
+    private async Task LoginAsync()
     {
         ValidateProperty(UserName, nameof(UserName));
         ValidateProperty(Password, nameof(Password));
@@ -139,9 +163,8 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         }
     }
 
-
     [RelayCommand(CanExecute = nameof(IsUserNameAndPasswordValid))]
-    void MoveToFieldGenderPanel()
+    private void MoveToFieldGenderPanel()
     {
         ValidateProperty(UserName, nameof(UserName));
         ValidateProperty(Password, nameof(Password));
@@ -152,7 +175,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     }
 
     [RelayCommand]
-    void MoveToUsernamePasswordPanel()
+    private void MoveToUsernamePasswordPanel()
     {
         Field = default;
         Gender = default;
@@ -162,7 +185,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     }
 
     [RelayCommand(CanExecute = nameof(IsFieldAndGenderValid))]
-    void MoveToCheckInfomationPanel()
+    private void MoveToCheckInfomationPanel()
     {
         ValidateProperty(Field, nameof(Field));
         ValidateProperty(Gender, nameof(Gender));
@@ -173,13 +196,13 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     }
 
     [RelayCommand]
-    void Cancel()
+    private void Cancel()
     {
         NavigateRequsted?.Invoke(this, "Cancel");
     }
 
     [RelayCommand]
-    async Task RegisterAsync()
+    private async Task RegisterAsync()
     {
         try
         {
@@ -207,7 +230,5 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         }
     }
 
-    //TODO:发送登录消息
-
-    //TODO:接收登录请求
+    #endregion Private Methods
 }

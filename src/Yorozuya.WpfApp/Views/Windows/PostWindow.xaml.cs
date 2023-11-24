@@ -1,25 +1,30 @@
-﻿using System.Threading.Tasks;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System.Threading.Tasks;
 using System.Windows;
 using Yorozuya.WpfApp.ViewModels.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using System.ComponentModel;
+using Wpf.Ui.Mvvm.Contracts;
+using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
 /// <summary>
-/// QuestionWindow.xaml 的交互逻辑
+/// PostWindow.xaml 的交互逻辑
 /// </summary>
 public partial class PostWindow : UiWindow
 {
+    #region Public Constructors
+
     public PostWindow(PostWindowViewModel viewModel)
     {
         InitializeComponent();
         DataContext = this;
         ViewModel = viewModel;
-        ViewModel.GetCancelConfirmDialogService().SetDialogControl(Dialog);
-        ViewModel.GetSnackbarService().SetSnackbarControl(Snackbar);
+        App.Current.ServiceProvider.GetRequiredKeyedService<ISnackbarService>(nameof(PostWindowViewModel)).SetSnackbarControl(Snackbar);
+        App.Current.ServiceProvider.GetRequiredKeyedService<ILeftRightButtonDialogService>(nameof(PostWindowViewModel)).SetDialogControl(Dialog);
         ViewModel.WindowOpened += (_, _) =>
         {
             Show();
@@ -27,9 +32,27 @@ public partial class PostWindow : UiWindow
         };
     }
 
+    #endregion Public Constructors
+
+    #region Public Properties
+
     public PostWindowViewModel ViewModel { get; }
 
-    void OnMainWindowButtonClicked(object sender, RoutedEventArgs e)
+    #endregion Public Properties
+
+    #region Protected Methods
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        Hide();
+        e.Cancel = true;
+    }
+
+    #endregion Protected Methods
+
+    #region Private Methods
+
+    private void OnMainWindowButtonClicked(object sender, RoutedEventArgs e)
     {
         var mainWindow = App.Current.ServiceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
@@ -38,7 +61,7 @@ public partial class PostWindow : UiWindow
         mainWindow.Focus();
     }
 
-    async void OnCopyButtonClickedAsync(object sender, RoutedEventArgs e)
+    private async void OnCopyButtonClickedAsync(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrEmpty(ViewModel.CurrentReply!.Content))
             return;
@@ -50,9 +73,5 @@ public partial class PostWindow : UiWindow
         CopyButton.Appearance = ControlAppearance.Transparent;
     }
 
-    protected override void OnClosing(CancelEventArgs e)
-    {
-        Hide();
-        e.Cancel = true;
-    }
+    #endregion Private Methods
 }

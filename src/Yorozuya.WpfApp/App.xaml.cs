@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System;
 using System.Windows;
 using Yorozuya.WpfApp.Servcies;
 using Yorozuya.WpfApp.Servcies.Contracts;
@@ -15,10 +16,6 @@ using System.Configuration;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using System.IO;
-using System.Text.Json;
-using Yorozuya.WpfApp.Common;
-using Yorozuya.WpfApp.Models;
-using System.Collections.Generic;
 
 namespace Yorozuya.WpfApp;
 
@@ -27,14 +24,17 @@ namespace Yorozuya.WpfApp;
 /// </summary>
 public partial class App : Application
 {
+    #region Public Properties
+
     // 当前App实例
-    public static new App Current => (App)Application.Current;
+    public new static App Current => (App)Application.Current;
 
     // IoC容器
     public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
         .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
-        .AddTransient<ISnackbarService, SnackbarService>()
-        .AddTransient<ILeftRightButtonDialogService, LeftRightButtonDialogService>()
+        .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(PostWindowViewModel))
+        .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
+        .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(PostWindowViewModel))
         .AddSingleton<IUserService, LocalUserService>()
         .AddSingleton<IPostService, LocalPostService>()
         .AddSingleton<LoginWindowViewModel>()
@@ -51,6 +51,10 @@ public partial class App : Application
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
 
+    #endregion Public Properties
+
+    #region Protected Methods
+
     // 重写启动方法
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -63,17 +67,11 @@ public partial class App : Application
         ApplyAppFont(AppFont);
         mainWindow.Show();
         loginWindow.Show();
-        //TODO:启动登录测试
-        ServiceProvider.GetRequiredService<IUserService>().UserLoginAsync("Developer", "Password");
     }
 
+    #endregion Protected Methods
+
     #region App Configuration
-
-    private string? _appTheme;
-    private BackgroundType? _windowBackgroundType;
-    private string? _appFont;
-    private string? _loginBackgroundImage;
-
 
     public string AppTheme
     {
@@ -111,49 +109,7 @@ public partial class App : Application
         }
     }
 
-
-
     public Configuration Configuration { get; } = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-    private BackgroundType ReadWindowBackdropTypeFromConfiguration()
-    {
-        var element = Configuration.AppSettings.Settings["Window Backdrop Type"];
-        if (element is null)
-            return BackgroundType.Acrylic;
-        if (Enum.TryParse<BackgroundType>(element.Value, out var type))
-            return type;
-        return BackgroundType.Acrylic;
-    }
-
-    private string ReadAppThemeFromConfiguration()
-    {
-        var element = Configuration.AppSettings.Settings["App Theme"];
-        if (element is null)
-            return "System";
-        if (element.Value == "System" || element.Value == "Light" || element.Value == "Dark")
-            return element.Value;
-        return "System";
-    }
-
-    private string ReadAppFontFromConfiguration()
-    {
-        var element = Configuration.AppSettings.Settings["App Font"];
-        if (element is null)
-            return "System";
-        if (element.Value == "System" || element.Value == "Source Han Sans SC")
-            return element.Value;
-        return "System";
-    }
-
-    private string ReadLoginBackgroundImageFromConfiguration()
-    {
-        var element = Configuration.AppSettings.Settings["Login Background Image"];
-        if (element is null)
-            return "Default";
-        if (Path.Exists(element.Value))
-            return element.Value;
-        return "Default";
-    }
 
     public void ApplyAppTheme(string theme)
     {
@@ -162,14 +118,17 @@ public partial class App : Application
             case "Light":
                 Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
                 break;
+
             case "Dark":
                 Theme.Apply(ThemeType.Dark, WindowBackdropType, true, true);
                 break;
+
             case "System":
                 foreach (var window in Windows)
                     if (window is UiWindow uiWindow)
                         Watcher.Watch(uiWindow, WindowBackdropType, true, true);
                 break;
+
             default:
                 throw new NotImplementedException();
         }
@@ -236,5 +195,53 @@ public partial class App : Application
         Configuration.Save();
     }
 
-    #endregion
+    private string? _appTheme;
+
+    private BackgroundType? _windowBackgroundType;
+
+    private string? _appFont;
+
+    private string? _loginBackgroundImage;
+
+    private BackgroundType ReadWindowBackdropTypeFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["Window Backdrop Type"];
+        if (element is null)
+            return BackgroundType.Acrylic;
+        if (Enum.TryParse<BackgroundType>(element.Value, out var type))
+            return type;
+        return BackgroundType.Acrylic;
+    }
+
+    private string ReadAppThemeFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["App Theme"];
+        if (element is null)
+            return "System";
+        if (element.Value == "System" || element.Value == "Light" || element.Value == "Dark")
+            return element.Value;
+        return "System";
+    }
+
+    private string ReadAppFontFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["App Font"];
+        if (element is null)
+            return "System";
+        if (element.Value == "System" || element.Value == "Source Han Sans SC")
+            return element.Value;
+        return "System";
+    }
+
+    private string ReadLoginBackgroundImageFromConfiguration()
+    {
+        var element = Configuration.AppSettings.Settings["Login Background Image"];
+        if (element is null)
+            return "Default";
+        if (Path.Exists(element.Value))
+            return element.Value;
+        return "Default";
+    }
+
+    #endregion App Configuration
 }
