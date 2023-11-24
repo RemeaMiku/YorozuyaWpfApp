@@ -49,7 +49,9 @@ public class LocalPostService(IUserService userService) : IPostService
     public async Task DeletePostAsync(string token, long postId)
     {
         ArgumentNullException.ThrowIfNull(token);
-        _localPosts.Remove(_localPosts.Single(p => p.Id == postId && p.AskerId == long.Parse(token)));
+        var post = _localPosts.Single(p => p.Id == postId && p.AskerId == long.Parse(token));
+        post.DelTag = 1;
+        _localPosts.Remove(post);
         await Task.Delay(500);
     }
 

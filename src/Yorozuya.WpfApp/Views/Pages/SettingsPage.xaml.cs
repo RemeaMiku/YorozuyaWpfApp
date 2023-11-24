@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System.Windows;
 using System.Windows.Controls;
 using Wpf.Ui.Appearance;
 using Yorozuya.WpfApp.ViewModels.Pages;
@@ -10,6 +11,8 @@ namespace Yorozuya.WpfApp.Views.Pages;
 /// </summary>
 public partial class SettingsPage : Page
 {
+    #region Public Constructors
+
     public SettingsPage(SettingsPageViewModel viewModel)
     {
         InitializeComponent();
@@ -19,14 +22,22 @@ public partial class SettingsPage : Page
         viewModel.GetDialogService().SetDialogControl(Dialog);
     }
 
+    #endregion Public Constructors
+
+    #region Public Properties
+
+    public SettingsPageViewModel ViewModel { get; }
+
+    #endregion Public Properties
+
+    #region Private Methods
+
     private void OnSettingsPageLoaded(object sender, RoutedEventArgs e)
     {
         ThemeBox.SelectedValue = App.Current.AppTheme;
         FontFamilyBox.SelectedValue = App.Current.AppFont;
         WindowBackdropTypeBox.SelectedValue = App.Current.WindowBackdropType;
     }
-
-    public SettingsPageViewModel ViewModel { get; }
 
     private void OnThemeBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -47,4 +58,6 @@ public partial class SettingsPage : Page
         App.Current.ApplyBackdropType(type);
         App.Current.WriteBackdropTypeToConfiguration(type);
     }
+
+    #endregion Private Methods
 }
