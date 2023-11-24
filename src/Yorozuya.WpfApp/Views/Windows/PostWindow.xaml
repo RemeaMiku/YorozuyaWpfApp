@@ -65,6 +65,12 @@
                     IsEnabled="{Binding ViewModel.IsNotBusy, Mode=OneWay}"
                     Style="{StaticResource TitleBarUiButtonStyle}"
                     ToolTip="前进到下一个问题" />
+                <ui:Button
+                    Command="{Binding ViewModel.RefreshPostCommand, Mode=OneTime}"
+                    Icon="ArrowClockwise24"
+                    IsEnabled="{Binding ViewModel.IsNotBusy, Mode=OneWay}"
+                    Style="{StaticResource TitleBarUiButtonStyle}"
+                    ToolTip="刷新" />
             </StackPanel>
             <ui:TitleBar
                 x:Name="TitleBar"
@@ -323,17 +329,15 @@
                                                 Foreground="White"
                                                 Icon="ThumbLike24"
                                                 IconFilled="{Binding ViewModel.IsCurrentReplyLiked, Mode=OneWay}"
-                                                Style="{StaticResource BorderlessTransparentUiButtonStyle}">
-                                                <ui:Button.ToolTip>
-                                                    <ToolTip Content="{Binding ViewModel.CurrentReply.Likes, Mode=OneWay}" ContentStringFormat="回答点赞数：{0}" />
-                                                </ui:Button.ToolTip>
-                                            </ui:Button>
+                                                Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                                ToolTip="点击按钮点赞/取消点赞" />
                                             <ui:Button
                                                 Command="{Binding ViewModel.DeleteReplyCommand, Mode=OneTime}"
                                                 FontSize="{StaticResource LargeFontSize}"
                                                 Foreground="White"
                                                 Icon="Delete24"
                                                 Style="{StaticResource BorderlessTransparentUiButtonStyle}"
+                                                ToolTip="删除回答"
                                                 Visibility="{Binding ViewModel.IsUserReply, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                                         </WrapPanel>
                                     </Grid>

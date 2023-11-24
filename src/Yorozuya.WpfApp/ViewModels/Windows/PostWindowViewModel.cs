@@ -216,11 +216,11 @@ public partial class PostWindowViewModel : BaseViewModel
         {
 
         }
-        finally 
+        finally
         {
             IsBusy = false;
         }
-        
+
     }
 
     private async Task ReplyOpenPostRequestAsync(Post post)
@@ -290,7 +290,7 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         catch (Exception)
         {
-            //TODO 异常处理
+            //TODO:异常处理
         }
         finally
         {

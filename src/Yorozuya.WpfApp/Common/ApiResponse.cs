@@ -6,7 +6,7 @@ namespace Yorozuya.WpfApp.Common;
 /// API 响应类
 /// </summary>
 /// <typeparam name="TData">数据类型，在 Data 包含多个数据时使用Dictionary<string,JsonElement>以进一步反序列化 </typeparam>
-public class Response<TData>
+public class ApiResponse<TData>
 {
     [JsonPropertyName("code")]
     public long Code { get; set; }
@@ -16,4 +16,10 @@ public class Response<TData>
 
     [JsonPropertyName("msg")]
     public string Message { get; set; } = null!;
+
+    public void EnsureSuccess()
+    {
+        if (Code != 200)
+            throw new ApiResponseException(Message);
+    }
 }
