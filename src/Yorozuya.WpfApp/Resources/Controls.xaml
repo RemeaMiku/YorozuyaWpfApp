@@ -23,32 +23,47 @@
     </Style>
 
     <ControlTemplate x:Key="DefaultValidationErrorTemplate">
-        <StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
             <AdornedElementPlaceholder />
-            <ItemsControl ItemsSource="{Binding}">
+            <ItemsControl
+                Grid.Row="1"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{Binding}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border
                             Padding="3,1"
                             Background="{StaticResource MikuRedBrushAlpha}"
                             CornerRadius="3">
-                            <StackPanel Orientation="Horizontal">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
                                 <ui:SymbolIcon
                                     FontSize="{StaticResource SmallFontSize}"
                                     Foreground="White"
                                     Symbol="ErrorCircle24" />
                                 <TextBlock
+                                    Grid.Column="1"
+                                    MaxWidth="300"
                                     Margin="5,0,0,0"
+                                    HorizontalAlignment="Left"
                                     FontSize="{StaticResource SmallFontSize}"
                                     Foreground="White"
                                     Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                    Text="{Binding ErrorContent}" />
-                            </StackPanel>
+                                    Text="{Binding ErrorContent}"
+                                    TextWrapping="Wrap" />
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </StackPanel>
+        </Grid>
     </ControlTemplate>
 
     <Style

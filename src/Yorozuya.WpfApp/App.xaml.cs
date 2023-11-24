@@ -16,6 +16,7 @@ using System.Configuration;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Yorozuya.WpfApp;
 
@@ -36,7 +37,7 @@ public partial class App : Application
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(SettingsPageViewModel))
-        .AddSingleton<IUserService, LocalUserService>()
+        .AddSingleton<IUserService, HttpUserService>()
         .AddSingleton<IPostService, LocalPostService>()
         .AddSingleton<LoginWindowViewModel>()
         .AddSingleton<HomePageViewModel>()
@@ -57,7 +58,7 @@ public partial class App : Application
     #region Protected Methods
 
     // 重写启动方法
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         // 从容器中获取MainWindow并显示
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
@@ -67,6 +68,8 @@ public partial class App : Application
         ApplyBackdropType(WindowBackdropType);
         ApplyAppFont(AppFont);
         mainWindow.Show();
+        //等待主窗体加载完毕，然后显示登录窗口
+        await Task.Delay(500);
         loginWindow.Show();
     }
 

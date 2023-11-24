@@ -19,7 +19,7 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class PostWindowViewModel : BaseViewModel
 {
-    public EventHandler? WindowOpened;
+    public EventHandler? OpenPostRequested;
 
     public PostWindowViewModel([FromKeyedServices(nameof(PostWindowViewModel))] ILeftRightButtonDialogService dialogService, [FromKeyedServices(nameof(PostWindowViewModel))] ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)
     {
@@ -30,7 +30,7 @@ public partial class PostWindowViewModel : BaseViewModel
         messenger.Register<PostWindowViewModel, Post>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m));
         messenger.Register<PostWindowViewModel, string>(this, (r, m) =>
         {
-            if (m == StringMessages.UserLoggedIn)
+            if (m == StringMessages.UserLoggedIn || m == StringMessages.UserLoggedOut)
                 RefreshPostCommand.Execute(default);
         });
     }
@@ -66,6 +66,8 @@ public partial class PostWindowViewModel : BaseViewModel
     public bool IsUserPost => Post is not null && _userService.IsUserLoggedIn && Post.Id == _userService.UserInfo!.Id;
 
     public bool IsUserReply => CurrentReply is not null && _userService.IsUserLoggedIn && CurrentReply.UserId == _userService.UserInfo!.Id;
+
+    public bool CanAddNewReply => Post is not null && Post.DelTag == 0 && _userService.IsUserLoggedIn && UserReply is null;
 
     public bool CanAcceptReply => IsUserPost && !IsCurrentReplyAccepted;
 
@@ -103,7 +105,7 @@ public partial class PostWindowViewModel : BaseViewModel
     private bool _isOrderByLikes = true;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsUserPost))]
+    [NotifyPropertyChangedFor(nameof(IsUserPost), nameof(CanAddNewReply))]
     [NotifyCanExecuteChangedFor(nameof(AcceptReplyCommand))]
     private Post? _post;
 
@@ -129,6 +131,7 @@ public partial class PostWindowViewModel : BaseViewModel
     private bool _isCurrentReplyLiked = false;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanAddNewReply))]
     private Reply? _userReply;
 
     private Reply? _mostLikedReply;
@@ -211,21 +214,22 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = true;
             await UpdateReplies(CurrentReply?.Id);
             await UpdateCurrentReplyIsUserLiked();
+            OnPropertyChanged(string.Empty);
         }
         catch (Exception)
         {
 
         }
-        finally 
+        finally
         {
             IsBusy = false;
         }
-        
+
     }
 
     private async Task ReplyOpenPostRequestAsync(Post post)
     {
-        WindowOpened?.Invoke(this, EventArgs.Empty);
+        OpenPostRequested?.Invoke(this, EventArgs.Empty);
         if (_snackbarService.ShowErrorMessageIf("加载失败", () => IsBusy, "正在忙碌，请稍后重试"))
             return;
         if (Post is not null && Post.Id != post.Id)
@@ -290,7 +294,7 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         catch (Exception)
         {
-            //TODO 异常处理
+            //TODO:异常处理
         }
         finally
         {

@@ -26,7 +26,7 @@ public partial class PostWindow : UiWindow
         ViewModel = viewModel;
         App.Current.ServiceProvider.GetRequiredKeyedService<ISnackbarService>(nameof(PostWindowViewModel)).SetSnackbarControl(Snackbar);
         App.Current.ServiceProvider.GetRequiredKeyedService<ILeftRightButtonDialogService>(nameof(PostWindowViewModel)).SetDialogControl(Dialog);
-        ViewModel.WindowOpened += (_, _) => { WindowReactivator.Reactive(this); };
+        ViewModel.OpenPostRequested += (_, _) => { WindowReactivator.Reactive(this); };
     }
 
     #endregion Public Constructors

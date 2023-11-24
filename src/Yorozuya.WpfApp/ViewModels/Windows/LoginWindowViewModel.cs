@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -85,24 +86,23 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [NotifyDataErrorInfo]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     [NotifyCanExecuteChangedFor(nameof(MoveToFieldGenderPanelCommand))]
-    [Required(ErrorMessage = "用户名不能为空")]
-    [MinLength(1, ErrorMessage = "用户名长度不得小于1")]
-    [MaxLength(10, ErrorMessage = "用户名长度不得大于10")]
+    [Required(ErrorMessage = "不能为空")]
+    [RegularExpression("^[a-zA-Z][a-zA-Z0-9_]{4,15}$", ErrorMessage = "字母开头，长度在5~16之间，仅允许字母、数字和下划线")]
     private string? _userName;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     [NotifyCanExecuteChangedFor(nameof(MoveToFieldGenderPanelCommand))]
-    [Required(ErrorMessage = "密码不能为空")]
-    [MinLength(8, ErrorMessage = "密码长度不得小于8")]
-    [MaxLength(16, ErrorMessage = "密码长度不得大于16")]
+    [Required(ErrorMessage = "不能为空")]
+    [RegularExpression("^[a-zA-Z]\\w{5,17}$", ErrorMessage = "字母开头，长度在6~18之间，仅允许字符、数字和下划线")]
     private string? _password;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [NotifyCanExecuteChangedFor(nameof(MoveToCheckInfomationPanelCommand))]
     [Required(ErrorMessage = "领域不能为空")]
+    [Length(1, 20, ErrorMessage = "领域长度必须在1~20之间")]
     private string? _field;
 
     [ObservableProperty]
@@ -110,6 +110,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [NotifyPropertyChangedFor(nameof(DisplayGender))]
     [NotifyCanExecuteChangedFor(nameof(MoveToCheckInfomationPanelCommand))]
     [Required(ErrorMessage = "性别不能为空")]
+    [AllowedValues(0, 1)]
     private int? _gender;
 
     [ObservableProperty]
@@ -122,6 +123,11 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     #endregion Private Fields
 
     #region Private Methods
+
+    private void HandleExceptions(Exception ex)
+    {
+
+    }
 
     [RelayCommand(CanExecute = nameof(IsUserNameAndPasswordValid))]
     private async Task LoginAsync()
@@ -151,9 +157,12 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             MoveToFieldGenderPanelCommand.NotifyCanExecuteChanged();
             LoginCommand.NotifyCanExecuteChanged();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("登录失败", "请检查用户名和密码是否正确");
+            if (ex is ApiResponseException)
+                _snackbarService.ShowErrorMessage("登录失败", ex.Message);
+            if (ex is HttpRequestException)
+                _snackbarService.ShowErrorMessage("登录失败", "请检查网络设置");
             NavigateRequsted?.Invoke(this, "NotLogined");
         }
         finally

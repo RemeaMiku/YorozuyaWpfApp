@@ -1,13 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Yorozuya.WpfApp.Models;
 
 namespace Yorozuya.WpfApp.Servcies.Contracts;
 
 public interface IUserService
 {
-    public bool TryGetUserInfo(out UserInfo? userInfo);
+    public bool TryGetUserInfo([NotNullWhen(true)] out UserInfo? userInfo);
 
-    public bool TryGetToken(out string? token);
+    public bool TryGetToken([NotNullWhen(true)] out string? token);
 
     public UserInfo? UserInfo { get; }
 
