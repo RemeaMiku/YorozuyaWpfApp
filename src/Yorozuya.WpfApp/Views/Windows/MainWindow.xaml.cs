@@ -51,7 +51,7 @@ public partial class MainWindow : UiWindow
 
     private static readonly TimeSpan _navigateDuration = TimeSpan.FromSeconds(0.2);
 
-    private readonly Dictionary<Wpf.Ui.Controls.Button, (int Index, Type PageType)> _navigateDictionary = [];
+    private readonly Dictionary<Wpf.Ui.Controls.Button, (int Index, Page Page)> _navigateDictionary = [];
 
     private Wpf.Ui.Controls.Button _currentNavigateButton;
 
@@ -113,9 +113,9 @@ public partial class MainWindow : UiWindow
     /// </summary>
     private void InitializeNavigateDictionary()
     {
-        _navigateDictionary.Add(HomeButton, (0, typeof(HomePage)));
-        _navigateDictionary.Add(PersonButton, (1, typeof(PersonPage)));
-        _navigateDictionary.Add(SettingsButton, (2, typeof(SettingsPage)));
+        _navigateDictionary.Add(HomeButton, (0, App.Current.ServiceProvider.GetRequiredService<HomePage>()));
+        _navigateDictionary.Add(PersonButton, (1, App.Current.ServiceProvider.GetRequiredService<PersonPage>()));
+        _navigateDictionary.Add(SettingsButton, (2, App.Current.ServiceProvider.GetRequiredService<SettingsPage>()));
     }
 
     /// <summary>
@@ -164,8 +164,7 @@ public partial class MainWindow : UiWindow
     {
         var oldPage = (Page)Frame.Content;
         (var oldIndex, _) = _navigateDictionary[_currentNavigateButton];
-        (var newIndex, var newPageType) = _navigateDictionary[button];
-        var newPage = (Page)App.Current.ServiceProvider.GetRequiredService(newPageType);
+        (var newIndex, var newPage) = _navigateDictionary[button];
         if (oldPage == newPage)
             return;
         var easingFunction = new QuarticEase { EasingMode = EasingMode.EaseInOut };

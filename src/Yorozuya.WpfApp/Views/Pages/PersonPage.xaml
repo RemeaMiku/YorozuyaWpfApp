@@ -13,54 +13,82 @@
     <Grid d:Background="White">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Margin="0,5,0,10" Text="{Binding Path=ViewModel.NowUserInfo.Username}" d:Text="Aya" FontWeight="Bold" FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DynamicForegroundTextBlock}" TextAlignment="Center"/>
+            <TextBlock
+                Grid.Row="0"
+                Margin="0,5,0,10"
+                d:Text="Aya"
+                FontSize="{StaticResource LargeFontSize}"
+                FontWeight="Bold"
+                Style="{StaticResource DynamicForegroundTextBlock}"
+                Text="{Binding Path=ViewModel.NowUserInfo.Username}"
+                TextAlignment="Center" />
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-            <ui:CardExpander Margin="10" Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}" BorderThickness="0" Padding="20,10">
-                <ui:CardExpander.Header>
-                    <TextBlock Text="历史提问" FontSize="{StaticResource LargeFontSize}"></TextBlock>
-                </ui:CardExpander.Header>
-                <ui:CardExpander.Content>
-                    <ItemsControl ItemsSource="{Binding Path=ViewModel.PostSource}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ui:CardAction Margin="0, 5" Command="{Binding RelativeSource={RelativeSource AncestorType=Page},Path=ViewModel.OpenPostCommand}" CommandParameter="{Binding}">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Path=Title}" FontSize="{StaticResource MediumFontSize}" FontWeight="Bold"/>
-                                        <TextBlock Margin="0,3,0,0" Text="{Binding Path=Post.Content}" FontSize="{StaticResource MediumFontSize}" />
-                                    </StackPanel>
-                                </ui:CardAction>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ui:CardExpander.Content>
-            </ui:CardExpander>
-            <ui:CardExpander Margin="10" Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}" BorderThickness="0" Padding="20,10">
-                <ui:CardExpander.Header>
-                    <TextBlock Text="历史回答" FontSize="{StaticResource LargeFontSize}"></TextBlock>
-                </ui:CardExpander.Header>
-                <ui:CardExpander.Content>
-                    <ItemsControl ItemsSource="{Binding Path=ViewModel.ReplySource}">
-s                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                        <ui:CardAction Margin="0, 5" Command="{Binding RelativeSource={RelativeSource AncestorType=Page},Path=ViewModel.OpenReplyCommand}" CommandParameter="{Binding}">
+                <StackPanel>
+                    <ui:CardExpander
+                        Margin="10"
+                        Padding="20,10"
+                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                        BorderThickness="0">
+                        <ui:CardExpander.Header>
+                            <TextBlock FontSize="{StaticResource LargeFontSize}" Text="历史提问" />
+                        </ui:CardExpander.Header>
+                        <ui:CardExpander.Content>
+                            <ItemsControl ItemsSource="{Binding Path=ViewModel.PostSource}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:CardAction
+                                            Margin="0,5"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=ViewModel.OpenPostCommand}"
+                                            CommandParameter="{Binding}">
                                             <StackPanel>
-                                        <TextBlock Text="{Binding Path=Reply.Content}" FontSize="{StaticResource MediumFontSize}"/>
-                                        <TextBlock Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
-                                            <Run Text="点赞数："/>
-                                            <Run Text="{Binding Path=Reply.Likes}"/>
-                                        </TextBlock>
-                                    </StackPanel>
-                                </ui:CardAction>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ui:CardExpander.Content>
-            </ui:CardExpander>
-            </StackPanel>
+                                                <TextBlock
+                                                    FontSize="{StaticResource MediumFontSize}"
+                                                    FontWeight="Bold"
+                                                    Text="{Binding Path=Title}" />
+                                                <TextBlock
+                                                    Margin="0,3,0,0"
+                                                    FontSize="{StaticResource MediumFontSize}"
+                                                    Text="{Binding Path=Post.Content}" />
+                                            </StackPanel>
+                                        </ui:CardAction>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ui:CardExpander.Content>
+                    </ui:CardExpander>
+                    <ui:CardExpander
+                        Margin="10"
+                        Padding="20,10"
+                        Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
+                        BorderThickness="0">
+                        <ui:CardExpander.Header>
+                            <TextBlock FontSize="{StaticResource LargeFontSize}" Text="历史回答" />
+                        </ui:CardExpander.Header>
+                        <ui:CardExpander.Content>
+                            <ItemsControl ItemsSource="{Binding Path=ViewModel.ReplySource}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ui:CardAction
+                                            Margin="0,5"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=ViewModel.OpenReplyCommand}"
+                                            CommandParameter="{Binding}">
+                                            <StackPanel>
+                                                <TextBlock FontSize="{StaticResource MediumFontSize}" Text="{Binding Path=Reply.Content}" />
+                                                <TextBlock Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
+                                                    <Run Text="点赞数：" />
+                                                    <Run Text="{Binding Path=Reply.Likes}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </ui:CardAction>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ui:CardExpander.Content>
+                    </ui:CardExpander>
+                </StackPanel>
             </ScrollViewer>
         </Grid>
     </Grid>

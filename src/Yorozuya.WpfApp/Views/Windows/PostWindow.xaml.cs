@@ -8,6 +8,7 @@ using Wpf.Ui.Controls;
 using System.ComponentModel;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Servcies.Contracts;
+using Yorozuya.WpfApp.Common.Helpers;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
@@ -25,11 +26,7 @@ public partial class PostWindow : UiWindow
         ViewModel = viewModel;
         App.Current.ServiceProvider.GetRequiredKeyedService<ISnackbarService>(nameof(PostWindowViewModel)).SetSnackbarControl(Snackbar);
         App.Current.ServiceProvider.GetRequiredKeyedService<ILeftRightButtonDialogService>(nameof(PostWindowViewModel)).SetDialogControl(Dialog);
-        ViewModel.WindowOpened += (_, _) =>
-        {
-            Show();
-            Focus();
-        };
+        ViewModel.WindowOpened += (_, _) => { WindowReactivator.Reactive(this); };
     }
 
     #endregion Public Constructors

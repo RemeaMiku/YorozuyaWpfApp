@@ -45,24 +45,17 @@
                     Text="账号" />
                 <Grid
                     Margin="{StaticResource LargeStackSpacing}"
-                    d:Visibility="Collapsed"
+                    d:Visibility="Visible"
                     Visibility="{Binding ViewModel.UserInfo, Mode=OneWay, Converter={StaticResource NullableToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Border
-                        Width="64"
-                        Height="64"
-                        Background="{StaticResource MeaBlueBrushAlpha}"
-                        CornerRadius="32" />
-                    <Viewbox>
-                        <ui:SymbolIcon
-                            Padding="5"
-                            Filled="True"
-                            Foreground="{StaticResource MeaBlueBrush}"
-                            Symbol="Person24" />
-                    </Viewbox>
+                    <ui:SymbolIcon
+                        Padding="5"
+                        FontSize="64"
+                        Foreground="{StaticResource MeaBlueBrush}"
+                        Symbol="PersonCircle24" />
                     <StackPanel
                         Grid.Column="1"
                         Margin="20,0,0,0"
@@ -102,7 +95,10 @@
                             Style="{StaticResource BorderlessTransparentUiButtonStyle}" />
                     </StackPanel>
                 </Grid>
-                <Grid Margin="{StaticResource MediumStackSpacing}" Visibility="{Binding ViewModel.UserInfo, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}">
+                <Grid
+                    Margin="{StaticResource MediumStackSpacing}"
+                    d:Visibility="Collapsed"
+                    Visibility="{Binding ViewModel.UserInfo, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

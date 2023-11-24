@@ -19,13 +19,7 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class PostWindowViewModel : BaseViewModel
 {
-    #region Public Fields
-
     public EventHandler? WindowOpened;
-
-    #endregion Public Fields
-
-    #region Public Constructors
 
     public PostWindowViewModel([FromKeyedServices(nameof(PostWindowViewModel))] ILeftRightButtonDialogService dialogService, [FromKeyedServices(nameof(PostWindowViewModel))] ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)
     {
@@ -33,12 +27,13 @@ public partial class PostWindowViewModel : BaseViewModel
         _snackbarService = snackbarService;
         _userService = userService;
         _postService = postService;
-        messenger.Register<PostWindowViewModel, Post>(this, async (r, m) => await r.OpenPostAsync(m));
+        messenger.Register<PostWindowViewModel, Post>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m));
+        messenger.Register<PostWindowViewModel, string>(this, (r, m) =>
+        {
+            if (m == StringMessages.UserLoggedIn)
+                RefreshPostCommand.Execute(default);
+        });
     }
-
-    #endregion Public Constructors
-
-    #region Public Properties
 
     public int ReplyMaxLength { get; } = 10000;
 
@@ -75,10 +70,6 @@ public partial class PostWindowViewModel : BaseViewModel
     public bool CanAcceptReply => IsUserPost && !IsCurrentReplyAccepted;
 
     public bool IsCurrentReplyAccepted => CurrentReply is not null && CurrentReply.IsAccepted == 1;
-
-    #endregion Public Properties
-
-    #region Private Fields
 
     private const string _postIsNullErrorMessage = "问题不存在或已被删除";
 
@@ -121,7 +112,7 @@ public partial class PostWindowViewModel : BaseViewModel
     private bool _canBack;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsCurrentReplyMostLiked), nameof(CurrentReplyState), nameof(IsCurrentReplyAccepted))]
+    [NotifyPropertyChangedFor(nameof(IsCurrentReplyMostLiked), nameof(CurrentReplyState), nameof(IsCurrentReplyAccepted), nameof(IsUserReply))]
     [NotifyCanExecuteChangedFor(nameof(AcceptReplyCommand))]
     private Reply? _currentReply;
 
@@ -142,14 +133,9 @@ public partial class PostWindowViewModel : BaseViewModel
 
     private Reply? _mostLikedReply;
 
-    #endregion Private Fields
-
-    #region Private Properties
-
     private bool CanForward
     {
         get => _canForward;
-
         set
         {
             if (value == _canForward)
@@ -162,7 +148,6 @@ public partial class PostWindowViewModel : BaseViewModel
     private bool CanBack
     {
         get => _canBack;
-
         set
         {
             if (value == _canBack)
@@ -172,11 +157,73 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    #endregion Private Properties
+    async Task UpdateCurrentReplyIsUserLiked()
+    {
+        if (CurrentReply is null || !_userService.IsUserLoggedIn)
+        {
+            IsCurrentReplyLiked = false;
+            return;
+        }
+        IsCurrentReplyLiked = await _postService.GetIsLikedAsync(_userService.Token!, CurrentReply.Id);
+    }
 
-    #region Private Methods
+    async Task UpdateReplies(long? replyId = default)
+    {
+        if (Post is null)
+            return;
+        if (Post.DelTag != 0)
+        {
+            Post = default;
+            return;
+        }
+        var replies = await _postService.GetPostRepliesAsync(Post.Id);
+        if (replies is null)
+        {
+            RepliesViewSource.Source = default;
+            RepliesCount = 0;
+            UserReply = default;
+            _mostLikedReply = default;
+            CurrentReply = default;
+            SelectedIndex = -1;
+            return;
+        }
+        RepliesViewSource.Source = replies;
+        RepliesViewSource.View.Refresh();
+        RepliesCount = replies.Count();
+        UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
+        _mostLikedReply = replies.MaxBy(r => r.Likes);
+        if (replyId is null)
+        {
+            CurrentReply = _mostLikedReply;
+            return;
+        }
+        CurrentReply = replies.SingleOrDefault(r => r.Id == replyId && r.DelTag == 0);
+        CurrentReply ??= _mostLikedReply;
+    }
 
-    private async Task OpenPostAsync(Post post)
+    [RelayCommand]
+    private async Task RefreshPostAsync()
+    {
+        if (Post is null)
+            return;
+        try
+        {
+            IsBusy = true;
+            await UpdateReplies(CurrentReply?.Id);
+            await UpdateCurrentReplyIsUserLiked();
+        }
+        catch (Exception)
+        {
+
+        }
+        finally 
+        {
+            IsBusy = false;
+        }
+        
+    }
+
+    private async Task ReplyOpenPostRequestAsync(Post post)
     {
         WindowOpened?.Invoke(this, EventArgs.Empty);
         if (_snackbarService.ShowErrorMessageIf("加载失败", () => IsBusy, "正在忙碌，请稍后重试"))
@@ -191,7 +238,9 @@ public partial class PostWindowViewModel : BaseViewModel
             _forwardStack.Clear();
             CanForward = false;
         }
-        await GetAndUpdatePostRepliesAsync(post);
+        Post = post;
+        await UpdateReplies();
+        await UpdateCurrentReplyIsUserLiked();
     }
 
     partial void OnPostChanging(Post? value)
@@ -219,7 +268,7 @@ public partial class PostWindowViewModel : BaseViewModel
     [RelayCommand]
     private void OpenReplyPanel()
     {
-        if (_snackbarService.ShowErrorMessageIf("新建回答失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
+        if (_snackbarService.ShowErrorMessageIf("回答问题失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
             return;
         IsReplying = true;
     }
@@ -233,39 +282,15 @@ public partial class PostWindowViewModel : BaseViewModel
     [RelayCommand]
     private async Task SelectReplyAsync(Reply reply)
     {
+        CurrentReply = reply;
         try
         {
             IsBusy = true;
-            CurrentReply = reply;
-            IsCurrentReplyLiked = _userService.IsUserLoggedIn && await _postService.GetIsLikedAsync(_userService.Token!, reply.Id);
+            await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception)
         {
-            //TODO:异常处理
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async Task GetAndUpdatePostRepliesAsync(Post post, Func<Reply, bool>? prediction = default)
-    {
-        if (post.DelTag != 0)
-        {
-            Post = default;
-            return;
-        }
-        try
-        {
-            IsBusy = true;
-            Post = post;
-            var replies = await _postService.GetPostRepliesAsync(post.Id);
-            await UpdateRepliesAndSelectReplyAsync(replies, prediction);
-        }
-        catch (Exception)
-        {
-            //TODO:异常处理
+            //TODO 异常处理
         }
         finally
         {
@@ -281,9 +306,23 @@ public partial class PostWindowViewModel : BaseViewModel
             _forwardStack.Push(Post);
             CanForward = true;
         }
-        await GetAndUpdatePostRepliesAsync(_backStack.Pop());
+        Post = _backStack.Pop();
         if (_backStack.Count == 0)
             CanBack = false;
+        try
+        {
+            IsBusy = true;
+            await UpdateReplies();
+            await UpdateCurrentReplyIsUserLiked();
+        }
+        catch (Exception)
+        {
+            //TODO:异常处理
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanForward))]
@@ -294,9 +333,23 @@ public partial class PostWindowViewModel : BaseViewModel
             _backStack.Push(Post);
             CanBack = true;
         }
-        await GetAndUpdatePostRepliesAsync(_forwardStack.Pop());
         if (_forwardStack.Count == 0)
             CanForward = false;
+        Post = _forwardStack.Pop();
+        try
+        {
+            IsBusy = true;
+            await UpdateReplies();
+            await UpdateCurrentReplyIsUserLiked();
+        }
+        catch (Exception)
+        {
+            //TODO 异常处理
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanAcceptReply))]
@@ -309,17 +362,15 @@ public partial class PostWindowViewModel : BaseViewModel
             (() => CurrentReply!.IsAccepted == 1, "该回答已被采纳，请勿重复操作"),
             (() => !IsUserPost, "你不是提问者，无法接受该回答")))
             return;
+        await _dialogService.ShowDialogAsync("确定要采纳该回答吗？采纳后不可更改！", "警告", "取消", "确认");
+        if (!_dialogService.GetIsRightButtonClicked())
+            return;
         try
         {
-            await _dialogService.ShowDialogAsync("确定要采纳该回答吗？采纳后不可更改！", "警告", "取消", "确认");
-            if (!_dialogService.GetIsRightButtonClicked())
-                return;
             IsBusy = true;
             await _postService.AcceptReplyAsync(_userService.Token!, CurrentReply!.Id);
-            var replies = await _postService.GetPostRepliesAsync(Post!.Id);
-            var targetId = CurrentReply!.Id;
-            await UpdateRepliesAndSelectReplyAsync(replies, r => r.Id == targetId);
-
+            await UpdateReplies(CurrentReply!.Id);
+            await UpdateCurrentReplyIsUserLiked();
             // 仅在本地时保留
             OnPropertyChanged(nameof(IsCurrentReplyAccepted));
             OnPropertyChanged(nameof(CurrentReplyState));
@@ -344,15 +395,15 @@ public partial class PostWindowViewModel : BaseViewModel
              (() => CurrentReply!.DelTag != 0, "该回答已被删除，请勿重复操作"),
              (() => !IsUserReply, "你不是此回答的作者，无法删除该回答")))
             return;
+        await _dialogService.ShowDialogAsync("确定要删除该回答吗？删除后不可恢复！", "警告", "取消", "确认");
+        if (!_dialogService.GetIsRightButtonClicked())
+            return;
         try
         {
-            await _dialogService.ShowDialogAsync("确定要删除该回答吗？删除后不可恢复！", "警告", "取消", "确认");
-            if (!_dialogService.GetIsRightButtonClicked())
-                return;
             IsBusy = true;
             await _postService.DeleteReplyAsync(_userService.Token!, CurrentReply!.Id);
-            var replies = await _postService.GetPostRepliesAsync(Post!.Id);
-            await UpdateRepliesAndSelectReplyAsync(replies);
+            await UpdateReplies(CurrentReply!.Id);
+            await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
         {
@@ -373,15 +424,14 @@ public partial class PostWindowViewModel : BaseViewModel
            (() => !IsUserPost, "你不是提问者，无法删除该问题"),
            (() => Post!.DelTag != 0, "该问题已被删除，请勿重复操作")))
             return;
+        await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "警告", "取消", "确认");
+        if (!_dialogService.GetIsRightButtonClicked())
+            return;
         try
         {
-            await _dialogService.ShowDialogAsync("确定要删除该问题吗？删除后不可恢复！", "警告", "取消", "确认");
-            if (!_dialogService.GetIsRightButtonClicked())
-                return;
             IsBusy = true;
             await _postService.DeletePostAsync(_userService.Token!, Post!.Id);
             Post = default;
-            IsBusy = false;
         }
         catch (Exception ex)
         {
@@ -393,48 +443,27 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    private async Task UpdateRepliesAndSelectReplyAsync(IEnumerable<Reply>? replies, Func<Reply, bool>? prediction = default)
-    {
-        if (replies is not null)
-        {
-            RepliesViewSource.Source = replies;
-            RepliesViewSource.View.Refresh();
-            RepliesCount = replies.Count();
-            UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
-            _mostLikedReply = replies.MaxBy(r => r.Likes);
-            CurrentReply = prediction is null ? _mostLikedReply : replies.SingleOrDefault(prediction);
-            IsCurrentReplyLiked = CurrentReply is not null && _userService.IsUserLoggedIn && await _postService.GetIsLikedAsync(_userService.Token!, CurrentReply.Id);
-        }
-        else
-        {
-            RepliesViewSource.Source = default;
-            RepliesCount = 0;
-            UserReply = default;
-            _mostLikedReply = default;
-            CurrentReply = default;
-            SelectedIndex = -1;
-        }
-    }
-
     [RelayCommand]
-    private async Task MoveToUserReply()
+    private void MoveToUserReply()
     {
+        if (_snackbarService.ShowErrorMessageIf("查看回答失败", () => !_userService.IsUserLoggedIn, _userNotLoggedInErrorMessage))
+            return;
         ArgumentNullException.ThrowIfNull(UserReply);
-        await SelectReplyAsync(UserReply);
+        SelectReplyCommand.Execute(UserReply);
     }
 
     [RelayCommand(CanExecute = nameof(IsNotLastReply))]
     private async Task MoveToNextReply()
     {
         SelectedIndex++;
-        await SelectReplyAsync(CurrentReply!);
+        await UpdateCurrentReplyIsUserLiked();
     }
 
     [RelayCommand(CanExecute = nameof(IsNotFirstReply))]
     private async Task MoveToPreviousReply()
     {
         SelectedIndex--;
-        await SelectReplyAsync(CurrentReply!);
+        await UpdateCurrentReplyIsUserLiked();
     }
 
     partial void OnIsReplyingChanged(bool value)
@@ -456,9 +485,8 @@ public partial class PostWindowViewModel : BaseViewModel
         {
             IsBusy = true;
             var newReply = await _postService.PublishReplyAsync(_userService.Token!, Post!.Id, NewReplyContent);
-            var replies = await _postService.GetPostRepliesAsync(Post!.Id);
-            await UpdateRepliesAndSelectReplyAsync(replies, r => r.Id == newReply.Id);
             IsReplying = false;
+            await UpdateReplies(newReply.Id);
         }
         catch (Exception ex)
         {
@@ -491,8 +519,7 @@ public partial class PostWindowViewModel : BaseViewModel
                 await _postService.LikeAsync(_userService.Token!, CurrentReply!.Id);
                 CurrentReply!.Likes++;
             }
-            IsBusy = false;
-            IsCurrentReplyLiked = !IsCurrentReplyLiked;
+            await UpdateCurrentReplyIsUserLiked();
             OnPropertyChanged(nameof(CurrentReply));
         }
         catch (Exception ex)
@@ -505,5 +532,4 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    #endregion Private Methods
 }
