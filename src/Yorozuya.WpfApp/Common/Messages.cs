@@ -1,6 +1,6 @@
 ﻿namespace Yorozuya.WpfApp.Common;
 
-public static class MessageTokens
+public static class Messages
 {
     public const string RequestUserLogin = nameof(RequestUserLogin);
 

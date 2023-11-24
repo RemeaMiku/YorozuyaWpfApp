@@ -35,7 +35,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         _messenger = messenger;
         messenger.Register<LoginWindowViewModel, string>(this, (viewModel, token) =>
         {
-            if (token == MessageTokens.RequestUserLogin && !_userService.IsUserLoggedIn)
+            if (token == Messages.RequestUserLogin && !_userService.IsUserLoggedIn)
                 viewModel.ReplyLoginRequest();
         });
     }
@@ -63,8 +63,6 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
 
     public void ReplyLoginRequest()
     {
-        UserName = default;
-        Password = default;
         Field = default;
         Gender = default;
         ClearErrors();
@@ -143,7 +141,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             _messenger.Send(await _userService.UserLoginAsync(UserName!, Password!));
             NavigateRequsted?.Invoke(this, "Successed");
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
-            _messenger.Send(MessageTokens.UserLoggedIn);
+            _messenger.Send(Messages.UserLoggedIn);
             UserName = default;
             Password = default;
             Field = default;

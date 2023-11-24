@@ -54,10 +54,16 @@ public partial class LoginWindow : UiWindow
                 PasswordBox.Password = string.Empty;
             await NavigateAsync(e);
         };
-        ViewModel.LoginRequested += (_, _) =>
+        ViewModel.LoginRequested += async (_, _) =>
         {
             Show();
             Focus();
+            if (ViewModel.IsBusy)
+                return;
+            if (FieldGenderPanel.Visibility == Visibility.Visible)
+                await NavigateAsync("Back");
+            if (CheckInfomationPanel.Visibility == Visibility.Visible)
+                await NavigateAsync("Cancel");
         };
         ViewModel.UserLoggedIn += (_, _) => { Hide(); };
     }
@@ -162,6 +168,8 @@ public partial class LoginWindow : UiWindow
         inElement.Visibility = Visibility.Visible;
         await inElement.SlideAndFadeInAsync(duration, inMargin, ease);
         _isNavigating = false;
+        outElement.Margin = new();
+        outElement.Opacity = 1;
         inElement.IsEnabled = true;
         outElement.IsEnabled = true;
     }
@@ -172,12 +180,11 @@ public partial class LoginWindow : UiWindow
         ViewModel.Password = passwordBox.Password;
     }
 
-    private void OnBackgroundMouseDown(object sender, MouseButtonEventArgs e)
+    private void OnBackgroundMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        e.Handled = true;
-        if (e.ChangedButton == MouseButton.Left)
+        if (Mouse.LeftButton == MouseButtonState.Pressed)
             DragMove();
     }
 
-    #endregion Private Methods
+    #endregion Private Methods   
 }
