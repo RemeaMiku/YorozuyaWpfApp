@@ -16,6 +16,7 @@ using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Mvvm.Contracts;
+using Yorozuya.WpfApp.Common.Helpers;
 using Yorozuya.WpfApp.Extensions;
 using Yorozuya.WpfApp.ViewModels.Windows;
 
@@ -56,8 +57,7 @@ public partial class LoginWindow : UiWindow
         };
         ViewModel.LoginRequested += async (_, _) =>
         {
-            Show();
-            Focus();
+            WindowReactivator.Reactive(this);
             if (ViewModel.IsBusy)
                 return;
             if (FieldGenderPanel.Visibility == Visibility.Visible)
@@ -65,7 +65,11 @@ public partial class LoginWindow : UiWindow
             if (CheckInfomationPanel.Visibility == Visibility.Visible)
                 await NavigateAsync("Cancel");
         };
-        ViewModel.UserLoggedIn += (_, _) => { Hide(); };
+        ViewModel.UserLoggedIn += (_, _) =>
+        {
+            Hide();
+            WindowReactivator.Reactive(App.Current.ServiceProvider.GetRequiredService<MainWindow>());
+        };
     }
 
     #endregion Public Constructors

@@ -38,10 +38,10 @@ public partial class PersonPageViewModel : BaseViewModel
 
     private async void SetActionCard()
     {
-        var posts = await _postService.GetUserPostsAsync(_userService.Token);
-        var replies = await _postService.GetUserRepliesAsync(_userService.Token);
-        PostSource = posts?.ToList() ?? [];
-        ReplySource = replies?.ToList() ?? [];
+        //var posts = await _postService.GetUserPostsAsync(_userService.Token);
+        //var replies = await _postService.GetUserRepliesAsync(_userService.Token);
+        //PostSource = posts?.ToList() ?? [];
+        //ReplySource = replies?.ToList() ?? [];
     }
 
     public PersonPageViewModel(IUserService userService, IPostService postService, IMessenger messenger)

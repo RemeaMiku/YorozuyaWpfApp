@@ -33,9 +33,9 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         _userService = userService;
         _snackbarService = snackbarService;
         _messenger = messenger;
-        messenger.Register<LoginWindowViewModel, string>(this, (viewModel, token) =>
+        messenger.Register<LoginWindowViewModel, string>(this, (viewModel, message) =>
         {
-            if (token == Messages.RequestUserLogin && !_userService.IsUserLoggedIn)
+            if (message == StringMessages.RequestUserLogin && !_userService.IsUserLoggedIn)
                 viewModel.ReplyLoginRequest();
         });
     }
@@ -130,6 +130,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         ValidateProperty(Password, nameof(Password));
         if (!IsUserNameAndPasswordValid)
         {
+            MoveToFieldGenderPanelCommand.NotifyCanExecuteChanged();
             LoginCommand.NotifyCanExecuteChanged();
             return;
         }
@@ -141,7 +142,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             _messenger.Send(await _userService.UserLoginAsync(UserName!, Password!));
             NavigateRequsted?.Invoke(this, "Successed");
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
-            _messenger.Send(Messages.UserLoggedIn);
+            _messenger.Send(StringMessages.UserLoggedIn);
             UserName = default;
             Password = default;
             Field = default;
@@ -166,10 +167,13 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     {
         ValidateProperty(UserName, nameof(UserName));
         ValidateProperty(Password, nameof(Password));
-        if (IsUserNameAndPasswordValid)
-            NavigateRequsted?.Invoke(this, "Register");
-        else
+        if (!IsUserNameAndPasswordValid)
+        {
             MoveToFieldGenderPanelCommand.NotifyCanExecuteChanged();
+            LoginCommand.NotifyCanExecuteChanged();
+            return;
+        }
+        NavigateRequsted?.Invoke(this, "Register");
     }
 
     [RelayCommand]

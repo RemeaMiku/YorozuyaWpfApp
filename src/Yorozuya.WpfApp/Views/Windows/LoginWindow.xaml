@@ -66,12 +66,12 @@
                         <StackPanel Orientation="Horizontal">
                             <ui:Button
                                 Click="OnBackgroundSettingButtonClicked"
-                                Icon="Edit24"
+                                Icon="ImageEdit24"
                                 MouseOverBackground="{StaticResource MikuGreenBrush}"
                                 Style="{StaticResource TitleBarUiButtonStyle}" />
                             <ui:Button
                                 Click="OnResetButtonClicked"
-                                Icon="ArrowCounterclockwise24"
+                                Icon="ArrowReset24"
                                 Style="{StaticResource TitleBarUiButtonStyle}" />
                         </StackPanel>
                     </ui:TitleBar.Header>
