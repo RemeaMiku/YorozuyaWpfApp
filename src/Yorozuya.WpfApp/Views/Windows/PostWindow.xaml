@@ -398,7 +398,7 @@
                                 Icon="ChatAdd24"
                                 Style="{StaticResource BorderlessTransparentUiButtonStyle}"
                                 ToolTip="回答问题"
-                                Visibility="{Binding ViewModel.UserReply, Converter={StaticResource ReversedNullableToVisibilityConverter}, Mode=OneWay}" />
+                                Visibility="{Binding ViewModel.CanAddNewReply, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" />
                             <ui:Button
                                 Command="{Binding ViewModel.MoveToUserReplyCommand, Mode=OneTime}"
                                 FontSize="{StaticResource LargeFontSize}"

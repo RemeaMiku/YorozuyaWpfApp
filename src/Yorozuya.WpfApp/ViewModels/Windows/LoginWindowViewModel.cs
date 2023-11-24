@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -123,6 +124,11 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
 
     #region Private Methods
 
+    private void HandleExceptions(Exception ex)
+    {
+
+    }
+
     [RelayCommand(CanExecute = nameof(IsUserNameAndPasswordValid))]
     private async Task LoginAsync()
     {
@@ -151,9 +157,12 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             MoveToFieldGenderPanelCommand.NotifyCanExecuteChanged();
             LoginCommand.NotifyCanExecuteChanged();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("登录失败", "请检查用户名和密码是否正确");
+            if (ex is ApiResponseException)
+                _snackbarService.ShowErrorMessage("登录失败", ex.Message);
+            if (ex is HttpRequestException)
+                _snackbarService.ShowErrorMessage("登录失败", "请检查网络设置");
             NavigateRequsted?.Invoke(this, "NotLogined");
         }
         finally
