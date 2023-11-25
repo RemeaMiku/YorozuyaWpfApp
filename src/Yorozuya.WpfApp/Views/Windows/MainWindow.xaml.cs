@@ -185,6 +185,7 @@ public partial class MainWindow : UiWindow
     private async void OnNavigateButtonClicked(object sender, RoutedEventArgs e)
     {
         var newButton = (Wpf.Ui.Controls.Button)sender;
+        Title = (string)newButton.Tag;
         if ((DateTime.Now - _lastNavigateTime) < 2 * _navigateDuration)
             return;
         _lastNavigateTime = DateTime.Now;

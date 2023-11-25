@@ -84,19 +84,21 @@
                         <ui:Button
                             x:Name="HomeButton"
                             Click="OnNavigateButtonClicked"
-                            Style="{StaticResource MenuUiButtonStyle}">
+                            Style="{StaticResource MenuUiButtonStyle}"
+                            Tag="首页">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Style="{StaticResource MenuSymbolIconStyle}" Symbol="Home24" />
-                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="首页" />
+                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=ui:Button}}" />
                             </StackPanel>
                         </ui:Button>
                         <ui:Button
                             x:Name="PersonButton"
                             Click="OnNavigateButtonClicked"
-                            Style="{StaticResource MenuUiButtonStyle}">
+                            Style="{StaticResource MenuUiButtonStyle}"
+                            Tag="个人中心">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Style="{StaticResource MenuSymbolIconStyle}" Symbol="Person24" />
-                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="个人中心" />
+                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=ui:Button}}" />
                             </StackPanel>
                         </ui:Button>
                     </StackPanel>
@@ -116,10 +118,11 @@
                         <ui:Button
                             x:Name="SettingsButton"
                             Click="OnNavigateButtonClicked"
-                            Style="{StaticResource MenuUiButtonStyle}">
+                            Style="{StaticResource MenuUiButtonStyle}"
+                            Tag="设置">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Style="{StaticResource MenuSymbolIconStyle}" Symbol="Options24" />
-                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="设置" />
+                                <TextBlock Style="{StaticResource MenuTextBlockStyle}" Text="{Binding Tag, RelativeSource={RelativeSource AncestorType=ui:Button}}" />
                             </StackPanel>
                         </ui:Button>
                     </StackPanel>

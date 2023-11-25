@@ -20,5 +20,5 @@ public interface IUserService
 
     public Task UserRegisterAsync(string username, string password, string field, int gender);
 
-    public Task<UserInfo> UserLoginAsync(string username, string password);
+    public Task UserLoginAsync(string username, string password);
 }

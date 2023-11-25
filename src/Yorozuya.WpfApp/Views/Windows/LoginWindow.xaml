@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="LoginWindow"
+    Title="{Binding ViewModel.WindowTitle, Mode=OneWay}"
     Width="1000"
     Height="560"
     MinWidth="{Binding Width, Mode=OneTime}"
@@ -61,7 +61,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <ui:TitleBar x:Name="TitleBar">
+                <ui:TitleBar>
                     <ui:TitleBar.Header>
                         <StackPanel Orientation="Horizontal">
                             <ui:Button
@@ -72,6 +72,7 @@
                             <ui:Button
                                 Click="OnResetButtonClicked"
                                 Icon="ArrowReset24"
+                                MouseOverBackground="{StaticResource MeaBlueBrush}"
                                 Style="{StaticResource TitleBarUiButtonStyle}" />
                         </StackPanel>
                     </ui:TitleBar.Header>
@@ -153,7 +154,7 @@
                         <TextBlock
                             FontSize="{StaticResource LargeFontSize}"
                             Style="{StaticResource DefaultFontFamilyTextBlock}"
-                            Text="补充账号信息" />
+                            Text="完善个人信息" />
                         <TextBlock
                             Margin="0,30,0,0"
                             FontSize="{StaticResource MediumFontSize}"
@@ -218,7 +219,7 @@
                             Padding="50,0"
                             FontSize="{StaticResource LargeFontSize}"
                             Style="{StaticResource DefaultFontFamilyTextBlock}"
-                            Text="核对账号信息" />
+                            Text="确认账号信息" />
                         <ScrollViewer Grid.Row="1" Padding="50,0">
                             <StackPanel Orientation="Vertical">
                                 <TextBlock

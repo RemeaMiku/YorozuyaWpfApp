@@ -17,6 +17,13 @@ using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using System.IO;
 using System.Threading.Tasks;
+using System.Text.Json;
+using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Models;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 
 namespace Yorozuya.WpfApp;
 
@@ -32,6 +39,7 @@ public partial class App : Application
 
     // IoC容器
     public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
+        .AddSingleton<HttpClient>()
         .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
@@ -53,6 +61,8 @@ public partial class App : Application
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
 
+    public static Uri ServerAddress { get; } = new("http://127.0.0.1:4523/m1/3553693-0-default/");
+
     #endregion Public Properties
 
     #region Protected Methods
@@ -60,6 +70,7 @@ public partial class App : Application
     // 重写启动方法
     protected override async void OnStartup(StartupEventArgs e)
     {
+        ServiceProvider.GetRequiredService<HttpClient>().BaseAddress = ServerAddress;
         // 从容器中获取MainWindow并显示
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
         var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
