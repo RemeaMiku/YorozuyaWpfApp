@@ -13,8 +13,8 @@ public class LocalPostService(IUserService userService) : IPostService
 
     readonly List<Reply> _localReplies =
     [
-        new() { Id = 0, PostId = 0, UserId = 0, CreateTime = "2023.08.31 11:45:14", Content = "回答0", Likes = 831 },
-        new() { Id = 1, PostId = 0, UserId = 1, CreateTime = "2022.08.31 11:45:14", Content = "回答1", Likes = 123, IsAccepted = 1 },
+        new() { Id = 0, PostId = 0, UserId = 0, CreateTime = "2020.08.31 11:45:14", Content = "回答0", Likes = 831 },
+        new() { Id = 1, PostId = 0, UserId = 1, CreateTime = "2023.08.31 11:45:14", Content = "回答1", Likes = 123, IsAccepted = 1 },
         new() { Id = 2, PostId = 1, UserId = 2, CreateTime = "2021.08.31 11:45:14", Content = "回答2", Likes = 233 },
     ];
 

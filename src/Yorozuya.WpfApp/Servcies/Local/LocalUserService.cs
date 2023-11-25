@@ -30,14 +30,13 @@ public class LocalUserService : IUserService
         return UserInfo is not null;
     }
 
-    public async Task<UserInfo> UserLoginAsync(string username, string password)
+    public async Task UserLoginAsync(string username, string password)
     {
         await Task.Delay(500);
         var userInfo = _localUserInfos.SingleOrDefault(u => u.Username == username && u.Password == password) ?? throw new InvalidOperationException("登录失败");
         UserInfo = userInfo;
         //本地Token就是UserId
         Token = UserInfo.Id.ToString();
-        return UserInfo;
     }
 
     public void UserLogout()

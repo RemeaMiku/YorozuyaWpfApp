@@ -14,11 +14,10 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.Servcies;
 
-public class HttpUserService : IUserService
+public class HttpUserService(HttpClient httpClient) : IUserService
 {
-    public static Uri BaseAddress { get; } = new("http://127.0.0.1:4523/m1/3553693-0-default/");
 
-    private readonly HttpClient _httpClient = new() { BaseAddress = BaseAddress };
+    private readonly HttpClient _httpClient = httpClient;
 
     public UserInfo? UserInfo { get; private set; }
 
@@ -45,22 +44,25 @@ public class HttpUserService : IUserService
         return builder.ToString();
     }
 
-    public async Task<UserInfo> UserLoginAsync(string username, string password)
+    public async Task UserLoginAsync(string username, string password)
     {
-        var content = new MultipartFormDataContent();
-        content.Headers.Add("ContentType", "multipart/form-data");
-        content.Add(new StringContent(username), "username");
-        content.Add(new StringContent(GetMd5Hash(password)), "password");
+        var content = new MultipartFormDataContent
+        {
+            { new StringContent(username), "username" },
+            { new StringContent(GetMd5Hash(password)), "password" }
+        };
         var httpResponseMessage = await _httpClient.PostAsync("api/user/login", content);
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
         ArgumentNullException.ThrowIfNull(apiResonse);
         apiResonse.EnsureSuccess();
         ArgumentNullException.ThrowIfNull(apiResonse.Data);
-        Token = apiResonse.Data["token"].GetString();
-        UserInfo = apiResonse.Data["userInfo"].Deserialize<UserInfo>();
-        ArgumentNullException.ThrowIfNull(UserInfo);
-        return UserInfo;
+        var token = apiResonse.Data["token"].GetString();
+        var userInfo = apiResonse.Data["userInfo"].Deserialize<UserInfo>();
+        ArgumentNullException.ThrowIfNull(token);
+        ArgumentNullException.ThrowIfNull(userInfo);
+        Token = token;
+        UserInfo = userInfo;
     }
 
     public void UserLogout()
@@ -73,12 +75,13 @@ public class HttpUserService : IUserService
 
     public async Task UserRegisterAsync(string username, string password, string field, int gender)
     {
-        var content = new MultipartFormDataContent();
-        content.Headers.Add("ContentType", "multipart/form-data");
-        content.Add(new StringContent(username), "username");
-        content.Add(new StringContent(GetMd5Hash(password)), "password");
-        content.Add(new StringContent(field), "field");
-        content.Add(new StringContent(gender.ToString()), "gender");
+        var content = new MultipartFormDataContent
+        {
+            { new StringContent(username), "username" },
+            { new StringContent(GetMd5Hash(password)), "password" },
+            { new StringContent(field), "field" },
+            { new StringContent(gender.ToString()), "gender" }
+        };
         var httpResponseMessage = await _httpClient.PostAsync("api/user/register", content);
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<object>>();

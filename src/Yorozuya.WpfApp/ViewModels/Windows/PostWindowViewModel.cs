@@ -19,6 +19,8 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class PostWindowViewModel : BaseViewModel
 {
+    //TODO 异常处理
+
     public EventHandler? OpenPostRequested;
 
     public PostWindowViewModel([FromKeyedServices(nameof(PostWindowViewModel))] ILeftRightButtonDialogService dialogService, [FromKeyedServices(nameof(PostWindowViewModel))] ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)

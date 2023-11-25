@@ -82,6 +82,11 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
 
     private readonly IMessenger _messenger;
 
+    const string _defaultWindowTitle = "登录/注册";
+
+    [ObservableProperty]
+    string _windowTitle = _defaultWindowTitle;
+
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
@@ -101,7 +106,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [ObservableProperty]
     [NotifyDataErrorInfo]
     [NotifyCanExecuteChangedFor(nameof(MoveToCheckInfomationPanelCommand))]
-    [Required(ErrorMessage = "领域不能为空")]
+    [Required(ErrorMessage = "不能为空")]
     [Length(1, 20, ErrorMessage = "领域长度必须在1~20之间")]
     private string? _field;
 
@@ -109,7 +114,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [NotifyDataErrorInfo]
     [NotifyPropertyChangedFor(nameof(DisplayGender))]
     [NotifyCanExecuteChangedFor(nameof(MoveToCheckInfomationPanelCommand))]
-    [Required(ErrorMessage = "性别不能为空")]
+    [Required(ErrorMessage = "不能为空")]
     [AllowedValues(0, 1)]
     private int? _gender;
 
@@ -124,9 +129,12 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
 
     #region Private Methods
 
-    private void HandleExceptions(Exception ex)
+    private void HandleExceptions(string title, Exception ex)
     {
-
+        _snackbarService.ShowErrorMessageIfAny(title,
+            (() => ex is ApiResponseException, ex.Message),
+            (() => ex is HttpRequestException, "请检查网络设置"),
+            (() => true, $"出现了一些问题：{ex.Message}"));
     }
 
     [RelayCommand(CanExecute = nameof(IsUserNameAndPasswordValid))]
@@ -144,8 +152,10 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         {
             IsBusy = true;
             BusyMessage = "正在尝试让你登录...";
+            WindowTitle = "正在登录";
             NavigateRequsted?.Invoke(this, "TryLogin");
-            _messenger.Send(await _userService.UserLoginAsync(UserName!, Password!));
+            await _userService.UserLoginAsync(UserName!, Password!);
+            WindowTitle=_defaultWindowTitle;
             NavigateRequsted?.Invoke(this, "Successed");
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
             _messenger.Send(StringMessages.UserLoggedIn);
@@ -159,11 +169,9 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         }
         catch (Exception ex)
         {
-            if (ex is ApiResponseException)
-                _snackbarService.ShowErrorMessage("登录失败", ex.Message);
-            if (ex is HttpRequestException)
-                _snackbarService.ShowErrorMessage("登录失败", "请检查网络设置");
+            HandleExceptions("登录失败", ex);
             NavigateRequsted?.Invoke(this, "NotLogined");
+            WindowTitle = _defaultWindowTitle;
         }
         finally
         {
@@ -182,6 +190,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             LoginCommand.NotifyCanExecuteChanged();
             return;
         }
+        WindowTitle = "完善信息";
         NavigateRequsted?.Invoke(this, "Register");
     }
 
@@ -192,6 +201,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         Gender = default;
         ClearErrors();
         MoveToCheckInfomationPanelCommand.NotifyCanExecuteChanged();
+        WindowTitle = _defaultWindowTitle;
         NavigateRequsted?.Invoke(this, "Back");
     }
 
@@ -201,7 +211,10 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         ValidateProperty(Field, nameof(Field));
         ValidateProperty(Gender, nameof(Gender));
         if (IsFieldAndGenderValid)
+        {
+            WindowTitle = "确认信息";
             NavigateRequsted?.Invoke(this, "Continue");
+        }
         else
             MoveToCheckInfomationPanelCommand.NotifyCanExecuteChanged();
     }
@@ -210,6 +223,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     private void Cancel()
     {
         NavigateRequsted?.Invoke(this, "Cancel");
+        WindowTitle = _defaultWindowTitle;
     }
 
     [RelayCommand]
@@ -219,6 +233,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         {
             IsBusy = true;
             BusyMessage = "正在尝试注册账号...";
+            WindowTitle = "正在注册";
             NavigateRequsted?.Invoke(this, "TryRegister");
             await _userService.UserRegisterAsync(UserName!, Password!, Field!, (int)Gender!);
             NavigateRequsted?.Invoke(this, "Successed");
@@ -230,9 +245,10 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             MoveToFieldGenderPanelCommand.NotifyCanExecuteChanged();
             LoginCommand.NotifyCanExecuteChanged();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("注册失败", "用户名已被注册");
+            HandleExceptions("注册失败", ex);
+            WindowTitle = _defaultWindowTitle;
             NavigateRequsted?.Invoke(this, "NotRegistered");
         }
         finally
