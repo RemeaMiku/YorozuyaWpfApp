@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <AssemblyName>Yorozuya</AssemblyName>
+    <ApplicationIcon>Yorozuya.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -37,6 +38,10 @@
     <None Remove="Assets\Images\DefaultLoginBackground-Light.jpg" />
     <None Remove="Assets\Images\Yorozuya.png" />
     <None Remove="Assets\SOURCEHANSANSSC-REGULAR.OTF" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Yorozuya.ico" />
   </ItemGroup>
 
   <ItemGroup>
