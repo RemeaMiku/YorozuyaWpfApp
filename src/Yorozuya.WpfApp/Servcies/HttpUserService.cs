@@ -55,7 +55,7 @@ public class HttpUserService(HttpClient httpClient) : IUserService
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
         ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccess();
+        apiResonse.EnsureSuccessStatusCode();
         ArgumentNullException.ThrowIfNull(apiResonse.Data);
         var token = apiResonse.Data["token"].GetString();
         var userInfo = apiResonse.Data["userInfo"].Deserialize<UserInfo>();
@@ -86,6 +86,6 @@ public class HttpUserService(HttpClient httpClient) : IUserService
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<object>>();
         ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccess();
+        apiResonse.EnsureSuccessStatusCode();
     }
 }

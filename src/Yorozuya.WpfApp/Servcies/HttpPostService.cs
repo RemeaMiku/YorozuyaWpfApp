@@ -24,7 +24,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<object>>();
         ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccess();
+        apiResonse.EnsureSuccessStatusCode();
     }
 
     private static async Task<TModel> HandleDataHttpResponseMessage<TModel>(HttpResponseMessage httpResponseMessage)
@@ -32,25 +32,25 @@ public class HttpPostService(HttpClient httpClient) : IPostService
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<TModel>>();
         ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccess();
+        apiResonse.EnsureSuccessStatusCode();
         ArgumentNullException.ThrowIfNull(apiResonse.Data);
         return apiResonse.Data;
     }
 
-    private static async Task<IEnumerable<TModel>?> HandleIEnumerbleDataHttpResponseMessage<TModel>(string name, HttpResponseMessage httpResponseMessage)
+    private static async Task<IEnumerable<TModel>?> HandleIEnumerbleDataHttpResponseMessage<TModel>(string key, HttpResponseMessage httpResponseMessage)
     {
         httpResponseMessage.EnsureSuccessStatusCode();
         var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
         ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccess();
+        apiResonse.EnsureSuccessStatusCode();
         ArgumentNullException.ThrowIfNull(apiResonse.Data);
-        return apiResonse.Data[name].Deserialize<IEnumerable<TModel>>();
+        return apiResonse.Data[key].Deserialize<IEnumerable<TModel>>();
     }
 
     public async Task AcceptReplyAsync(string token, long replyId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Put, "api/post/accept")
+        var message = new HttpRequestMessage(HttpMethod.Post, "api/post/accept")
         {
             Content = new MultipartFormDataContent()
             {
@@ -63,38 +63,56 @@ public class HttpPostService(HttpClient httpClient) : IPostService
 
     public async Task CancelLikeAsync(string token, long replyId)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/cancelLike?replyId={replyId}");
+        AddAuthorization(message, token);
+        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
     }
 
 
     public async Task DeletePostAsync(string token, long postId)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/remove?postId={postId}");
+        AddAuthorization(message, token);
+        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
     }
 
     public async Task DeleteReplyAsync(string token, long replyId)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/deleteReply?replyId={replyId}");
+        AddAuthorization(message, token);
+        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
     }
 
-
-    public Task<bool> GetIsLikedAsync(string token, long replyId)
+    public async Task<bool> GetIsLikedAsync(string token, long replyId)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Get, $"api/post/isLiked?replyId={replyId}");
+        AddAuthorization(message, token);
+        var httpResponseMessage = await _httpClient.SendAsync(message);
+        httpResponseMessage.EnsureSuccessStatusCode();
+        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
+        ArgumentNullException.ThrowIfNull(apiResonse);
+        apiResonse.EnsureSuccessStatusCode();
+        ArgumentNullException.ThrowIfNull(apiResonse.Data);
+        return apiResonse.Data["isLiked"].GetBoolean();
     }
 
     public async Task<IEnumerable<Reply>?> GetPostRepliesAsync(long postId)
         => await HandleIEnumerbleDataHttpResponseMessage<Reply>("replyList", await _httpClient.GetAsync($"api/post/postReplies?postId={postId}"));
 
 
-    public Task<IEnumerable<Post>?> GetPostsByFieldAsync(string field)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<IEnumerable<Post>?> GetPostsByFieldAsync(string field)
+        => await HandleIEnumerbleDataHttpResponseMessage<Post>("postList", await _httpClient.GetAsync($"api/post/getPostsByField?field={field}"));
 
-    public Task<IEnumerable<Post>?> GetUserPostsAsync(string token)
+    public async Task<IEnumerable<Post>?> GetUserPostsAsync(string token)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Get, "api/post/history");
+        AddAuthorization(message, token);
+        return await HandleIEnumerbleDataHttpResponseMessage<Post>("postList", await _httpClient.SendAsync(message));
     }
 
     public Task<IEnumerable<Reply>?> GetUserRepliesAsync(string token)
@@ -104,32 +122,47 @@ public class HttpPostService(HttpClient httpClient) : IPostService
 
     public async Task LikeAsync(string token, long replyId)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Post, "api/post/like")
+        {
+            Content = new MultipartFormDataContent()
+            {
+                { new StringContent(replyId.ToString()), "replyId" }
+            }
+        };
+        AddAuthorization(message, token);
+        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
     }
 
 
     public async Task<Post> PublishPostAsync(string token, string title, string content, string field)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var multipartFormDataContentcontent = new MultipartFormDataContent()
+        var message = new HttpRequestMessage(HttpMethod.Post, "api/post/push")
         {
-            { new StringContent(title), "title" },
-            { new StringContent(content), "content" },
-            { new StringContent(field), "field" },
+            Content = new MultipartFormDataContent()
+            {
+                { new StringContent(title), "title" },
+                { new StringContent(content), "content" },
+                { new StringContent(field), "field" },
+            }
         };
-        multipartFormDataContentcontent.Headers.Add("Authorization", token);
-        return await HandleDataHttpResponseMessage<Post>(await _httpClient.PostAsync("api/post/push", multipartFormDataContentcontent));
+        AddAuthorization(message, token);
+        return await HandleDataHttpResponseMessage<Post>(await _httpClient.SendAsync(message));
     }
 
     public async Task<Reply> PublishReplyAsync(string token, long postId, string content)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var multipartFormDataContentcontent = new MultipartFormDataContent()
+        var message = new HttpRequestMessage(HttpMethod.Post, "api/post/reply")
         {
-            { new StringContent(postId.ToString()), "postId" },
-            { new StringContent(content), "content" },
+            Content = new MultipartFormDataContent()
+            {
+                { new StringContent(postId.ToString()), "postId" },
+                { new StringContent(content), "content" },
+            }
         };
-        multipartFormDataContentcontent.Headers.Add("Authorization", token);
-        return await HandleDataHttpResponseMessage<Reply>(await _httpClient.PostAsync("api/post/reply", multipartFormDataContentcontent));
+        AddAuthorization(message, token);
+        return await HandleDataHttpResponseMessage<Reply>(await _httpClient.SendAsync(message));
     }
 }
