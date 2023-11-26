@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.Http;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Common;
 using Yorozuya.WpfApp.Extensions;
+using Yorozuya.WpfApp.Common.Exceptions;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
@@ -32,7 +34,7 @@ public partial class PostWindowViewModel : BaseViewModel
         messenger.Register<PostWindowViewModel, Post>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m));
         messenger.Register<PostWindowViewModel, string>(this, (r, m) =>
         {
-            if (m == StringMessages.UserLoggedIn || m == StringMessages.UserLoggedOut)
+            if (m == StringMessages.UserLogined || m == StringMessages.UserLogouted)
                 RefreshPostCommand.Execute(default);
         });
     }
@@ -206,6 +208,24 @@ public partial class PostWindowViewModel : BaseViewModel
         CurrentReply ??= _mostLikedReply;
     }
 
+    private async Task HandleExceptions(string title, Exception exception)
+    {
+        var leftButtonContent = "取消";
+        var rightButtonContent = "重试";
+        switch (exception)
+        {
+            case ApiResponseException apiResponseException:
+                await _dialogService.ShowDialogAsync(apiResponseException.Message, title, leftButtonContent, rightButtonContent);
+                break;
+            case HttpRequestException httpRequestException:
+                await _dialogService.ShowDialogAsync($"请检查网络设置：{httpRequestException.Message}", title, leftButtonContent, rightButtonContent);
+                break;
+            default:
+                await _dialogService.ShowDialogAsync($"出现了一些问题：{exception.Message}", title, leftButtonContent, rightButtonContent);
+                break;
+        }
+    }
+
     [RelayCommand]
     private async Task RefreshPostAsync()
     {
@@ -218,21 +238,22 @@ public partial class PostWindowViewModel : BaseViewModel
             await UpdateCurrentReplyIsUserLiked();
             OnPropertyChanged(string.Empty);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await RefreshPostAsync();
         }
         finally
         {
             IsBusy = false;
         }
-
     }
 
     private async Task ReplyOpenPostRequestAsync(Post post)
     {
         OpenPostRequested?.Invoke(this, EventArgs.Empty);
-        if (_snackbarService.ShowErrorMessageIf("加载失败", () => IsBusy, "正在忙碌，请稍后重试"))
+        if (_snackbarService.ShowErrorMessageIf($"打开问题：{post.Id} 失败", () => IsBusy, "正在忙碌，请稍后重试"))
             return;
         if (Post is not null && Post.Id != post.Id)
         {
@@ -245,11 +266,31 @@ public partial class PostWindowViewModel : BaseViewModel
             CanForward = false;
         }
         Post = post;
-        await UpdateReplies();
-        await UpdateCurrentReplyIsUserLiked();
+        try
+        {
+            IsBusy = true;
+            await UpdateReplies();
+            await UpdateCurrentReplyIsUserLiked();
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await RefreshPostAsync();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     partial void OnPostChanging(Post? value)
+    {
+        IsReplying = false;
+        NewReplyContent = string.Empty;
+    }
+
+    partial void OnCurrentReplyChanging(Reply? value)
     {
         IsReplying = false;
     }
@@ -294,9 +335,11 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = true;
             await UpdateCurrentReplyIsUserLiked();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            //TODO:异常处理
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await SelectReplyAsync(reply);
         }
         finally
         {
@@ -321,9 +364,11 @@ public partial class PostWindowViewModel : BaseViewModel
             await UpdateReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            //TODO:异常处理
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await RefreshPostAsync();
         }
         finally
         {
@@ -348,9 +393,11 @@ public partial class PostWindowViewModel : BaseViewModel
             await UpdateReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            //TODO 异常处理
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await RefreshPostAsync();
         }
         finally
         {
@@ -383,7 +430,9 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("采纳回答失败", ex.Message);
+            await HandleExceptions("采纳回答失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await AcceptReplyAsync();
         }
         finally
         {
@@ -413,7 +462,9 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("删除回答失败", ex.Message);
+            await HandleExceptions("删除回答失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await DeleteReplyAsync();
         }
         finally
         {
@@ -441,7 +492,9 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("删除问题失败", ex.Message);
+            await HandleExceptions("删除问题失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await DeletePostAsync();
         }
         finally
         {
@@ -462,20 +515,42 @@ public partial class PostWindowViewModel : BaseViewModel
     private async Task MoveToNextReply()
     {
         SelectedIndex++;
-        await UpdateCurrentReplyIsUserLiked();
+        try
+        {
+            IsBusy = true;
+            await UpdateCurrentReplyIsUserLiked();
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await UpdateCurrentReplyIsUserLiked();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(IsNotFirstReply))]
     private async Task MoveToPreviousReply()
     {
         SelectedIndex--;
-        await UpdateCurrentReplyIsUserLiked();
-    }
-
-    partial void OnIsReplyingChanged(bool value)
-    {
-        if (!IsReplying)
-            NewReplyContent = string.Empty;
+        try
+        {
+            IsBusy = true;
+            await UpdateCurrentReplyIsUserLiked();
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptions("加载失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await UpdateCurrentReplyIsUserLiked();
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -492,11 +567,14 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = true;
             var newReply = await _postService.PublishReplyAsync(_userService.Token!, Post!.Id, NewReplyContent);
             IsReplying = false;
+            NewReplyContent = string.Empty;
             await UpdateReplies(newReply.Id);
         }
         catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("提交回答失败", ex.Message);
+            await HandleExceptions("提交回答失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await ReplyPostAsync();
         }
         finally
         {
@@ -518,19 +596,21 @@ public partial class PostWindowViewModel : BaseViewModel
             if (IsCurrentReplyLiked)
             {
                 await _postService.CancelLikeAsync(_userService.Token!, CurrentReply!.Id);
-                CurrentReply!.Likes--;
+                CurrentReply.Likes--;
             }
             else
             {
                 await _postService.LikeAsync(_userService.Token!, CurrentReply!.Id);
-                CurrentReply!.Likes++;
+                CurrentReply.Likes++;
             }
             await UpdateCurrentReplyIsUserLiked();
             OnPropertyChanged(nameof(CurrentReply));
         }
         catch (Exception ex)
         {
-            _snackbarService.ShowErrorMessage("点赞或取消点赞失败", ex.Message);
+            await HandleExceptions("点赞/取消点赞失败", ex);
+            if (_dialogService.GetIsRightButtonClicked())
+                await LikeOrCancelLikeAsync();
         }
         finally
         {

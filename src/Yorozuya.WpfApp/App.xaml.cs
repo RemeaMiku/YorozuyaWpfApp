@@ -24,6 +24,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Yorozuya.WpfApp.Servcies.Http;
+using System.Diagnostics;
 
 namespace Yorozuya.WpfApp;
 
@@ -65,7 +67,7 @@ public partial class App : Application
 
     #endregion Public Properties
 
-    #region Protected Methods
+    #region Protected Methods    
 
     // 重写启动方法
     protected override async void OnStartup(StartupEventArgs e)

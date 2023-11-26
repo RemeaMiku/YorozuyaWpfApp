@@ -9,16 +9,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Common.Helpers;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
-namespace Yorozuya.WpfApp.Servcies;
+namespace Yorozuya.WpfApp.Servcies.Http;
 
-public class HttpUserService(HttpClient httpClient) : IUserService
+public class HttpUserService(HttpClient httpClient) : BaseHttpService(httpClient), IUserService
 {
-
-    private readonly HttpClient _httpClient = httpClient;
-
     public UserInfo? UserInfo { get; private set; }
 
     public string? Token { get; private set; }
@@ -46,6 +44,8 @@ public class HttpUserService(HttpClient httpClient) : IUserService
 
     public async Task UserLoginAsync(string username, string password)
     {
+        if (UserInfo is not null || Token is not null)
+            throw new InvalidOperationException("The previous account have to be logged out before logging in new account.");
         var content = new MultipartFormDataContent
         {
             { new StringContent(username), "username" },
@@ -68,7 +68,7 @@ public class HttpUserService(HttpClient httpClient) : IUserService
     public void UserLogout()
     {
         if (UserInfo is null || Token is null)
-            throw new InvalidOperationException("User not logged in.");
+            throw new InvalidOperationException("The user not logged in.");
         UserInfo = default;
         Token = default;
     }

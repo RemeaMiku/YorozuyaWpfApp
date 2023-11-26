@@ -7,46 +7,14 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Common.Helpers;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
-namespace Yorozuya.WpfApp.Servcies;
+namespace Yorozuya.WpfApp.Servcies.Http;
 
-public class HttpPostService(HttpClient httpClient) : IPostService
+public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient), IPostService
 {
-    private readonly HttpClient _httpClient = httpClient;
-
-    private static void AddAuthorization(HttpRequestMessage message, string token)
-        => message.Headers.Authorization = new("Bearer", token);
-
-    private static async Task HandleNoDataHttpResponseMessage(HttpResponseMessage httpResponseMessage)
-    {
-        httpResponseMessage.EnsureSuccessStatusCode();
-        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<object>>();
-        ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccessStatusCode();
-    }
-
-    private static async Task<TModel> HandleDataHttpResponseMessage<TModel>(HttpResponseMessage httpResponseMessage)
-    {
-        httpResponseMessage.EnsureSuccessStatusCode();
-        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<TModel>>();
-        ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccessStatusCode();
-        ArgumentNullException.ThrowIfNull(apiResonse.Data);
-        return apiResonse.Data;
-    }
-
-    private static async Task<IEnumerable<TModel>?> HandleIEnumerbleDataHttpResponseMessage<TModel>(string key, HttpResponseMessage httpResponseMessage)
-    {
-        httpResponseMessage.EnsureSuccessStatusCode();
-        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
-        ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccessStatusCode();
-        ArgumentNullException.ThrowIfNull(apiResonse.Data);
-        return apiResonse.Data[key].Deserialize<IEnumerable<TModel>>();
-    }
-
     public async Task AcceptReplyAsync(string token, long replyId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
@@ -58,7 +26,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
             }
         };
         AddAuthorization(message, token);
-        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
+        await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
     public async Task CancelLikeAsync(string token, long replyId)
@@ -66,7 +34,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
         ArgumentException.ThrowIfNullOrEmpty(token);
         var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/cancelLike?replyId={replyId}");
         AddAuthorization(message, token);
-        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
+        await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
 
@@ -75,7 +43,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
         ArgumentException.ThrowIfNullOrEmpty(token);
         var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/remove?postId={postId}");
         AddAuthorization(message, token);
-        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
+        await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
     public async Task DeleteReplyAsync(string token, long replyId)
@@ -83,7 +51,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
         ArgumentException.ThrowIfNullOrEmpty(token);
         var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/deleteReply?replyId={replyId}");
         AddAuthorization(message, token);
-        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
+        await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
     public async Task<bool> GetIsLikedAsync(string token, long replyId)
@@ -101,23 +69,26 @@ public class HttpPostService(HttpClient httpClient) : IPostService
     }
 
     public async Task<IEnumerable<Reply>?> GetPostRepliesAsync(long postId)
-        => await HandleIEnumerbleDataHttpResponseMessage<Reply>("replyList", await _httpClient.GetAsync($"api/post/postReplies?postId={postId}"));
+        => await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Reply>("replyList", await _httpClient.GetAsync($"api/post/postReplies?postId={postId}"));
 
 
     public async Task<IEnumerable<Post>?> GetPostsByFieldAsync(string field)
-        => await HandleIEnumerbleDataHttpResponseMessage<Post>("postList", await _httpClient.GetAsync($"api/post/getPostsByField?field={field}"));
+        => await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>("postList", await _httpClient.GetAsync($"api/post/getPostsByField?field={field}"));
 
     public async Task<IEnumerable<Post>?> GetUserPostsAsync(string token)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
         var message = new HttpRequestMessage(HttpMethod.Get, "api/post/history");
         AddAuthorization(message, token);
-        return await HandleIEnumerbleDataHttpResponseMessage<Post>("postList", await _httpClient.SendAsync(message));
+        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>("postList", await _httpClient.SendAsync(message));
     }
 
-    public Task<IEnumerable<Reply>?> GetUserRepliesAsync(string token)
+    public async Task<IEnumerable<Reply>?> GetUserRepliesAsync(string token)
     {
-        throw new NotImplementedException();
+        ArgumentException.ThrowIfNullOrEmpty(token);
+        var message = new HttpRequestMessage(HttpMethod.Get, "api/post/userReplies");
+        AddAuthorization(message, token);
+        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Reply>("replyList", await _httpClient.SendAsync(message));
     }
 
     public async Task LikeAsync(string token, long replyId)
@@ -131,7 +102,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
             }
         };
         AddAuthorization(message, token);
-        await HandleNoDataHttpResponseMessage(await _httpClient.SendAsync(message));
+        await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
 
@@ -148,7 +119,7 @@ public class HttpPostService(HttpClient httpClient) : IPostService
             }
         };
         AddAuthorization(message, token);
-        return await HandleDataHttpResponseMessage<Post>(await _httpClient.SendAsync(message));
+        return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Post>(await _httpClient.SendAsync(message));
     }
 
     public async Task<Reply> PublishReplyAsync(string token, long postId, string content)
@@ -163,6 +134,6 @@ public class HttpPostService(HttpClient httpClient) : IPostService
             }
         };
         AddAuthorization(message, token);
-        return await HandleDataHttpResponseMessage<Reply>(await _httpClient.SendAsync(message));
+        return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Reply>(await _httpClient.SendAsync(message));
     }
 }
