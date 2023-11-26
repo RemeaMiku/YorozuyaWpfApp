@@ -1,10 +1,13 @@
 ﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Common.Exceptions;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
@@ -21,7 +24,7 @@ public partial class SettingsPageViewModel : BaseViewModel
         _messenger = messenger;
         messenger.Register<SettingsPageViewModel, string>(this, (viewModel, message) =>
         {
-            if (message == StringMessages.UserLoggedIn)
+            if (message == StringMessages.UserLogined)
                 viewModel.ReplyUserLoggedIn();
         });
     }
@@ -58,13 +61,11 @@ public partial class SettingsPageViewModel : BaseViewModel
     private async Task Logout()
     {
         await _dialogService.ShowDialogAsync("确定退出当前账号吗？", "警告", "取消", "退出");
-        if (_dialogService.GetIsRightButtonClicked())
-        {
-            UserInfo = default;
-            _userService.UserLogout();
-            _messenger.Send(StringMessages.UserLoggedOut);
-            _messenger.Send(StringMessages.RequestUserLogin);
-        }
+        if (!_dialogService.GetIsRightButtonClicked())
+            return;
+        _userService.UserLogout();
+        _messenger.Send(StringMessages.UserLogouted);
+        _messenger.Send(StringMessages.RequestUserLogin);
     }
 
     #endregion Private Methods

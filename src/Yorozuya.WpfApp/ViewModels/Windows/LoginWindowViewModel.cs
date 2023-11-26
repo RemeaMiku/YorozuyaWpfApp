@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Common.Exceptions;
 using Yorozuya.WpfApp.Extensions;
 using Yorozuya.WpfApp.Servcies.Contracts;
 
@@ -17,17 +18,12 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class LoginWindowViewModel : BaseValidatorViewModel
 {
-    #region Public Fields
 
     public EventHandler? LoginRequested;
 
     public EventHandler? UserLoggedIn;
 
     public EventHandler<string>? NavigateRequsted;
-
-    #endregion Public Fields
-
-    #region Public Constructors
 
     public LoginWindowViewModel(IUserService userService, [FromKeyedServices(nameof(LoginWindowViewModel))] ISnackbarService snackbarService, IMessenger messenger)
     {
@@ -36,14 +32,10 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         _messenger = messenger;
         messenger.Register<LoginWindowViewModel, string>(this, (viewModel, message) =>
         {
-            if (message == StringMessages.RequestUserLogin && !_userService.IsUserLoggedIn)
+            if (message == StringMessages.RequestUserLogin)
                 viewModel.ReplyLoginRequest();
         });
     }
-
-    #endregion Public Constructors
-
-    #region Public Properties
 
     public string? DisplayGender => Gender switch
     {
@@ -58,11 +50,7 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
 
     public bool IsFieldAndGenderValid => !GetErrors(nameof(Field)).Any() && !GetErrors(nameof(Gender)).Any();
 
-    #endregion Public Properties
-
-    #region Public Methods
-
-    public void ReplyLoginRequest()
+    private void ReplyLoginRequest()
     {
         Field = default;
         Gender = default;
@@ -71,10 +59,6 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         LoginCommand.NotifyCanExecuteChanged();
         LoginRequested?.Invoke(this, EventArgs.Empty);
     }
-
-    #endregion Public Methods
-
-    #region Private Fields
 
     private readonly IUserService _userService;
 
@@ -125,15 +109,11 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
     [ObservableProperty]
     private string? _busyMessage;
 
-    #endregion Private Fields
-
-    #region Private Methods
-
     private void HandleExceptions(string title, Exception ex)
     {
         _snackbarService.ShowErrorMessageIfAny(title,
             (() => ex is ApiResponseException, ex.Message),
-            (() => ex is HttpRequestException, "请检查网络设置"),
+            (() => ex is HttpRequestException, $"请检查网络设置：{ex.Message}"),
             (() => true, $"出现了一些问题：{ex.Message}"));
     }
 
@@ -155,10 +135,10 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
             WindowTitle = "正在登录";
             NavigateRequsted?.Invoke(this, "TryLogin");
             await _userService.UserLoginAsync(UserName!, Password!);
-            WindowTitle=_defaultWindowTitle;
+            WindowTitle = _defaultWindowTitle;
             NavigateRequsted?.Invoke(this, "Successed");
             UserLoggedIn?.Invoke(this, EventArgs.Empty);
-            _messenger.Send(StringMessages.UserLoggedIn);
+            _messenger.Send(StringMessages.UserLogined);
             UserName = default;
             Password = default;
             Field = default;
@@ -257,5 +237,4 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
         }
     }
 
-    #endregion Private Methods
 }

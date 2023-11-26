@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Yorozuya.WpfApp.Models;
 
@@ -15,6 +16,9 @@ public interface IUserService
     public string? Token { get; }
 
     public bool IsUserLoggedIn => UserInfo is not null && Token is not null;
+
+    //[Obsolete]
+    //public Task UserLogoutAsync();
 
     public void UserLogout();
 

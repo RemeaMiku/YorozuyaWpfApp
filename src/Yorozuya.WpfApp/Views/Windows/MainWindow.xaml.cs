@@ -41,12 +41,6 @@ public partial class MainWindow : UiWindow
 
     #endregion Public Properties
 
-    /// <summary>
-    /// 主题切换时手动更新导航按钮的颜色
-    /// </summary>
-    /// <param name="currentTheme"> </param>
-    /// <param name="systemAccent"> </param>
-
     #region Private Fields
 
     private static readonly TimeSpan _navigateDuration = TimeSpan.FromSeconds(0.2);
@@ -94,23 +88,11 @@ public partial class MainWindow : UiWindow
         }
     }
 
-    /// <summary>
-    /// 判断系统主题，如果是深色主题则自动切换为深色主题；否则使用浅色主题。设置导航按钮的颜色
-    /// </summary>
-    /// <param name="sender"> </param>
-    /// <param name="e"> </param>
-
     private void OnMainWindowLoaded(object sender, RoutedEventArgs e)
     {
         OnNavigateButtonClicked(HomeButton, e);
     }
 
-    /// <summary>
-    /// 导航按钮与索引和页面类型的对应关系。 索引用于判断导航按钮的上下顺序用于确定切换动画方向，页面类型用于从容器中获取页面实例
-    /// </summary>
-    /// <summary>
-    /// 当前导航按钮
-    /// </summary>
     private void InitializeNavigateDictionary()
     {
         _navigateDictionary.Add(HomeButton, (0, App.Current.ServiceProvider.GetRequiredService<HomePage>()));
@@ -131,16 +113,6 @@ public partial class MainWindow : UiWindow
         else
             Theme.Apply(ThemeType.Light, WindowBackdropType, true, true);
     }
-
-    /// <summary>
-    /// 页面切换动画的持续时间
-    /// </summary>
-    /// <summary>
-    /// 上一次导航按钮点击的时间，用于防止快速点击导航按钮导致的动画异常
-    /// </summary>
-    /// <summary>
-    /// 重新设置所有导航按钮的颜色
-    /// </summary>
 
     private void ResetAllNavigateButtons()
     {
