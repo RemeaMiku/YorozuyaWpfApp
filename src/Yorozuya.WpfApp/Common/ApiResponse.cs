@@ -14,12 +14,14 @@ public class ApiResponse<TData>
     [JsonPropertyName("data")]
     public TData? Data { get; set; } = default;
 
-    [JsonPropertyName("msg")]
+    [JsonPropertyName("message")]
     public string Message { get; set; } = null!;
 
-    public void EnsureSuccess()
+    public bool IsSuccessStatusCode => Code >= 200 && Code <= 299;
+
+    public void EnsureSuccessStatusCode()
     {
-        if (Code != 200)
+        if (!IsSuccessStatusCode)
             throw new ApiResponseException(Message);
     }
 }

@@ -46,7 +46,7 @@ public partial class App : Application
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(SettingsPageViewModel))
         .AddSingleton<IUserService, HttpUserService>()
-        .AddSingleton<IPostService, LocalPostService>()
+        .AddSingleton<IPostService, HttpPostService>()
         .AddSingleton<LoginWindowViewModel>()
         .AddSingleton<HomePageViewModel>()
         .AddSingleton<PersonPageViewModel>()
@@ -61,7 +61,7 @@ public partial class App : Application
         .AddSingleton<MainWindow>()
         .BuildServiceProvider();
 
-    public static Uri ServerAddress { get; } = new("http://127.0.0.1:4523/m1/3553693-0-default/");
+    public static Uri ServerAddress { get; } = new("http://txy.suwako.cn:9961/");
 
     #endregion Public Properties
 
