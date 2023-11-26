@@ -82,10 +82,6 @@ public class HttpUserService(HttpClient httpClient) : BaseHttpService(httpClient
             { new StringContent(field), "field" },
             { new StringContent(gender.ToString()), "gender" }
         };
-        var httpResponseMessage = await _httpClient.PostAsync("api/user/register", content);
-        httpResponseMessage.EnsureSuccessStatusCode();
-        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<object>>();
-        ArgumentNullException.ThrowIfNull(apiResonse);
-        apiResonse.EnsureSuccessStatusCode();
+        await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.PostAsync("api/user/register", content));
     }
 }

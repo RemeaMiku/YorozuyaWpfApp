@@ -21,8 +21,6 @@ namespace Yorozuya.WpfApp.ViewModels.Windows;
 
 public partial class PostWindowViewModel : BaseViewModel
 {
-    //TODO 异常处理
-
     public EventHandler? OpenPostRequested;
 
     public PostWindowViewModel([FromKeyedServices(nameof(PostWindowViewModel))] ILeftRightButtonDialogService dialogService, [FromKeyedServices(nameof(PostWindowViewModel))] ISnackbarService snackbarService, IUserService userService, IPostService postService, IMessenger messenger)
@@ -32,6 +30,7 @@ public partial class PostWindowViewModel : BaseViewModel
         _userService = userService;
         _postService = postService;
         messenger.Register<PostWindowViewModel, Post>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m));
+        messenger.Register<PostWindowViewModel, Tuple<Post, long>>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m.Item1, m.Item2));
         messenger.Register<PostWindowViewModel, string>(this, (r, m) =>
         {
             if (m == StringMessages.UserLogined || m == StringMessages.UserLogouted)
@@ -250,7 +249,7 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    private async Task ReplyOpenPostRequestAsync(Post post)
+    private async Task ReplyOpenPostRequestAsync(Post post, long? replyId = default)
     {
         OpenPostRequested?.Invoke(this, EventArgs.Empty);
         if (_snackbarService.ShowErrorMessageIf($"打开问题：{post.Id} 失败", () => IsBusy, "正在忙碌，请稍后重试"))
@@ -269,7 +268,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies();
+            await UpdateReplies(replyId);
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
