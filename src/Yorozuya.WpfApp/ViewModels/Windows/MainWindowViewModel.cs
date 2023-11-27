@@ -1,9 +1,43 @@
-﻿namespace Yorozuya.WpfApp.ViewModels.Windows;
+﻿using System;
+using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
+using Yorozuya.WpfApp.Servcies.Contracts;
 
-public class MainWindowViewModel : BaseViewModel
+namespace Yorozuya.WpfApp.ViewModels.Windows;
+
+public partial class MainWindowViewModel : BaseViewModel
 {
-    public MainWindowViewModel()
-    {
+    readonly ILeftRightButtonDialogService _dialogService;
 
+    public MainWindowViewModel([FromKeyedServices(nameof(MainWindowViewModel))] ILeftRightButtonDialogService dialogService)
+    {
+        _dialogService = dialogService;
+    }
+
+    [ObservableProperty]
+    bool _doNotShowExitDialog = false;
+
+    [ObservableProperty]
+    bool _confirmCloseWindow = true;
+
+    public EventHandler? CloseWindowRequested;
+
+    public EventHandler? HideWindowRequested;
+
+    [RelayCommand]
+    async Task Close()
+    {
+        if (!DoNotShowExitDialog)
+        {
+            await _dialogService.ShowDialogAsync(string.Empty, default, "取消", "确认");
+            if (!_dialogService.GetIsRightButtonClicked())
+                return;
+        }
+        if (ConfirmCloseWindow)
+            CloseWindowRequested?.Invoke(this, EventArgs.Empty);
+        else
+            HideWindowRequested?.Invoke(this, EventArgs.Empty);
     }
 }

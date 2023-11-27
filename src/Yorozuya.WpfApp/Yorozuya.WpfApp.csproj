@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <AssemblyName>Yorozuya</AssemblyName>
-    <ApplicationIcon>Yorozuya.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\Images\Yorozuya.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -41,7 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Yorozuya.ico" />
+    <Resource Include="Assets\Images\Yorozuya.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

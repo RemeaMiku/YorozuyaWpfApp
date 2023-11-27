@@ -13,6 +13,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Mvvm.Contracts;
+using System.ComponentModel;
+using Yorozuya.WpfApp.Servcies.Contracts;
+using Yorozuya.WpfApp.Common.Helpers;
 
 namespace Yorozuya.WpfApp.Views.Windows;
 
@@ -21,8 +25,6 @@ namespace Yorozuya.WpfApp.Views.Windows;
 /// </summary>
 public partial class MainWindow : UiWindow
 {
-    #region Public Constructors
-
     public MainWindow(MainWindowViewModel viewModel)
     {
         InitializeComponent();
@@ -31,17 +33,13 @@ public partial class MainWindow : UiWindow
         Theme.Changed += OnThemeChanged;
         _currentNavigateButton = HomeButton;
         ViewModel = viewModel;
+        DataContext = this;
+        App.Current.ServiceProvider.GetRequiredKeyedService<ILeftRightButtonDialogService>(nameof(MainWindowViewModel)).SetDialogControl(ExitDialog);
+        ViewModel.CloseWindowRequested += (sender, args) => App.Current.Shutdown();
+        ViewModel.HideWindowRequested += (sender, args) => Hide();
     }
 
-    #endregion Public Constructors
-
-    #region Public Properties
-
     public MainWindowViewModel ViewModel { get; }
-
-    #endregion Public Properties
-
-    #region Private Fields
 
     private static readonly TimeSpan _navigateDuration = TimeSpan.FromSeconds(0.2);
 
@@ -50,10 +48,6 @@ public partial class MainWindow : UiWindow
     private Wpf.Ui.Controls.Button _currentNavigateButton;
 
     private DateTime _lastNavigateTime = DateTime.MinValue;
-
-    #endregion Private Fields
-
-    #region Private Methods
 
     /// <summary>
     /// 设置当前导航按钮的颜色
@@ -182,5 +176,17 @@ public partial class MainWindow : UiWindow
             MenuPanel.BeginAnimation(WidthProperty, new DoubleAnimation(MenuPanel.MinWidth, duration) { EasingFunction = easingFunction });
     }
 
-    #endregion Private Methods
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        e.Cancel = true;
+        ViewModel.CloseCommand.Execute(default);
+    }
+
+    private void OnMenuItemClicked(object sender, RoutedEventArgs e)
+    {
+        if ((string)((Wpf.Ui.Controls.MenuItem)sender)!.Tag == "Show")
+            WindowReactivator.Reactive(this);
+        else
+            App.Current.Shutdown();
+    }
 }
