@@ -51,7 +51,46 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ui:TitleBar Background="{ui:ThemeResource}" />
+        <ui:NotifyIcon
+            x:Name="NotifyIcon"
+            Icon="/Assets/Images/Yorozuya.ico"
+            MenuOnRightClick="True"
+            ToolTip="Yorozuya"
+            TooltipText="Yorozuya">
+            <ui:NotifyIcon.Menu>
+                <ContextMenu>
+                    <ui:MenuItem
+                        Click="OnMenuItemClicked"
+                        Header="显示主窗口"
+                        Tag="Show" />
+                    <ui:MenuItem
+                        Click="OnMenuItemClicked"
+                        Header="退出"
+                        Tag="Exit" />
+                </ContextMenu>
+            </ui:NotifyIcon.Menu>
+        </ui:NotifyIcon>
+        <ui:TitleBar x:Name="TitleBar" Background="{ui:ThemeResource}" />
+        <ui:Dialog
+            x:Name="ExitDialog"
+            Grid.Row="1"
+            Panel.ZIndex="1000"
+            ButtonLeftAppearance="Secondary"
+            ButtonRightAppearance="Primary"
+            DialogHeight="280">
+            <StackPanel Orientation="Vertical">
+                <TextBlock
+                    FontWeight="Bold"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
+                    Text="点击关闭按钮以后" />
+                <RadioButton Margin="0,20,0,0" Content="最小化到系统托盘" />
+                <RadioButton Content="退出应用" IsChecked="{Binding ViewModel.ConfirmCloseWindow}" />
+                <CheckBox
+                    HorizontalAlignment="Right"
+                    Content="不再提示"
+                    IsChecked="{Binding ViewModel.DoNotShowExitDialog, Mode=OneWayToSource}" />
+            </StackPanel>
+        </ui:Dialog>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -133,5 +172,6 @@
                 Grid.Column="1"
                 Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}" />
         </Grid>
+
     </Grid>
 </ui:UiWindow>

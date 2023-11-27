@@ -26,6 +26,7 @@ using System.Linq;
 using System.Net.Http;
 using Yorozuya.WpfApp.Servcies.Http;
 using System.Diagnostics;
+using System.Windows.Media.Imaging;
 
 namespace Yorozuya.WpfApp;
 
@@ -45,6 +46,7 @@ public partial class App : Application
         .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
+        .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(MainWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(SettingsPageViewModel))
         .AddSingleton<IUserService, HttpUserService>()
