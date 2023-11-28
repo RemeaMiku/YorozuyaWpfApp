@@ -58,7 +58,7 @@
                                                 <TextBlock
                                                     Margin="0,3,0,0"
                                                     FontSize="{StaticResource MediumFontSize}"
-                                                    Text="{Binding Path=Post.Content}" />
+                                                    Text="{Binding Path=Content}" />
                                             </StackPanel>
                                         </ui:CardAction>
                                     </DataTemplate>
@@ -83,10 +83,10 @@
                                             Command="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=ViewModel.OpenReplyCommand}"
                                             CommandParameter="{Binding}">
                                             <StackPanel>
-                                                <TextBlock FontSize="{StaticResource MediumFontSize}" Text="{Binding Path=Reply.Content}" />
+                                                <TextBlock FontSize="{StaticResource MediumFontSize}" Text="{Binding Path=Content}" />
                                                 <TextBlock Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
                                                     <Run Text="点赞数：" />
-                                                    <Run Text="{Binding Path=Reply.Likes}" />
+                                                    <Run Text="{Binding Path=Likes}" />
                                                 </TextBlock>
                                             </StackPanel>
                                         </ui:CardAction>
