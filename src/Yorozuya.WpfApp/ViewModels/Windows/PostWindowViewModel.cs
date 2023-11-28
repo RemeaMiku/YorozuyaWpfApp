@@ -568,6 +568,7 @@ public partial class PostWindowViewModel : BaseViewModel
             IsReplying = false;
             NewReplyContent = string.Empty;
             await UpdateReplies(newReply.Id);
+            await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
         {
