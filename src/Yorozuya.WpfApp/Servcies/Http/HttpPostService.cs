@@ -66,7 +66,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         ArgumentNullException.ThrowIfNull(apiResonse);
         apiResonse.EnsureSuccessStatusCode();
         ArgumentNullException.ThrowIfNull(apiResonse.Data);
-        return apiResonse.Data["isLiked"].GetBoolean();
+        return apiResonse.Data["isLiked"].GetInt32() > 0;
     }
 
     public async Task<IEnumerable<Reply>?> GetPostRepliesAsync(long postId)
