@@ -136,4 +136,16 @@ public class LocalPostService(IUserService userService) : IPostService
         _localReplies.Add(reply);
         return reply;
     }
+
+    public async Task<IEnumerable<Post>?> GetPostById(long postId)
+    {
+        await Task.Delay(500);
+        return _localPosts.FindAll(p => p.Id == postId);
+    }
+
+    public async Task<IEnumerable<Post>?> GetPostByTitle(string title)
+    {
+        await Task.Delay(500);
+        return _localPosts.FindAll(p => p.Title == title);
+    }
 }

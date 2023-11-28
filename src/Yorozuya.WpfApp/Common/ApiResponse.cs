@@ -15,7 +15,7 @@ public class ApiResponse<TData>
     [JsonPropertyName("data")]
     public TData? Data { get; set; } = default;
 
-    [JsonPropertyName("message")]
+    [JsonPropertyName("msg")]
     public string Message { get; set; } = null!;
 
     public bool IsSuccessStatusCode => Code >= 200 && Code <= 299;

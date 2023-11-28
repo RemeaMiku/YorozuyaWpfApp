@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -80,7 +81,16 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         ArgumentException.ThrowIfNullOrEmpty(token);
         var message = new HttpRequestMessage(HttpMethod.Get, "api/post/history");
         AddAuthorization(message, token);
-        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>("postList", await _httpClient.SendAsync(message));
+        var response = await _httpClient.SendAsync(message);
+        try
+        {
+            return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>("postList",
+                response);
+        }
+        catch (Exception _)
+        {
+            return new List<Post>();
+        }
     }
 
     public async Task<IEnumerable<Reply>?> GetUserRepliesAsync(string token)
@@ -88,7 +98,16 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         ArgumentException.ThrowIfNullOrEmpty(token);
         var message = new HttpRequestMessage(HttpMethod.Get, "api/post/userReplies");
         AddAuthorization(message, token);
-        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Reply>("replyList", await _httpClient.SendAsync(message));
+        var response = await _httpClient.SendAsync(message);
+        try
+        {
+            return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Reply>("replyList",
+                response);
+        }
+        catch (Exception e)
+        {
+            return new List<Reply>();
+        }
     }
 
     public async Task LikeAsync(string token, long replyId)
@@ -135,5 +154,28 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         };
         AddAuthorization(message, token);
         return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Reply>(await _httpClient.SendAsync(message));
+    }
+
+    public async Task<IEnumerable<Post>?> GetPostById(long postId)
+    {
+        var message = new HttpRequestMessage(HttpMethod.Get,
+            "api/post/getPostByPostId?postId=" + Uri.EscapeDataString($"{postId}"));
+        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
+            "postList", await _httpClient.SendAsync(message));
+    }
+
+    public async Task<IEnumerable<Post>?> GetPostByTitle(string title)
+    {
+        var message = new HttpRequestMessage(HttpMethod.Get,
+            "api/post/getPostByTitle?title=" + Uri.EscapeDataString($"{title}"));
+        try
+        {
+            return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
+                "postList", await _httpClient.SendAsync(message));
+        }
+        catch (Exception _)
+        {
+            return new List<Post>();
+        }
     }
 }
