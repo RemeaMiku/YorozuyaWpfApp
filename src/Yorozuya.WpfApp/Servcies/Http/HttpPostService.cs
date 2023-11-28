@@ -38,7 +38,6 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
-
     public async Task DeletePostAsync(string token, long postId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
