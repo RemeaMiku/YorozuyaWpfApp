@@ -2,9 +2,9 @@
     x:Class="Yorozuya.WpfApp.Views.Windows.LoginWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:common="clr-namespace:Yorozuya.WpfApp.Common"
     xmlns:controls="clr-namespace:Yorozuya.WpfApp.Controls"
     xmlns:cv="clr-namespace:Yorozuya.WpfApp.Common.Converters"
-    xmlns:common="clr-namespace:Yorozuya.WpfApp.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -164,13 +164,7 @@
                         <ComboBox
                             Margin="0,10,0,0"
                             ItemsSource="{Binding Path=ViewModel.Fields}"
-                            SelectedItem="{Binding Path=ViewModel.Field}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <ComboBoxItem Padding="0" Content="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                            SelectedItem="{Binding Path=ViewModel.Field}" />
                         <TextBlock
                             Margin="0,30,0,0"
                             FontSize="{StaticResource MediumFontSize}"

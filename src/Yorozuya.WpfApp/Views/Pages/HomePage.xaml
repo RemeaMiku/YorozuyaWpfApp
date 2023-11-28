@@ -2,12 +2,12 @@
     x:Class="Yorozuya.WpfApp.Views.Pages.HomePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:Yorozuya.WpfApp.Common.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:models="clr-namespace:Yorozuya.WpfApp.Models"
-    xmlns:converters="clr-namespace:Yorozuya.WpfApp.Common.Converters"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{d:DesignInstance local:HomePage}"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -44,38 +44,43 @@
                         TextTrimming="CharacterEllipsis"
                         TextWrapping="Wrap" />
                     <DockPanel Grid.Row="2" LastChildFill="False">
-                        <TextBlock DockPanel.Dock="Left"
-                                   Margin="0,5,0,0"
-                                   FontSize="{StaticResource SmallFontSize}">
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            DockPanel.Dock="Left"
+                            FontSize="{StaticResource SmallFontSize}">
                             <Run Text="浏览数:" />
                             <Run Text="{Binding Path=Views, Mode=OneWay}" />
                         </TextBlock>
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <ui:SymbolIcon Symbol="Tag28"/>
-                            <TextBlock Text="{Binding Path=Field, Mode=OneWay}"/>
+                            <ui:SymbolIcon Symbol="Tag28" />
+                            <TextBlock Text="{Binding Path=Field, Mode=OneWay}" />
                         </StackPanel>
                     </DockPanel>
                 </Grid>
             </ui:CardAction>
         </DataTemplate>
     </Page.Resources>
-    <Grid d:Background="White" Margin="10">
+    <Grid Margin="10" d:Background="White">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ui:TextBox Grid.Column="0" d:Text="111" Text="{Binding Path=ViewModel.SearchInput, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:Button Grid.Column="1"
-                Margin="5,0,0,0"
-                Command="{Binding Path=ViewModel.StartSearchCommand, Mode=OneTime}"
-                Icon="Search28"
-                ToolTip="搜索" />
+                <ui:TextBox
+                    Grid.Column="0"
+                    d:Text="111"
+                    Text="{Binding Path=ViewModel.SearchInput, UpdateSourceTrigger=PropertyChanged}" />
+                <ui:Button
+                    Grid.Column="1"
+                    Margin="5,0,0,0"
+                    Command="{Binding Path=ViewModel.StartSearchCommand, Mode=OneTime}"
+                    Icon="Search28"
+                    ToolTip="搜索" />
             </Grid>
             <Grid Grid.Row="1" Margin="0,5,0,0">
                 <Grid.ColumnDefinitions>
@@ -83,18 +88,18 @@
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
                 <ListView
-            Grid.Column="0"
-            IsSynchronizedWithCurrentItem="True"
-            ItemsSource="{Binding Path=ViewModel.FieldSource}"
-            SelectedItem="{Binding Path=ViewModel.NowSelectedField}"
-            SelectionMode="Single">
+                    Grid.Column="0"
+                    IsSynchronizedWithCurrentItem="True"
+                    ItemsSource="{Binding Path=ViewModel.FieldSource}"
+                    SelectedItem="{Binding Path=ViewModel.NowSelectedField}"
+                    SelectionMode="Single">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
-                        Padding="5,10"
-                        FontSize="{StaticResource LargeFontSize}"
-                        Style="{StaticResource DynamicForegroundTextBlock}"
-                        Text="{Binding}" />
+                                Padding="5,10"
+                                FontSize="{StaticResource LargeFontSize}"
+                                Style="{StaticResource DynamicForegroundTextBlock}"
+                                Text="{Binding}" />
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
@@ -109,99 +114,170 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock
-                    Grid.Column="0"
-                    d:Text="文文可爱捏"
-                    FontSize="{StaticResource LargeFontSize}"
-                    FontWeight="Bold"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
-                    Text="{Binding Path=ViewModel.NowSelectedField, Mode=OneWay}"
-                    TextAlignment="Center" />
+                            Grid.Column="0"
+                            d:Text="文文可爱捏"
+                            FontSize="{StaticResource LargeFontSize}"
+                            FontWeight="Bold"
+                            Style="{StaticResource DynamicForegroundTextBlock}"
+                            Text="{Binding Path=ViewModel.NowSelectedField, Mode=OneWay}"
+                            TextAlignment="Center" />
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <ui:Button
+                                Appearance="Primary"
                                 Command="{Binding Path=ViewModel.StartPostNewPostCommand}"
-                        Appearance="Primary"
-                        Icon="Add28"
-                        ToolTip="发布一个新问题" />
+                                Icon="Add28"
+                                ToolTip="发布一个新问题" />
                             <ui:Button
-                        Margin="5,0,0,0"
-                        Command="{Binding Path=ViewModel.RefreshPostsCommand, Mode=OneTime}"
-                        Icon="ArrowClockwise28"
-                        ToolTip="刷新" />
+                                Margin="5,0,0,0"
+                                Command="{Binding Path=ViewModel.RefreshPostsCommand, Mode=OneTime}"
+                                Icon="ArrowClockwise28"
+                                ToolTip="刷新" />
                         </StackPanel>
                     </Grid>
                     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl
-                    IsEnabled="{Binding Path=ViewModel.IsNotBusy}"
-                    ItemsSource="{Binding Path=ViewModel.PostSource}"
-                    ItemTemplate="{StaticResource PostListItem}">
+                            IsEnabled="{Binding Path=ViewModel.IsNotBusy}"
+                            ItemTemplate="{StaticResource PostListItem}"
+                            ItemsSource="{Binding Path=ViewModel.PostSource}">
                             <d:ItemsControl.ItemsSource>
                                 <x:Array Type="{x:Type models:Post}">
-                                    <models:Post Title="11" Views="123" Field="www" Content="w1af51wa51wfawaf" AskerId="1" CreateTime="12" DelTag="0" Id="1" UpdateTime="12"/>
+                                    <models:Post
+                                        Title="11"
+                                        AskerId="1"
+                                        Content="w1af51wa51wfawaf"
+                                        CreateTime="12"
+                                        DelTag="0"
+                                        Field="www"
+                                        Id="1"
+                                        UpdateTime="12"
+                                        Views="123" />
                                 </x:Array>
                             </d:ItemsControl.ItemsSource>
                         </ItemsControl>
                     </ScrollViewer>
                 </Grid>
             </Grid>
-            <Grid x:Name="SearchResultGrid" Background="{ui:ThemeResource ApplicationBackgroundBrush}" Grid.Row="1" Visibility="Collapsed">
+            <Grid
+                x:Name="SearchResultGrid"
+                Grid.Row="1"
+                Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+                Visibility="Collapsed">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding Path=ViewModel.SearchResult}" ItemTemplate="{StaticResource PostListItem}">
+                    <ItemsControl ItemTemplate="{StaticResource PostListItem}" ItemsSource="{Binding Path=ViewModel.SearchResult}">
                         <d:ItemsControl.ItemsSource>
                             <x:Array Type="{x:Type models:Post}">
-                                <models:Post Title="11" Views="123" Field="www" Content="w1af51wa51wfawaf" AskerId="1" CreateTime="12" DelTag="0" Id="1" UpdateTime="12"/>
+                                <models:Post
+                                    Title="11"
+                                    AskerId="1"
+                                    Content="w1af51wa51wfawaf"
+                                    CreateTime="12"
+                                    DelTag="0"
+                                    Field="www"
+                                    Id="1"
+                                    UpdateTime="12"
+                                    Views="123" />
                             </x:Array>
                         </d:ItemsControl.ItemsSource>
                     </ItemsControl>
                 </ScrollViewer>
-                <TextBlock HorizontalAlignment="Center" Style="{StaticResource DynamicForegroundTextBlock}" Grid.Row="0" Text="搜索中……" Visibility="{Binding Path=ViewModel.SearchResult, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}"/>
-                <TextBlock HorizontalAlignment="Center" Style="{StaticResource DynamicForegroundTextBlock}" Grid.Row="0" Text="未找到结果" Visibility="{Binding Path=ViewModel.SearchResult, Mode=OneWay, Converter={StaticResource IEnumerableToVisibilityConverter}}"/>
-                <ui:Button Command="{Binding Path=ViewModel.EndSearchCommand, Mode=OneTime}" Margin="0,5" Grid.Row="1" Content="关闭" HorizontalAlignment="Center"/>
+                <TextBlock
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Text="搜索中……"
+                    Visibility="{Binding Path=ViewModel.SearchResult, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}" />
+                <TextBlock
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Text="未找到结果"
+                    Visibility="{Binding Path=ViewModel.SearchResult, Mode=OneWay, Converter={StaticResource IEnumerableToVisibilityConverter}}" />
+                <ui:Button
+                    Grid.Row="1"
+                    Margin="0,5"
+                    HorizontalAlignment="Center"
+                    Command="{Binding Path=ViewModel.EndSearchCommand, Mode=OneTime}"
+                    Content="关闭" />
             </Grid>
         </Grid>
-        <Grid Background="{ui:ThemeResource ApplicationBackgroundBrush}" x:Name="AddNewPostGrid" Visibility="Collapsed">
+        <Grid
+            x:Name="AddNewPostGrid"
+            Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+            Visibility="Collapsed">
             <Grid Margin="10">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <DockPanel Grid.Row="0">
-                    <ui:Button DockPanel.Dock="Left" Command="{Binding Path=ViewModel.EndPostNewPostCommand}" Icon="IosArrowRtl24" Style="{StaticResource BorderlessTransparentUiButtonStyle}"/>
-                    <TextBlock Text="发布一个新问题" TextAlignment="Center" FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DynamicForegroundTextBlock}" FontWeight="Bold"/>
+                    <ui:Button
+                        Command="{Binding Path=ViewModel.EndPostNewPostCommand}"
+                        DockPanel.Dock="Left"
+                        Icon="IosArrowRtl24"
+                        Style="{StaticResource BorderlessTransparentUiButtonStyle}" />
+                    <TextBlock
+                        FontSize="{StaticResource LargeFontSize}"
+                        FontWeight="Bold"
+                        Style="{StaticResource DynamicForegroundTextBlock}"
+                        Text="发布一个新问题"
+                        TextAlignment="Center" />
                 </DockPanel>
                 <DockPanel Grid.Row="1" Margin="0,5,0,0">
-                    <TextBlock Text="标题：" FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DynamicForegroundTextBlock}"/>
-                    <ui:TextBox MaxLines="1" FontSize="{StaticResource LargeFontSize}" Text="{Binding Path=ViewModel.NewPostTitle, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock
+                        FontSize="{StaticResource LargeFontSize}"
+                        Style="{StaticResource DynamicForegroundTextBlock}"
+                        Text="标题：" />
+                    <ui:TextBox
+                        FontSize="{StaticResource LargeFontSize}"
+                        MaxLines="1"
+                        Text="{Binding Path=ViewModel.NewPostTitle, UpdateSourceTrigger=PropertyChanged}" />
                 </DockPanel>
                 <Grid Grid.Row="2" Margin="0,5,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="问题描述：" FontSize="{StaticResource MediumFontSize}" Style="{StaticResource DynamicForegroundTextBlock}"/>
-                    <ui:TextBox Grid.Row="1" FontSize="{StaticResource MediumFontSize}" Margin="0,3" Text="{Binding Path=ViewModel.NewPostContent}" ClearButtonEnabled="False" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <TextBlock
+                        Grid.Row="0"
+                        FontSize="{StaticResource MediumFontSize}"
+                        Style="{StaticResource DynamicForegroundTextBlock}"
+                        Text="问题描述：" />
+                    <ui:TextBox
+                        Grid.Row="1"
+                        Margin="0,3"
+                        AcceptsReturn="True"
+                        ClearButtonEnabled="False"
+                        FontSize="{StaticResource MediumFontSize}"
+                        Text="{Binding Path=ViewModel.NewPostContent}"
+                        TextWrapping="Wrap" />
                 </Grid>
                 <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel HorizontalAlignment="Center" Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Text="选择领域：" FontSize="{StaticResource MediumFontSize}" Style="{StaticResource DynamicForegroundTextBlock}"/>
-                        <ComboBox ItemsSource="{Binding Path=ViewModel.FieldSource}" SelectedItem="{Binding Path=ViewModel.SelectedNewPostField, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <ComboBoxItem Padding="0" Content="{Binding}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                    <StackPanel
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            FontSize="{StaticResource MediumFontSize}"
+                            Style="{StaticResource DynamicForegroundTextBlock}"
+                            Text="选择领域：" />
+                        <ComboBox ItemsSource="{Binding Path=ViewModel.FieldSource}" SelectedItem="{Binding Path=ViewModel.SelectedNewPostField, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
-                    <ui:Button Grid.Column="1" FontSize="{StaticResource MediumFontSize}" Command="{Binding Path=ViewModel.PostNewPostCommand}" HorizontalAlignment="Center" Content="发送"/>
+                    <ui:Button
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Command="{Binding Path=ViewModel.PostNewPostCommand}"
+                        Content="发送"
+                        FontSize="{StaticResource MediumFontSize}" />
                 </Grid>
             </Grid>
         </Grid>
