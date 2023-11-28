@@ -31,12 +31,14 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
                         Grid.Row="0"
                         FontSize="{StaticResource LargeFontSize}"
                         Text="{Binding Path=Title, Mode=OneWay}"
                         TextTrimming="WordEllipsis"
                         TextWrapping="NoWrap" />
                     <TextBlock
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
                         Grid.Row="1"
                         MaxHeight="75"
                         FontSize="{StaticResource MediumFontSize}"
@@ -45,6 +47,7 @@
                         TextWrapping="Wrap" />
                     <DockPanel Grid.Row="2" LastChildFill="False">
                         <TextBlock
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
                             Margin="0,5,0,0"
                             DockPanel.Dock="Left"
                             FontSize="{StaticResource SmallFontSize}">
@@ -53,7 +56,7 @@
                         </TextBlock>
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                             <ui:SymbolIcon Symbol="Tag28" />
-                            <TextBlock Text="{Binding Path=Field, Mode=OneWay}" />
+                            <TextBlock Text="{Binding Path=Field, Mode=OneWay}" Style="{StaticResource DefaultFontFamilyTextBlock}"/>
                         </StackPanel>
                     </DockPanel>
                 </Grid>
@@ -98,7 +101,7 @@
                             <TextBlock
                                 Padding="5,10"
                                 FontSize="{StaticResource LargeFontSize}"
-                                Style="{StaticResource DynamicForegroundTextBlock}"
+                                Style="{StaticResource DefaultFontFamilyTextBlock}"
                                 Text="{Binding}" />
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -118,7 +121,7 @@
                             d:Text="文文可爱捏"
                             FontSize="{StaticResource LargeFontSize}"
                             FontWeight="Bold"
-                            Style="{StaticResource DynamicForegroundTextBlock}"
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
                             Text="{Binding Path=ViewModel.NowSelectedField, Mode=OneWay}"
                             TextAlignment="Center" />
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -187,13 +190,13 @@
                 <TextBlock
                     Grid.Row="0"
                     HorizontalAlignment="Center"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="搜索中……"
                     Visibility="{Binding Path=ViewModel.SearchResult, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}" />
                 <TextBlock
                     Grid.Row="0"
                     HorizontalAlignment="Center"
-                    Style="{StaticResource DynamicForegroundTextBlock}"
+                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                     Text="未找到结果"
                     Visibility="{Binding Path=ViewModel.SearchResult, Mode=OneWay, Converter={StaticResource IEnumerableToVisibilityConverter}}" />
                 <ui:Button
@@ -224,14 +227,14 @@
                     <TextBlock
                         FontSize="{StaticResource LargeFontSize}"
                         FontWeight="Bold"
-                        Style="{StaticResource DynamicForegroundTextBlock}"
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
                         Text="发布一个新问题"
                         TextAlignment="Center" />
                 </DockPanel>
                 <DockPanel Grid.Row="1" Margin="0,5,0,0">
                     <TextBlock
                         FontSize="{StaticResource LargeFontSize}"
-                        Style="{StaticResource DynamicForegroundTextBlock}"
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
                         Text="标题：" />
                     <ui:TextBox
                         FontSize="{StaticResource LargeFontSize}"
@@ -246,7 +249,7 @@
                     <TextBlock
                         Grid.Row="0"
                         FontSize="{StaticResource MediumFontSize}"
-                        Style="{StaticResource DynamicForegroundTextBlock}"
+                        Style="{StaticResource DefaultFontFamilyTextBlock}"
                         Text="问题描述：" />
                     <ui:TextBox
                         Grid.Row="1"
@@ -268,7 +271,7 @@
                         Orientation="Horizontal">
                         <TextBlock
                             FontSize="{StaticResource MediumFontSize}"
-                            Style="{StaticResource DynamicForegroundTextBlock}"
+                            Style="{StaticResource DefaultFontFamilyTextBlock}"
                             Text="选择领域：" />
                         <ComboBox ItemsSource="{Binding Path=ViewModel.FieldSource}" SelectedItem="{Binding Path=ViewModel.SelectedNewPostField, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>

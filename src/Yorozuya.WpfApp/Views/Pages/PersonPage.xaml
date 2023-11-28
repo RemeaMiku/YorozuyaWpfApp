@@ -16,7 +16,7 @@
         <cv:ReversedNullableToVisibilityConverter x:Key="ReversedNullableToVisibilityConverter" />
     </Page.Resources>
     <Grid d:Background="White">
-        <TextBlock FontSize="{StaticResource LargeFontSize}" FontWeight="Bold" Style="{StaticResource DynamicForegroundTextBlock}" HorizontalAlignment="Center" Text="请先登录以查看个人记录！" d:Visibility="Collapsed"  Visibility="{Binding Path=ViewModel.NowUserInfo, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}"/>
+        <TextBlock FontSize="{StaticResource LargeFontSize}" FontWeight="Bold" Style="{StaticResource DefaultFontFamilyTextBlock}" HorizontalAlignment="Center" Text="请先登录以查看个人记录！" d:Visibility="Collapsed"  Visibility="{Binding Path=ViewModel.NowUserInfo, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}"/>
         <Grid d:Visibility="Visible" Visibility="{Binding Path=ViewModel.NowUserInfo, Mode=OneWay, Converter={StaticResource NullableToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -29,7 +29,7 @@
                 d:Text="Aya"
                 FontSize="{StaticResource LargeFontSize}"
                 FontWeight="Bold"
-                Style="{StaticResource DynamicForegroundTextBlock}"
+                Style="{StaticResource DefaultFontFamilyTextBlock}"
                 Text="{Binding Path=ViewModel.NowUserInfo.Username}"
                 HorizontalAlignment="Center" />
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -40,7 +40,7 @@
                         Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
                         BorderThickness="0">
                         <ui:CardExpander.Header>
-                            <TextBlock FontSize="{StaticResource LargeFontSize}" Text="历史提问" />
+                            <TextBlock FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DefaultFontFamilyTextBlock}" Text="历史提问" />
                         </ui:CardExpander.Header>
                         <ui:CardExpander.Content>
                             <ItemsControl ItemsSource="{Binding Path=ViewModel.PostSource}">
@@ -52,10 +52,12 @@
                                             CommandParameter="{Binding}">
                                             <StackPanel>
                                                 <TextBlock
+                                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                                     FontSize="{StaticResource MediumFontSize}"
                                                     FontWeight="Bold"
                                                     Text="{Binding Path=Title}" />
                                                 <TextBlock
+                                                    Style="{StaticResource DefaultFontFamilyTextBlock}"
                                                     Margin="0,3,0,0"
                                                     FontSize="{StaticResource MediumFontSize}"
                                                     Text="{Binding Path=Content}" />
@@ -72,7 +74,7 @@
                         Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
                         BorderThickness="0">
                         <ui:CardExpander.Header>
-                            <TextBlock FontSize="{StaticResource LargeFontSize}" Text="历史回答" />
+                            <TextBlock FontSize="{StaticResource LargeFontSize}" Style="{StaticResource DefaultFontFamilyTextBlock}" Text="历史回答" />
                         </ui:CardExpander.Header>
                         <ui:CardExpander.Content>
                             <ItemsControl ItemsSource="{Binding Path=ViewModel.ReplySource}">
@@ -83,8 +85,8 @@
                                             Command="{Binding RelativeSource={RelativeSource AncestorType=Page}, Path=ViewModel.OpenReplyCommand}"
                                             CommandParameter="{Binding}">
                                             <StackPanel>
-                                                <TextBlock FontSize="{StaticResource MediumFontSize}" Text="{Binding Path=Content}" />
-                                                <TextBlock Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
+                                                <TextBlock Style="{StaticResource DefaultFontFamilyTextBlock}" FontSize="{StaticResource MediumFontSize}" Text="{Binding Path=Content}" />
+                                                <TextBlock Style="{StaticResource DefaultFontFamilyTextBlock}" Margin="0,5,0,0" FontSize="{StaticResource SmallFontSize}">
                                                     <Run Text="点赞数：" />
                                                     <Run Text="{Binding Path=Likes}" />
                                                 </TextBlock>
