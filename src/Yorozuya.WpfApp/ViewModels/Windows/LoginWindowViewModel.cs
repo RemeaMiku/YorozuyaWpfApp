@@ -1,5 +1,6 @@
 ﻿// Author : RemeaMiku (Wuhan University) E-mail : remeamiku@whu.edu.cn
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http;
@@ -36,6 +37,8 @@ public partial class LoginWindowViewModel : BaseValidatorViewModel
                 viewModel.ReplyLoginRequest();
         });
     }
+
+    public static List<string> Fields => Common.Field.Fields.ToList();
 
     public string? DisplayGender => Gender switch
     {
