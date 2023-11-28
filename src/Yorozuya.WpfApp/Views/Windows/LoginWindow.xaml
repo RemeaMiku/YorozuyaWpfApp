@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Yorozuya.WpfApp.Controls"
     xmlns:cv="clr-namespace:Yorozuya.WpfApp.Common.Converters"
+    xmlns:common="clr-namespace:Yorozuya.WpfApp.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Yorozuya.WpfApp.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -160,11 +161,16 @@
                             FontSize="{StaticResource MediumFontSize}"
                             Style="{StaticResource DefaultFontFamilyTextBlock}"
                             Text="感兴趣或擅长的领域" />
-                        <ui:TextBox
+                        <ComboBox
                             Margin="0,10,0,0"
-                            Icon="Tag24"
-                            PlaceholderText="请输入感兴趣或擅长的领域"
-                            Text="{Binding ViewModel.Field, UpdateSourceTrigger=PropertyChanged}" />
+                            ItemsSource="{Binding Path=ViewModel.Fields}"
+                            SelectedItem="{Binding Path=ViewModel.Field}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <ComboBoxItem Padding="0" Content="{Binding}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <TextBlock
                             Margin="0,30,0,0"
                             FontSize="{StaticResource MediumFontSize}"

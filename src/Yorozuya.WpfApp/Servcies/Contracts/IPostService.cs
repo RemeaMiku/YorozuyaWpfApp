@@ -29,4 +29,8 @@ public interface IPostService
     public Task DeleteReplyAsync(string token, long replyId);
 
     public Task<Post> PublishPostAsync(string token, string title, string content, string field);
+
+    public Task<IEnumerable<Post>?> GetPostById(long postId);
+    
+    public Task<IEnumerable<Post>?> GetPostByTitle(string title);
 }
