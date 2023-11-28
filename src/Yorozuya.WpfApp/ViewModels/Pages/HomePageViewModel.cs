@@ -54,7 +54,6 @@ public partial class HomePageViewModel : BaseValidatorViewModel
         EndPostNewPost();
     }
 
-
     private bool StartPostNewPostCommandCanExe => !string.IsNullOrEmpty(_userService.Token);
     [RelayCommand(CanExecute = nameof(StartPostNewPostCommandCanExe))]
     private void StartPostNewPost()
@@ -142,11 +141,11 @@ public partial class HomePageViewModel : BaseValidatorViewModel
             switch (message)
             {
                 case StringMessages.UserLogined:
-                    viewModel.PostNewPostCommand.NotifyCanExecuteChanged();
+                    viewModel.StartPostNewPostCommand.NotifyCanExecuteChanged();
                     break;
                 case StringMessages.UserLogouted:
                     EndPostNewPost();
-                    viewModel.PostNewPostCommand.NotifyCanExecuteChanged();
+                    viewModel.StartPostNewPostCommand.NotifyCanExecuteChanged();
                     break;
             }
         });
