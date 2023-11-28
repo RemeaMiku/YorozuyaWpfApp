@@ -10,6 +10,8 @@ namespace Yorozuya.WpfApp.Common.Converters;
 /// </summary>
 public class ReversedBooleanToVisibilityConverter : IValueConverter
 {
+    #region Public Methods
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var booleanValue = (bool)value;
@@ -21,4 +23,6 @@ public class ReversedBooleanToVisibilityConverter : IValueConverter
         var visibilityValue = (System.Windows.Visibility)value;
         return visibilityValue == System.Windows.Visibility.Collapsed;
     }
+
+    #endregion Public Methods
 }

@@ -37,8 +37,8 @@ public partial class HomePageViewModel : BaseValidatorViewModel
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(PostNewPostCommand))]
     private string _selectedNewPostField = string.Empty;
-    [ObservableProperty] private List<string> _fieldSource = new();
-    public ObservableCollection<Post> PostSource { get; } = new();
+    [ObservableProperty] private List<string> _fieldSource = [];
+    public ObservableCollection<Post> PostSource { get; } = [];
 
     partial void OnNowSelectedFieldChanged(string value)
     {
@@ -110,7 +110,7 @@ public partial class HomePageViewModel : BaseValidatorViewModel
         var postsTask = _postService.GetPostByTitle(SearchInput);
         _messenger.Send(UiStatus.StartSearch, nameof(HomePage));
         var posts = await postsTask;
-        SearchResult = posts?.ToList() ?? new();
+        SearchResult = posts?.ToList() ?? [];
         //SearchResult = new List<Post>
         //{
         //    new()

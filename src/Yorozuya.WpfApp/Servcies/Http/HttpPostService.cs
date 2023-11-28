@@ -87,7 +87,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>("postList",
                 response);
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return new List<Post>();
         }
@@ -104,7 +104,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Reply>("replyList",
                 response);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return new List<Reply>();
         }
@@ -173,7 +173,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
                 "postList", await _httpClient.SendAsync(message));
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return new List<Post>();
         }

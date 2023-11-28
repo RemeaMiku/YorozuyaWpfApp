@@ -7,6 +7,8 @@ namespace Yorozuya.WpfApp.Common.Converters;
 public class ReplyStateToBrushConverter : IValueConverter
 {
 
+    #region Public Methods
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var replyState = (ReplyState)value;
@@ -23,4 +25,6 @@ public class ReplyStateToBrushConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+
+    #endregion Public Methods
 }

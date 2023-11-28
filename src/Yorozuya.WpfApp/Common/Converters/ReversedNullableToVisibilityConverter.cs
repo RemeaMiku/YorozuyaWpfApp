@@ -11,6 +11,8 @@ namespace Yorozuya.WpfApp.Common.Converters;
 /// </summary>
 public class ReversedNullableToVisibilityConverter : IValueConverter
 {
+    #region Public Methods
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value is null ? Visibility.Visible : Visibility.Collapsed;
@@ -20,5 +22,7 @@ public class ReversedNullableToVisibilityConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+
+    #endregion Public Methods
 }
 

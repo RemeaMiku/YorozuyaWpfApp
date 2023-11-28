@@ -10,6 +10,8 @@ namespace Yorozuya.WpfApp.Common.Converters;
 /// </summary>
 public class NullableToVisibilityConverter : IValueConverter
 {
+    #region Public Methods
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value is null ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
@@ -19,4 +21,6 @@ public class NullableToVisibilityConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+
+    #endregion Public Methods
 }
