@@ -179,7 +179,7 @@ public partial class PostWindowViewModel : BaseViewModel
         IsCurrentReplyLiked = await _postService.GetIsLikedAsync(_userService.Token!, CurrentReply.Id);
     }
 
-    async Task UpdateReplies(long? replyId = default)
+    async Task UpdatePostAndReplies(long? replyId = default)
     {
         if (Post is null)
             return;
@@ -188,6 +188,7 @@ public partial class PostWindowViewModel : BaseViewModel
             Post = default;
             return;
         }
+        Post = await _postService.GetPostById(Post.Id);
         var replies = await _postService.GetPostRepliesAsync(Post.Id);
         if (replies is null)
         {
@@ -243,7 +244,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies(CurrentReply?.Id);
+            await UpdatePostAndReplies(CurrentReply?.Id);
             await UpdateCurrentReplyIsUserLiked();
             OnPropertyChanged(string.Empty);
         }
@@ -280,7 +281,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies(replyId);
+            await UpdatePostAndReplies(replyId);
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -372,7 +373,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies();
+            await UpdatePostAndReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -401,7 +402,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies();
+            await UpdatePostAndReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -433,7 +434,7 @@ public partial class PostWindowViewModel : BaseViewModel
         {
             IsBusy = true;
             await _postService.AcceptReplyAsync(_userService.Token!, CurrentReply!.Id);
-            await UpdateReplies(CurrentReply!.Id);
+            await UpdatePostAndReplies(CurrentReply!.Id);
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -465,7 +466,7 @@ public partial class PostWindowViewModel : BaseViewModel
         {
             IsBusy = true;
             await _postService.DeleteReplyAsync(_userService.Token!, CurrentReply!.Id);
-            await UpdateReplies();
+            await UpdatePostAndReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -576,7 +577,7 @@ public partial class PostWindowViewModel : BaseViewModel
             var newReply = await _postService.PublishReplyAsync(_userService.Token!, Post!.Id, NewReplyContent);
             IsReplying = false;
             NewReplyContent = string.Empty;
-            await UpdateReplies(newReply.Id);
+            await UpdatePostAndReplies(newReply.Id);
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)

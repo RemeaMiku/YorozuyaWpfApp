@@ -33,10 +33,8 @@ public partial class PersonPageViewModel : BaseViewModel
     private async Task OpenReply(Reply reply)
     {
         var post = await _postService.GetPostById(reply.PostId);
-        if (post is not null && post.Any())
-        {
-            _messenger.Send(Tuple.Create(post.First(), reply.Id));
-        }
+        if (post is not null)
+            _messenger.Send(Tuple.Create(post, reply.Id));
     }
 
     [RelayCommand]

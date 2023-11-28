@@ -168,12 +168,11 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Reply>(await _httpClient.SendAsync(message));
     }
 
-    public async Task<IEnumerable<Post>?> GetPostById(long postId)
+    public async Task<Post> GetPostById(long postId)
     {
         var message = new HttpRequestMessage(HttpMethod.Get,
             "api/post/getPostByPostId?postId=" + Uri.EscapeDataString($"{postId}"));
-        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
-            "postList", await _httpClient.SendAsync(message));
+        return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Post>(await _httpClient.SendAsync(message));
     }
 
     public async Task<IEnumerable<Post>?> GetPostByTitle(string title)
