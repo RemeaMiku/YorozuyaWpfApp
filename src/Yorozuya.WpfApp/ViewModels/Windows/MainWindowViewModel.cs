@@ -7,15 +7,9 @@ using Yorozuya.WpfApp.Servcies.Contracts;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
-public partial class MainWindowViewModel : BaseViewModel
+public partial class MainWindowViewModel([FromKeyedServices(nameof(MainWindowViewModel))] ILeftRightButtonDialogService dialogService) : BaseViewModel
 {
-    readonly ILeftRightButtonDialogService _dialogService;
-
-    public MainWindowViewModel([FromKeyedServices(nameof(MainWindowViewModel))] ILeftRightButtonDialogService dialogService)
-    {
-        _dialogService = dialogService;
-    }
-
+    readonly ILeftRightButtonDialogService _dialogService = dialogService;
     [ObservableProperty]
     bool _doNotShowExitDialog = false;
 

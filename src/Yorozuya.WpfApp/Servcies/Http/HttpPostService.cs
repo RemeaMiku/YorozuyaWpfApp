@@ -42,7 +42,13 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
     public async Task DeletePostAsync(string token, long postId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/remove?postId={postId}");
+        var message = new HttpRequestMessage(HttpMethod.Delete, "api/post/remove")
+        {
+            Content = new MultipartFormDataContent()
+            {
+                { new StringContent(postId.ToString()), "postId" }
+            }
+        };
         AddAuthorization(message, token);
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
@@ -50,7 +56,13 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
     public async Task DeleteReplyAsync(string token, long replyId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/deleteReply?replyId={replyId}");
+        var message = new HttpRequestMessage(HttpMethod.Delete, "api/post/deleteReply")
+        {
+            Content = new MultipartFormDataContent
+            {
+                { new StringContent(replyId.ToString()), "replyId" }
+            }
+        };
         AddAuthorization(message, token);
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }

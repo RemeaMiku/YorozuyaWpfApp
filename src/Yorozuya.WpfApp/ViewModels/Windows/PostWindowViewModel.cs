@@ -16,6 +16,7 @@ using Yorozuya.WpfApp.Extensions;
 using Yorozuya.WpfApp.Common.Exceptions;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
+using System.Diagnostics;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
@@ -72,7 +73,7 @@ public partial class PostWindowViewModel : BaseViewModel
 
     public bool CanAddNewReply => Post is not null && Post.DelTag == 0 && _userService.IsUserLoggedIn && UserReply is null;
 
-    public bool CanAcceptReply => IsUserPost && !IsCurrentReplyAccepted;
+    public bool CanAcceptReply => IsUserPost && CurrentReply is not null && !IsCurrentReplyAccepted;
 
     public bool IsCurrentReplyAccepted => CurrentReply is not null && CurrentReply.IsAccepted == 1;
 
@@ -106,6 +107,11 @@ public partial class PostWindowViewModel : BaseViewModel
 
     [ObservableProperty]
     private bool _isOrderByLikes = true;
+
+    partial void OnIsOrderByLikesChanging(bool value)
+    {
+        RefreshPostCommand.Execute(default);
+    }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsUserPost), nameof(CanAddNewReply))]
@@ -193,18 +199,22 @@ public partial class PostWindowViewModel : BaseViewModel
             SelectedIndex = -1;
             return;
         }
+        UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
+        _mostLikedReply = replies.MaxBy(r => r.Likes);
         RepliesViewSource.Source = replies;
         RepliesViewSource.View.Refresh();
         RepliesCount = replies.Count();
-        UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
-        _mostLikedReply = replies.MaxBy(r => r.Likes);
         if (replyId is null)
         {
             CurrentReply = _mostLikedReply;
             return;
         }
         CurrentReply = replies.SingleOrDefault(r => r.Id == replyId && r.DelTag == 0);
-        CurrentReply ??= _mostLikedReply;
+        if (CurrentReply is null)
+        {
+            _snackbarService.ShowErrorMessage("加载回答失败", "回答不存在或已被删除");
+            CurrentReply = _mostLikedReply;
+        }
     }
 
     private async Task HandleExceptions(string title, Exception exception)
@@ -264,6 +274,8 @@ public partial class PostWindowViewModel : BaseViewModel
             _forwardStack.Clear();
             CanForward = false;
         }
+        if (_forwardStack.Count == 0)
+            CanForward = false;
         Post = post;
         try
         {
@@ -383,9 +395,9 @@ public partial class PostWindowViewModel : BaseViewModel
             _backStack.Push(Post);
             CanBack = true;
         }
+        Post = _forwardStack.Pop();
         if (_forwardStack.Count == 0)
             CanForward = false;
-        Post = _forwardStack.Pop();
         try
         {
             IsBusy = true;
@@ -423,9 +435,6 @@ public partial class PostWindowViewModel : BaseViewModel
             await _postService.AcceptReplyAsync(_userService.Token!, CurrentReply!.Id);
             await UpdateReplies(CurrentReply!.Id);
             await UpdateCurrentReplyIsUserLiked();
-            // 仅在本地时保留
-            OnPropertyChanged(nameof(IsCurrentReplyAccepted));
-            OnPropertyChanged(nameof(CurrentReplyState));
         }
         catch (Exception ex)
         {
@@ -456,7 +465,7 @@ public partial class PostWindowViewModel : BaseViewModel
         {
             IsBusy = true;
             await _postService.DeleteReplyAsync(_userService.Token!, CurrentReply!.Id);
-            await UpdateReplies(CurrentReply!.Id);
+            await UpdateReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -617,5 +626,4 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }

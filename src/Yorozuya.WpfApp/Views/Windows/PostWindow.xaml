@@ -429,6 +429,8 @@
                             CornerRadius="5">
                             <ui:TextBox
                                 x:Name="NewReplyBox"
+                                AcceptsReturn="True"
+                                AcceptsTab="True"
                                 MaxLength="{Binding ViewModel.ReplyMaxLength, Mode=OneTime}"
                                 PlaceholderText="输入你的回答..."
                                 Text="{Binding ViewModel.NewReplyContent}"
