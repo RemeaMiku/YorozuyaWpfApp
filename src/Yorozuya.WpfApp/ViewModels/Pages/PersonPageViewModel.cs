@@ -42,10 +42,25 @@ public partial class PersonPageViewModel : BaseViewModel
     [RelayCommand]
     private async Task SetActionCard()
     {
-        if (_userService.Token is null) return;
+        List<Task> taskList = new()
+        {
+            Task.Run(RefreshUserPosts),
+            Task.Run(RefreshUserReplies)
+        };
+        await Task.WhenAll(taskList);
+    }
+
+    private async void RefreshUserPosts()
+    {
+        if (string.IsNullOrEmpty(_userService.Token)) return;
         var posts = await _postService.GetUserPostsAsync(_userService.Token);
-        var replies = await _postService.GetUserRepliesAsync(_userService.Token);
         PostSource = posts?.ToList() ?? new();
+    }
+
+    private async void RefreshUserReplies()
+    {
+        if (string.IsNullOrEmpty(_userService.Token)) return;
+        var replies = await _postService.GetUserRepliesAsync(_userService.Token);
         ReplySource = replies?.ToList() ?? new();
     }
 
@@ -56,13 +71,22 @@ public partial class PersonPageViewModel : BaseViewModel
         _messenger = messenger;
         _messenger.Register<PersonPageViewModel, string>(this, (viewModel, message) =>
         {
-            if (message == StringMessages.UserLogined)
+            switch (message)
             {
-                NowUserInfo = userService.UserInfo;
-                SetActionCardCommand.Execute(default);
+                case StringMessages.UserLogined:
+                    NowUserInfo = userService.UserInfo;
+                    SetActionCardCommand.Execute(default);
+                    break;
+                case StringMessages.UserLogouted:
+                    NowUserInfo = null;
+                    break;
+                case StringMessages.UserPostChanged:
+                    RefreshUserPosts();
+                    break;
+                case StringMessages.UserReplyChanged:
+                    RefreshUserReplies();
+                    break;
             }
-            else if (message == StringMessages.UserLogouted)
-                NowUserInfo = null;
         });
         NowUserInfo = userService.UserInfo;
     }

@@ -50,7 +50,9 @@ public partial class HomePageViewModel : BaseValidatorViewModel
     [RelayCommand(CanExecute = nameof(PostNewPostCommandCanExe))]
     private async Task PostNewPost()
     {
-        await _postService.PublishPostAsync(_userService.Token!, NewPostTitle, NewPostContent, SelectedNewPostField);
+        var newPost = await _postService.PublishPostAsync(_userService.Token!, NewPostTitle, NewPostContent, SelectedNewPostField);
+        _messenger.Send(newPost);
+        _messenger.Send(StringMessages.UserPostChanged);
         EndPostNewPost();
     }
 

@@ -29,6 +29,7 @@ public partial class PostWindowViewModel : BaseViewModel
         _snackbarService = snackbarService;
         _userService = userService;
         _postService = postService;
+        _messenger = messenger;
         messenger.Register<PostWindowViewModel, Post>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m));
         messenger.Register<PostWindowViewModel, Tuple<Post, long>>(this, async (r, m) => await r.ReplyOpenPostRequestAsync(m.Item1, m.Item2));
         messenger.Register<PostWindowViewModel, string>(this, (r, m) =>
@@ -97,6 +98,8 @@ public partial class PostWindowViewModel : BaseViewModel
     private readonly IUserService _userService;
 
     private readonly IPostService _postService;
+
+    private readonly IMessenger _messenger;
 
     [ObservableProperty]
     private bool _isReplying = false;
@@ -458,6 +461,7 @@ public partial class PostWindowViewModel : BaseViewModel
             await _postService.DeleteReplyAsync(_userService.Token!, CurrentReply!.Id);
             await UpdateReplies(CurrentReply!.Id);
             await UpdateCurrentReplyIsUserLiked();
+            _messenger.Send(StringMessages.UserReplyChanged);
         }
         catch (Exception ex)
         {
@@ -488,6 +492,7 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = true;
             await _postService.DeletePostAsync(_userService.Token!, Post!.Id);
             Post = default;
+            _messenger.Send(StringMessages.UserPostChanged);
         }
         catch (Exception ex)
         {
@@ -568,6 +573,7 @@ public partial class PostWindowViewModel : BaseViewModel
             IsReplying = false;
             NewReplyContent = string.Empty;
             await UpdateReplies(newReply.Id);
+            _messenger.Send(StringMessages.UserReplyChanged);
         }
         catch (Exception ex)
         {
