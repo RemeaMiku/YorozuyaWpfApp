@@ -125,7 +125,7 @@ public partial class PostWindowViewModel : BaseViewModel
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentReplyIndex))]
     [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand), nameof(MoveToPreviousReplyCommand))]
-    private int _selectedIndex = 0;
+    private int _selectedIndex = -1;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand))]
