@@ -108,11 +108,6 @@ public partial class PostWindowViewModel : BaseViewModel
     [ObservableProperty]
     private bool _isOrderByLikes = true;
 
-    partial void OnIsOrderByLikesChanging(bool value)
-    {
-        RefreshPostCommand.Execute(default);
-    }
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsUserPost), nameof(CanAddNewReply))]
     [NotifyCanExecuteChangedFor(nameof(AcceptReplyCommand))]
