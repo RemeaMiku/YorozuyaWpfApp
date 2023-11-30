@@ -170,14 +170,20 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
     public async Task<Post> GetPostById(long postId)
     {
         var message = new HttpRequestMessage(HttpMethod.Get,
-            "api/post/getPostByPostId?postId=" + Uri.EscapeDataString($"{postId}"));
-        return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Post>(await _httpClient.SendAsync(message));
+            $"api/post/getPostByPostId?postId={postId}");
+        var httpResponseMessage = await _httpClient.SendAsync(message);
+        httpResponseMessage.EnsureSuccessStatusCode();
+        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
+        ArgumentNullException.ThrowIfNull(apiResonse);
+        apiResonse.EnsureSuccessStatusCode();
+        ArgumentNullException.ThrowIfNull(apiResonse.Data);
+        return JsonSerializer.Deserialize<Post>(apiResonse.Data["post"])!;
     }
 
     public async Task<IEnumerable<Post>?> GetPostByTitle(string title)
     {
         var message = new HttpRequestMessage(HttpMethod.Get,
-            "api/post/getPostByTitle?title=" + Uri.EscapeDataString($"{title}"));
+            "api/post/getPostByTitle?title=" + Uri.EscapeDataString(title));
         try
         {
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
