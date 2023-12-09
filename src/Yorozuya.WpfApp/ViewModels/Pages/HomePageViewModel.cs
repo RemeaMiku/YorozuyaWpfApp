@@ -151,10 +151,17 @@ public partial class HomePageViewModel : BaseValidatorViewModel
             {
                 case StringMessages.UserLogined:
                     viewModel.StartPostNewPostCommand.NotifyCanExecuteChanged();
+                    var fields = Field.Fields.ToList();
+                    var idx = fields.IndexOf(_userService.UserInfo!.Field);
+                    if(idx == -1) break;
+                    fields.RemoveAt(idx);
+                    fields.Insert(0, _userService.UserInfo.Field);
+                    FieldSource = fields;
                     break;
                 case StringMessages.UserLogouted:
                     EndPostNewPost();
                     viewModel.StartPostNewPostCommand.NotifyCanExecuteChanged();
+                    FieldSource = Field.Fields.ToList();
                     break;
             }
         });
