@@ -32,13 +32,19 @@ public partial class SettingsPage : Page
 
     #endregion Public Properties
 
+    #region Private Fields
+
+    private BackgroundType _nowBackgroundType;
+
+    #endregion Private Fields
+
     #region Private Methods
 
     private void OnSettingsPageLoaded(object sender, RoutedEventArgs e)
     {
         ThemeBox.SelectedValue = App.Current.AppTheme;
         FontFamilyBox.SelectedValue = App.Current.AppFont;
-        WindowBackdropTypeBox.SelectedValue = App.Current.WindowBackdropType;
+        WindowBackdropTypeBox.SelectedValue = _nowBackgroundType = App.Current.WindowBackdropType;
     }
 
     private void OnThemeBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -57,8 +63,15 @@ public partial class SettingsPage : Page
     private void OnWindowBackdropTypeBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var type = (BackgroundType)WindowBackdropTypeBox.SelectedValue;
-        App.Current.ApplyBackdropType(type);
-        App.Current.WriteBackdropTypeToConfiguration(type);
+        if (App.Current.ApplyBackdropType(type))
+        {
+            _nowBackgroundType = type;
+            App.Current.WriteBackdropTypeToConfiguration(type);
+        }
+        else
+        {
+            WindowBackdropTypeBox.SelectedValue = _nowBackgroundType;
+        }
     }
 
     #endregion Private Methods

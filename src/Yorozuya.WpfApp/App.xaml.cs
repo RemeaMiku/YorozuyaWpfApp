@@ -44,6 +44,7 @@ public partial class App : Application
     public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
         .AddSingleton<HttpClient>()
         .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
+        .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(MainWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(MainWindowViewModel))
@@ -80,7 +81,11 @@ public partial class App : Application
         var loginWindow = ServiceProvider.GetRequiredService<LoginWindow>();
         ServiceProvider.GetRequiredService<PostWindow>();
         ApplyAppTheme(AppTheme);
-        ApplyBackdropType(WindowBackdropType);
+        if(!ApplyBackdropType(WindowBackdropType))
+        {
+            ApplyBackdropType(BackgroundType.Auto);
+            WriteBackdropTypeToConfiguration(BackgroundType.Auto);
+        }
         ApplyAppFont(AppFont);
         mainWindow.Show();
         //等待主窗体加载完毕，然后显示登录窗口
@@ -164,11 +169,33 @@ public partial class App : Application
         Configuration.Save();
     }
 
-    public void ApplyBackdropType(BackgroundType type)
+    /// <summary>
+    /// 应用窗口背景类型
+    /// </summary>
+    /// <param name="type">要应用的窗口背景类型</param>
+    /// <returns>应用是否成功</returns>
+    public bool ApplyBackdropType(BackgroundType type)
     {
-        foreach (var window in Windows)
-            if (window is UiWindow uiWindow && uiWindow is not LoginWindow)
-                uiWindow.WindowBackdropType = type;
+        if (!Background.IsSupported(type)) return false;
+        var preType = Windows.OfType<MainWindow>().First().WindowBackdropType;
+
+        void SetWindowsBackdropType(BackgroundType setType)
+        {
+            foreach (var window in Windows)
+                if (window is UiWindow uiWindow and not LoginWindow)
+                    uiWindow.WindowBackdropType = setType;
+        }
+
+        try
+        {
+            SetWindowsBackdropType(type);
+            return true;
+        }
+        catch (Exception)
+        {
+            SetWindowsBackdropType(preType);
+            return false;
+        }
     }
 
     public void WriteBackdropTypeToConfiguration(BackgroundType type)

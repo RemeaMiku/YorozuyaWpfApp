@@ -15,7 +15,7 @@
         <cv:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter" />
         <cv:ReversedNullableToVisibilityConverter x:Key="ReversedNullableToVisibilityConverter" />
     </Page.Resources>
-    <Grid d:Background="White">
+    <Grid d:Background="White" Margin="10">
         <TextBlock FontSize="{StaticResource LargeFontSize}" FontWeight="Bold" Style="{StaticResource DefaultFontFamilyTextBlock}" HorizontalAlignment="Center" Text="请先登录以查看个人记录！" d:Visibility="Collapsed"  Visibility="{Binding Path=ViewModel.NowUserInfo, Mode=OneWay, Converter={StaticResource ReversedNullableToVisibilityConverter}}"/>
         <Grid d:Visibility="Visible" Visibility="{Binding Path=ViewModel.NowUserInfo, Mode=OneWay, Converter={StaticResource NullableToVisibilityConverter}}">
             <Grid.RowDefinitions>
@@ -35,7 +35,7 @@
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <ui:CardExpander
-                        Margin="10"
+                        Margin="0,10"
                         Padding="20,10"
                         Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
                         BorderThickness="0">
@@ -69,7 +69,7 @@
                         </ui:CardExpander.Content>
                     </ui:CardExpander>
                     <ui:CardExpander
-                        Margin="10"
+                        Margin="0,10"
                         Padding="20,10"
                         Background="{ui:ThemeResource ControlOnImageFillColorDefaultBrush}"
                         BorderThickness="0">

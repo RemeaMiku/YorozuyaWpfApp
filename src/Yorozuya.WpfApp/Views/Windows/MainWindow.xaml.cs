@@ -34,6 +34,7 @@ public partial class MainWindow : UiWindow
         _currentNavigateButton = HomeButton;
         ViewModel = viewModel;
         DataContext = this;
+        App.Current.ServiceProvider.GetRequiredKeyedService<ISnackbarService>(nameof(MainWindowViewModel)).SetSnackbarControl(Snackbar);
         App.Current.ServiceProvider.GetRequiredKeyedService<ILeftRightButtonDialogService>(nameof(MainWindowViewModel)).SetDialogControl(ExitDialog);
         ViewModel.CloseWindowRequested += (sender, args) => App.Current.Shutdown();
         ViewModel.HideWindowRequested += (sender, args) => Hide();
