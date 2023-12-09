@@ -16,6 +16,7 @@ using Yorozuya.WpfApp.Extensions;
 using Yorozuya.WpfApp.Common.Exceptions;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
+using System.Diagnostics;
 
 namespace Yorozuya.WpfApp.ViewModels.Windows;
 
@@ -73,7 +74,7 @@ public partial class PostWindowViewModel : BaseViewModel
 
     public bool CanAddNewReply => Post is not null && Post.DelTag == 0 && _userService.IsUserLoggedIn && UserReply is null;
 
-    public bool CanAcceptReply => IsUserPost && !IsCurrentReplyAccepted;
+    public bool CanAcceptReply => IsUserPost && CurrentReply is not null && !IsCurrentReplyAccepted;
 
     public bool IsCurrentReplyAccepted => CurrentReply is not null && CurrentReply.IsAccepted == 1;
 
@@ -127,7 +128,7 @@ public partial class PostWindowViewModel : BaseViewModel
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentReplyIndex))]
     [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand), nameof(MoveToPreviousReplyCommand))]
-    private int _selectedIndex = 0;
+    private int _selectedIndex = -1;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(MoveToNextReplyCommand))]
@@ -176,7 +177,7 @@ public partial class PostWindowViewModel : BaseViewModel
         IsCurrentReplyLiked = await _postService.GetIsLikedAsync(_userService.Token!, CurrentReply.Id);
     }
 
-    async Task UpdateReplies(long? replyId = default)
+    async Task UpdatePostAndReplies(long? replyId = default)
     {
         if (Post is null)
             return;
@@ -185,6 +186,7 @@ public partial class PostWindowViewModel : BaseViewModel
             Post = default;
             return;
         }
+        Post = await _postService.GetPostById(Post.Id);
         var replies = await _postService.GetPostRepliesAsync(Post.Id);
         if (replies is null)
         {
@@ -196,18 +198,22 @@ public partial class PostWindowViewModel : BaseViewModel
             SelectedIndex = -1;
             return;
         }
+        UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
+        _mostLikedReply = replies.MaxBy(r => r.Likes);
         RepliesViewSource.Source = replies;
         RepliesViewSource.View.Refresh();
         RepliesCount = replies.Count();
-        UserReply = _userService.IsUserLoggedIn ? replies.SingleOrDefault(r => r.UserId == _userService.UserInfo!.Id) : default;
-        _mostLikedReply = replies.MaxBy(r => r.Likes);
         if (replyId is null)
         {
             CurrentReply = _mostLikedReply;
             return;
         }
         CurrentReply = replies.SingleOrDefault(r => r.Id == replyId && r.DelTag == 0);
-        CurrentReply ??= _mostLikedReply;
+        if (CurrentReply is null)
+        {
+            _snackbarService.ShowErrorMessage("加载回答失败", "回答不存在或已被删除");
+            CurrentReply = _mostLikedReply;
+        }
     }
 
     private async Task HandleExceptions(string title, Exception exception)
@@ -236,7 +242,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies(CurrentReply?.Id);
+            await UpdatePostAndReplies(CurrentReply?.Id);
             await UpdateCurrentReplyIsUserLiked();
             OnPropertyChanged(string.Empty);
         }
@@ -267,11 +273,13 @@ public partial class PostWindowViewModel : BaseViewModel
             _forwardStack.Clear();
             CanForward = false;
         }
+        if (_forwardStack.Count == 0)
+            CanForward = false;
         Post = post;
         try
         {
             IsBusy = true;
-            await UpdateReplies(replyId);
+            await UpdatePostAndReplies(replyId);
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -363,7 +371,7 @@ public partial class PostWindowViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            await UpdateReplies();
+            await UpdatePostAndReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -386,13 +394,13 @@ public partial class PostWindowViewModel : BaseViewModel
             _backStack.Push(Post);
             CanBack = true;
         }
+        Post = _forwardStack.Pop();
         if (_forwardStack.Count == 0)
             CanForward = false;
-        Post = _forwardStack.Pop();
         try
         {
             IsBusy = true;
-            await UpdateReplies();
+            await UpdatePostAndReplies();
             await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
@@ -424,11 +432,8 @@ public partial class PostWindowViewModel : BaseViewModel
         {
             IsBusy = true;
             await _postService.AcceptReplyAsync(_userService.Token!, CurrentReply!.Id);
-            await UpdateReplies(CurrentReply!.Id);
+            await UpdatePostAndReplies(CurrentReply!.Id);
             await UpdateCurrentReplyIsUserLiked();
-            // 仅在本地时保留
-            OnPropertyChanged(nameof(IsCurrentReplyAccepted));
-            OnPropertyChanged(nameof(CurrentReplyState));
         }
         catch (Exception ex)
         {
@@ -459,7 +464,7 @@ public partial class PostWindowViewModel : BaseViewModel
         {
             IsBusy = true;
             await _postService.DeleteReplyAsync(_userService.Token!, CurrentReply!.Id);
-            await UpdateReplies(CurrentReply!.Id);
+            await UpdatePostAndReplies();
             await UpdateCurrentReplyIsUserLiked();
             _messenger.Send(StringMessages.UserReplyChanged);
         }
@@ -572,8 +577,9 @@ public partial class PostWindowViewModel : BaseViewModel
             var newReply = await _postService.PublishReplyAsync(_userService.Token!, Post!.Id, NewReplyContent);
             IsReplying = false;
             NewReplyContent = string.Empty;
-            await UpdateReplies(newReply.Id);
             _messenger.Send(StringMessages.UserReplyChanged);
+            await UpdatePostAndReplies(newReply.Id);
+            await UpdateCurrentReplyIsUserLiked();
         }
         catch (Exception ex)
         {
@@ -622,5 +628,4 @@ public partial class PostWindowViewModel : BaseViewModel
             IsBusy = false;
         }
     }
-
 }

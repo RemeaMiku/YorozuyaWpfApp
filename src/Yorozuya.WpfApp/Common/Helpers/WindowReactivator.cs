@@ -9,6 +9,8 @@ namespace Yorozuya.WpfApp.Common.Helpers;
 
 public class WindowReactivator
 {
+    #region Public Methods
+
     public static void Reactive(Window window)
     {
         if (window.WindowState == WindowState.Minimized)
@@ -17,4 +19,6 @@ public class WindowReactivator
             window.Show();
         window.Activate();
     }
+
+    #endregion Public Methods
 }

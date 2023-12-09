@@ -137,10 +137,10 @@ public class LocalPostService(IUserService userService) : IPostService
         return reply;
     }
 
-    public async Task<IEnumerable<Post>?> GetPostById(long postId)
+    public async Task<Post> GetPostById(long postId)
     {
         await Task.Delay(500);
-        return _localPosts.FindAll(p => p.Id == postId);
+        return _localPosts.Single(p => p.Id == postId);
     }
 
     public async Task<IEnumerable<Post>?> GetPostByTitle(string title)

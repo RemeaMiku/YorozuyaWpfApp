@@ -7,6 +7,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>Yorozuya</AssemblyName>
     <ApplicationIcon>Assets\Images\Yorozuya.ico</ApplicationIcon>
+    <Company>Wuhan University</Company>
+    <Authors>Tianchen Zhou,Tong Mo</Authors>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

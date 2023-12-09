@@ -19,9 +19,9 @@ public partial class PersonPageViewModel : BaseViewModel
 
     [ObservableProperty] private UserInfo? _nowUserInfo;
 
-    [ObservableProperty] private List<Post> _postSource = new();
+    [ObservableProperty] private List<Post> _postSource = [];
 
-    [ObservableProperty] private List<Reply> _replySource = new();
+    [ObservableProperty] private List<Reply> _replySource = [];
 
     [RelayCommand]
     private void OpenPost(Post post)
@@ -33,10 +33,8 @@ public partial class PersonPageViewModel : BaseViewModel
     private async Task OpenReply(Reply reply)
     {
         var post = await _postService.GetPostById(reply.PostId);
-        if (post is not null && post.Any())
-        {
-            _messenger.Send(Tuple.Create(post.First(), reply.Id));
-        }
+        if (post is not null)
+            _messenger.Send(Tuple.Create(post, reply.Id));
     }
 
     [RelayCommand]

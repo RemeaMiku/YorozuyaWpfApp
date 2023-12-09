@@ -38,11 +38,16 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
 
-
     public async Task DeletePostAsync(string token, long postId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/remove?postId={postId}");
+        var message = new HttpRequestMessage(HttpMethod.Delete, "api/post/remove")
+        {
+            Content = new MultipartFormDataContent()
+            {
+                { new StringContent(postId.ToString()), "postId" }
+            }
+        };
         AddAuthorization(message, token);
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
@@ -50,7 +55,13 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
     public async Task DeleteReplyAsync(string token, long replyId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/deleteReply?replyId={replyId}");
+        var message = new HttpRequestMessage(HttpMethod.Delete, "api/post/deleteReply")
+        {
+            Content = new MultipartFormDataContent
+            {
+                { new StringContent(replyId.ToString()), "replyId" }
+            }
+        };
         AddAuthorization(message, token);
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
@@ -87,7 +98,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>("postList",
                 response);
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return new List<Post>();
         }
@@ -104,7 +115,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Reply>("replyList",
                 response);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return new List<Reply>();
         }
@@ -156,24 +167,29 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         return await ApiResponseMessageHandler.HandleModelDataApiResponseMessage<Reply>(await _httpClient.SendAsync(message));
     }
 
-    public async Task<IEnumerable<Post>?> GetPostById(long postId)
+    public async Task<Post> GetPostById(long postId)
     {
         var message = new HttpRequestMessage(HttpMethod.Get,
-            "api/post/getPostByPostId?postId=" + Uri.EscapeDataString($"{postId}"));
-        return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
-            "postList", await _httpClient.SendAsync(message));
+            $"api/post/getPostByPostId?postId={postId}");
+        var httpResponseMessage = await _httpClient.SendAsync(message);
+        httpResponseMessage.EnsureSuccessStatusCode();
+        var apiResonse = await httpResponseMessage.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, JsonElement>>>();
+        ArgumentNullException.ThrowIfNull(apiResonse);
+        apiResonse.EnsureSuccessStatusCode();
+        ArgumentNullException.ThrowIfNull(apiResonse.Data);
+        return JsonSerializer.Deserialize<Post>(apiResonse.Data["post"])!;
     }
 
     public async Task<IEnumerable<Post>?> GetPostByTitle(string title)
     {
         var message = new HttpRequestMessage(HttpMethod.Get,
-            "api/post/getPostByTitle?title=" + Uri.EscapeDataString($"{title}"));
+            "api/post/getPostByTitle?title=" + Uri.EscapeDataString(title));
         try
         {
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
                 "postList", await _httpClient.SendAsync(message));
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return new List<Post>();
         }

@@ -11,8 +11,10 @@ namespace Yorozuya.WpfApp.Common.Converters;
 /// 可列举对象转换为可见性
 /// 如果对象为长度为 0，则返回 Collapsed，否则返回 Visible
 /// </summary>
-public class IEnumerableToVisibilityConverter: IValueConverter
+public class IEnumerableToVisibilityConverter : IValueConverter
 {
+    #region Public Methods
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var enumerableValue = (IEnumerable<object>)value;
@@ -23,4 +25,6 @@ public class IEnumerableToVisibilityConverter: IValueConverter
     {
         throw new NotImplementedException();
     }
+
+    #endregion Public Methods
 }

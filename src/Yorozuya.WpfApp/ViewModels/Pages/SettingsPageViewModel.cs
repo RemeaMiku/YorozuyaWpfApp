@@ -64,6 +64,7 @@ public partial class SettingsPageViewModel : BaseViewModel
         if (!_dialogService.GetIsRightButtonClicked())
             return;
         _userService.UserLogout();
+        UserInfo = default;
         _messenger.Send(StringMessages.UserLogouted);
         _messenger.Send(StringMessages.RequestUserLogin);
     }
