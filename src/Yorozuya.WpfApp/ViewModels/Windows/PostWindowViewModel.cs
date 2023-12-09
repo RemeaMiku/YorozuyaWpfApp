@@ -68,7 +68,7 @@ public partial class PostWindowViewModel : BaseViewModel
         }
     }
 
-    public bool IsUserPost => Post is not null && _userService.IsUserLoggedIn && Post.Id == _userService.UserInfo!.Id;
+    public bool IsUserPost => Post is not null && _userService.IsUserLoggedIn && Post.AskerId == _userService.UserInfo!.Id;
 
     public bool IsUserReply => CurrentReply is not null && _userService.IsUserLoggedIn && CurrentReply.UserId == _userService.UserInfo!.Id;
 
@@ -188,7 +188,7 @@ public partial class PostWindowViewModel : BaseViewModel
         }
         Post = await _postService.GetPostById(Post.Id);
         var replies = await _postService.GetPostRepliesAsync(Post.Id);
-        if (replies is null)
+        if (replies is null || !replies.Any())
         {
             RepliesViewSource.Source = default;
             RepliesCount = 0;

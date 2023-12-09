@@ -9,7 +9,7 @@
     <ApplicationIcon>Assets\Images\Yorozuya.ico</ApplicationIcon>
     <Company>Wuhan University</Company>
     <Authors>Tianchen Zhou,Tong Mo</Authors>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
