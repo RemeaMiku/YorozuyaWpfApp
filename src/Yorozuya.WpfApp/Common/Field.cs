@@ -10,7 +10,6 @@ public class Field
 {
     public static readonly string[] Fields = {
         "政治",
-        "体育",
         "生活",
         "学习",
         "游戏",

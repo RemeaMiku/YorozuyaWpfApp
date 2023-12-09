@@ -41,13 +41,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
     public async Task DeletePostAsync(string token, long postId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Delete, "api/post/remove")
-        {
-            Content = new MultipartFormDataContent()
-            {
-                { new StringContent(postId.ToString()), "postId" }
-            }
-        };
+        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/remove?postId={postId}");
         AddAuthorization(message, token);
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
@@ -55,13 +49,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
     public async Task DeleteReplyAsync(string token, long replyId)
     {
         ArgumentException.ThrowIfNullOrEmpty(token);
-        var message = new HttpRequestMessage(HttpMethod.Delete, "api/post/deleteReply")
-        {
-            Content = new MultipartFormDataContent
-            {
-                { new StringContent(replyId.ToString()), "replyId" }
-            }
-        };
+        var message = new HttpRequestMessage(HttpMethod.Delete, $"api/post/deleteReply?replyId={replyId}");
         AddAuthorization(message, token);
         await ApiResponseMessageHandler.HandleNoDataApiResponseMessage(await _httpClient.SendAsync(message));
     }
@@ -187,7 +175,7 @@ public class HttpPostService(HttpClient httpClient) : BaseHttpService(httpClient
         try
         {
             return await ApiResponseMessageHandler.HandleIEnumerbleModelDataApiResponseMessage<Post>(
-                "postList", await _httpClient.SendAsync(message));
+                "post", await _httpClient.SendAsync(message));
         }
         catch (Exception)
         {
