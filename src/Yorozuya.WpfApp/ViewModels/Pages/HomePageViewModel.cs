@@ -7,9 +7,13 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Mvvm.Contracts;
 using Yorozuya.WpfApp.Common;
+using Yorozuya.WpfApp.Extensions;
 using Yorozuya.WpfApp.Models;
 using Yorozuya.WpfApp.Servcies.Contracts;
+using Yorozuya.WpfApp.ViewModels.Windows;
 using Yorozuya.WpfApp.Views.Pages;
 
 namespace Yorozuya.WpfApp.ViewModels.Pages;
@@ -53,6 +57,7 @@ public partial class HomePageViewModel : BaseValidatorViewModel
         var newPost = await _postService.PublishPostAsync(_userService.Token!, NewPostTitle, NewPostContent, SelectedNewPostField);
         _messenger.Send(newPost);
         _messenger.Send(StringMessages.UserPostChanged);
+        _snackbarService.ShowSuccessMessage("发布成功！", "帖子已发布");
         EndPostNewPost();
     }
 
@@ -95,7 +100,7 @@ public partial class HomePageViewModel : BaseValidatorViewModel
         }
         catch (Exception e)
         {
-            //TODO: ErrorDialog
+            _snackbarService.ShowErrorMessage("获取错误，请重试", $"{e.Message}");
             Console.WriteLine(e);
         }
         finally
@@ -132,12 +137,14 @@ public partial class HomePageViewModel : BaseValidatorViewModel
     private readonly IPostService _postService;
     private readonly IMessenger _messenger;
     private readonly IUserService _userService;
+    private readonly ISnackbarService _snackbarService;
 
-    public HomePageViewModel(IPostService nowPostService, IUserService userService, IMessenger messenger)
+    public HomePageViewModel(IPostService nowPostService, IUserService userService, IMessenger messenger, [FromKeyedServices(nameof(MainWindowViewModel))]ISnackbarService snackbarService)
     {
         _postService = nowPostService;
         _messenger = messenger;
         _userService = userService;
+        _snackbarService = snackbarService;
         messenger.Register<HomePageViewModel, string>(this, (viewModel, message) =>
         {
             switch (message)

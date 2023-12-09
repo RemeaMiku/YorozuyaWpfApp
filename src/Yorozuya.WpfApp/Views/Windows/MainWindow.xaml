@@ -51,6 +51,13 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <ui:Snackbar
+            x:Name="Snackbar"
+            Grid.Row="1"
+            Width="300"
+            HorizontalAlignment="Right"
+            Panel.ZIndex="1000"
+            Timeout="2000" />
         <ui:NotifyIcon
             x:Name="NotifyIcon"
             Icon="/Assets/Images/Yorozuya.ico"

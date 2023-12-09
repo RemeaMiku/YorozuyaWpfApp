@@ -44,6 +44,7 @@ public partial class App : Application
     public IServiceProvider ServiceProvider { get; } = new ServiceCollection()
         .AddSingleton<HttpClient>()
         .AddSingleton<IMessenger>(WeakReferenceMessenger.Default)
+        .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(MainWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(PostWindowViewModel))
         .AddKeyedSingleton<ISnackbarService, SnackbarService>(nameof(LoginWindowViewModel))
         .AddKeyedSingleton<ILeftRightButtonDialogService, LeftRightButtonDialogService>(nameof(MainWindowViewModel))
