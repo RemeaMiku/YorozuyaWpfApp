@@ -190,7 +190,8 @@
                                     FontSize="{StaticResource LargeFontSize}"
                                     FontWeight="Bold"
                                     Style="{StaticResource DefaultFontFamilyTextBlock}"
-                                    Text="{Binding ViewModel.Post.Title, Mode=OneWay}" />
+                                    Text="{Binding ViewModel.Post.Title, Mode=OneWay}"
+                                    TextWrapping="Wrap" />
                                 <Grid Margin="0,5,0,0">
                                     <Border
                                         Padding="5"

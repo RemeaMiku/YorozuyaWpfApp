@@ -205,14 +205,14 @@ public partial class PostWindowViewModel : BaseViewModel
         RepliesCount = replies.Count();
         if (replyId is null)
         {
-            CurrentReply = _mostLikedReply;
+            CurrentReply = replies.First();
             return;
         }
         CurrentReply = replies.SingleOrDefault(r => r.Id == replyId && r.DelTag == 0);
         if (CurrentReply is null)
         {
             _snackbarService.ShowErrorMessage("加载回答失败", "回答不存在或已被删除");
-            CurrentReply = _mostLikedReply;
+            CurrentReply = replies.First();
         }
     }
 
